@@ -1,4 +1,5 @@
-// VECTORS
+import { Log } from "../banana.js";
+
 export class Utils {
     static toRadians(x: number): number {
         return x * (Math.PI / 180);
@@ -7,8 +8,28 @@ export class Utils {
     static toDegrees(x: number): number {
         return x * (180 / Math.PI);
     }
+
+    static clamp(value: number, min: number, max: number) {
+        if (min == max) {
+            return min;
+        }
+
+        if (min > max) {
+            Log.Error('Min is greater the max');
+        }
+
+        if (value > max) {
+            return max;
+        }
+        else if (value < min) {
+            return min;
+        }
+
+        return value;
+    } 
 }
 
+// VECTORS
 export class Vec2 {
 
     static readonly ZERO = new Vec2(0, 0);

@@ -1,4 +1,4 @@
-import { Vec2, PhysicsWorld, Log } from "../banana";
+import { Vec2, PhysicsWorld, Log, Utils } from "../banana";
 
 enum ShapeType {
     Circle,
@@ -43,15 +43,56 @@ export class Body2D {
     }
 
     public static CreateCircleBody2D(radius: number, density: number, isStatic: boolean, restitution: number): Body2D {
-        const area = radius * radius * Math.PI;
+        let area = radius * radius * Math.PI;
 
         if (area < PhysicsWorld.minBodySize) {
-            Log.Core_Warn(`Circle radius is too small. Min circle area is ${PhysicsWorld.minBodySize}`);
+            Log.Core_Warn(`Area is too small. Min area is ${PhysicsWorld.minBodySize}`);
+            area = PhysicsWorld.minBodySize;
         }
         else if (area > PhysicsWorld.maxBodySize) {
-            Log.Core_Warn(`Cirlce radius is too large. Max circle area is ${PhysicsWorld.maxBodySize}`);
+            Log.Core_Warn(`Area is too large. Max area is ${PhysicsWorld.maxBodySize}`);
+            area = PhysicsWorld.maxBodySize;
         }
 
-        return null;
+        if (density < PhysicsWorld.minDensity) {
+            Log.Core_Warn(`Density is too small. Min density is ${PhysicsWorld.minDensity}`);
+            density = PhysicsWorld.minDensity;
+        }
+        else if (density > PhysicsWorld.maxDensity) {
+            Log.Core_Warn(`Density is too large. Max density is ${PhysicsWorld.maxDensity}`);
+            density = PhysicsWorld.maxDensity;
+        }
+
+        restitution = Utils.clamp(restitution, 0, 1);
+        const mass = area * density;
+
+        return new Body2D(density, mass, restitution, area, isStatic, radius, 0, 0, ShapeType.Circle);
+    }
+    
+    public static CreateBoxBody2D(width: number, height: number, density: number, isStatic: boolean, restitution: number): Body2D {
+        let area = width * height;
+
+        if (area < PhysicsWorld.minBodySize) {
+            Log.Core_Warn(`Area is too small. Min area is ${PhysicsWorld.minBodySize}`);
+            area = PhysicsWorld.minBodySize;
+        }
+        else if (area > PhysicsWorld.maxBodySize) {
+            Log.Core_Warn(`Area is too large. Max area is ${PhysicsWorld.maxBodySize}`);
+            area = PhysicsWorld.maxBodySize;
+        }
+
+        if (density < PhysicsWorld.minDensity) {
+            Log.Core_Warn(`Density is too small. Min density is ${PhysicsWorld.minDensity}`);
+            density = PhysicsWorld.minDensity;
+        }
+        else if (density > PhysicsWorld.maxDensity) {
+            Log.Core_Warn(`Density is too large. Max density is ${PhysicsWorld.maxDensity}`);
+            density = PhysicsWorld.maxDensity;
+        }
+
+        restitution = Utils.clamp(restitution, 0, 1);
+        const mass = area * density;
+
+        return new Body2D(density, mass, restitution, area, isStatic, 0, width, height, ShapeType.Box);
     }
 }
