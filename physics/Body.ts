@@ -99,4 +99,9 @@ export class Body2D {
     public move(transform: TransformComponent) {
         transform.translate(this._linearVelocity.x, this._linearVelocity.y, 0);
     }
+
+    public set linearVelocity(v: Vec2) {
+        this.linearVelocity.x = v.x;
+        this.linearVelocity.y = v.y;
+    }
 }
