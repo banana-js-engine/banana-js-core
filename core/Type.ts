@@ -6,5 +6,5 @@ export enum ComponentType {
     CameraComponent,
     NativeScriptComponent,
     MovementComponent,
-    RigidBody2DComponent,
+    Body2DComponent,
 }

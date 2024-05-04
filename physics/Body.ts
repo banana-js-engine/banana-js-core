@@ -1,4 +1,4 @@
-import { Vec2, PhysicsWorld, Log, Utils } from "../banana";
+import { Vec2, PhysicsWorld, Log, Utils, TransformComponent } from "../banana";
 
 enum ShapeType {
     Circle,
@@ -94,5 +94,9 @@ export class Body2D {
         const mass = area * density;
 
         return new Body2D(density, mass, restitution, area, isStatic, 0, width, height, ShapeType.Box);
+    }
+
+    public move(transform: TransformComponent) {
+        transform.translate(this._linearVelocity.x, this._linearVelocity.y, 0);
     }
 }

@@ -5,6 +5,7 @@
       "target": "es5",
       "noEmit": true,
       "allowImportingTsExtensions": true,
+      "lib": ["ES2017"]
     },
     "include": ["./**/*"]
   }

@@ -5,6 +5,7 @@ import { Movement } from './Movement.ts'
 import RigidBody2D from '../physics/RigidBody2D.ts'
 import { Mat4, Vec3 } from '../math/MV.ts'
 import { ScriptableEntity } from './ScriptableEntity.ts'
+import { Body2D } from '../physics/Body.ts'
 
 export class Component {
     type: ComponentType;
@@ -253,15 +254,15 @@ export class MovementComponent extends NativeScriptComponent {
 }
 
 // PHYSICS-RELATED COMPONENTS
-export class RigidBody2DComponent extends Component {
+export class Body2DComponent extends Component {
 
-    rigidBody2D: RigidBody2D;
+    body2d: Body2D;
 
     constructor() {
         super();
-        this.rigidBody2D = new RigidBody2D();
+        this.body2d = Body2D.CreateBoxBody2D(100, 100, 2, true, 0.5);
 
-        this.type = ComponentType.RigidBody2DComponent;
+        this.type = ComponentType.Body2DComponent;
     }
 }
 
@@ -273,4 +274,4 @@ ComponentCreator[ComponentType.CircleRendererComponent] = CircleRendererComponen
 ComponentCreator[ComponentType.CameraComponent] = CameraComponent;
 ComponentCreator[ComponentType.NativeScriptComponent] = NativeScriptComponent;
 ComponentCreator[ComponentType.MovementComponent] = MovementComponent;
-ComponentCreator[ComponentType.RigidBody2DComponent] = RigidBody2DComponent;
+ComponentCreator[ComponentType.Body2DComponent] = Body2DComponent;

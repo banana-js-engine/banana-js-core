@@ -7,11 +7,12 @@ import { CameraComponent,
          Color, 
          Log, 
          NativeScriptComponent, 
-         RigidBody2DComponent, 
+         Body2DComponent, 
          SceneCamera, 
          SpriteRendererComponent, 
          TagComponent, 
-         TransformComponent } from '../banana.js'
+         TransformComponent, 
+         PhysicsWorld} from '../banana.js'
 import { Mat4, Vec2, Vec3 } from '../math/MV.ts'
  
 export class Scene 
@@ -96,13 +97,13 @@ export class Scene
 
         {
             // physics
-            const groupedEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.RigidBody2DComponent);
+            const groupedEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.Body2DComponent);
 
             groupedEntities.forEach(entity => {
                 const transformComponent = this.registry.get(entity, ComponentType.TransformComponent) as TransformComponent;
-                const rigidBodyComponent = this.registry.get(entity, ComponentType.RigidBody2DComponent) as RigidBody2DComponent;
+                const bodyComponent = this.registry.get(entity, ComponentType.Body2DComponent) as Body2DComponent;
 
-                //PhysicsSystem.update(rigidBodyComponent, transformComponent, deltaTime);
+                PhysicsWorld.update(bodyComponent.body2d, transformComponent);
             });
         }
 
