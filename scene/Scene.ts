@@ -99,13 +99,11 @@ export class Scene
             // physics
             const groupedEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.Body2DComponent);
 
-            console.log(groupedEntities);
-
             groupedEntities.forEach(entity => {
                 const transformComponent = this.registry.get(entity, ComponentType.TransformComponent) as TransformComponent;
                 const bodyComponent = this.registry.get(entity, ComponentType.Body2DComponent) as Body2DComponent;
 
-                PhysicsWorld.update(bodyComponent.body2d, transformComponent);
+                PhysicsWorld.update(bodyComponent, transformComponent);
             });
         }
 
@@ -137,6 +135,11 @@ export class Scene
         Renderer2D.beginScene(mainCamera, this._view);
 
         this.renderScene();
+
+        Renderer2D.drawLine(new Vec3(100, 200, 0), new Vec3(-100, 200, 0), Color.RED);
+
+        Renderer2D.drawRectangle(new Vec3(0, 0, 0), new Vec2(100, 100), Color.GREEN);
+        Renderer2D.drawRectangle(new Vec3(0, 0, 0), new Vec2(200, 200), Color.BLUE);
 
         Renderer2D.endScene();
     }

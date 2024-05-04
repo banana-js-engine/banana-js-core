@@ -6,8 +6,6 @@ import { Profiler } from "./Profiler.ts";
 export function main() {
     Log.Core_Info('Engine initialized');
 
-    Mat4.init();
-
     // init profiling
     //Profiler.BeginProfile('Application Init');
     let bananaApp = Application.createApplication(); 

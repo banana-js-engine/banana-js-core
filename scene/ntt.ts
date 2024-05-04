@@ -108,7 +108,7 @@ export class ntt {
 
     get_all_with_entity<T>(componentType: ComponentType): {[key: string]: T} {
         if (!this.component[componentType]) {
-            return null;
+            return {};
         }
 
         return this.component[componentType];

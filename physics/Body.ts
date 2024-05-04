@@ -101,7 +101,7 @@ export class Body2D {
     }
 
     public set linearVelocity(v: Vec2) {
-        this.linearVelocity.x = v.x;
-        this.linearVelocity.y = v.y;
+        this._linearVelocity.x = v.x;
+        this._linearVelocity.y = v.y;
     }
 }

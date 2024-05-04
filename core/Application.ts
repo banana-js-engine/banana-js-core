@@ -4,6 +4,7 @@ import { Event, EventDispatcher, EventType } from "../event/Event.ts"
 import { LayerStack } from "./LayerStack.ts"
 import { RenderCommand } from "../render/RenderCommand.ts"
 import { Gamepad } from "./Gamepad.ts"
+import { Mat4 } from "../banana.js"
 
 
 export class Application
@@ -35,6 +36,8 @@ export class Application
     }
 
     public run() {
+        Mat4.init();
+
         this.layerStack.getLayers().forEach(layer => {
             layer.onGUIRender();
         });

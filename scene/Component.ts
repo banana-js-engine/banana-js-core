@@ -3,7 +3,7 @@ import { ComponentType } from '../core/Type.ts'
 import { SceneCamera } from '../render/Camera.ts'
 import { Movement } from './Movement.ts'
 import RigidBody2D from '../physics/RigidBody2D.ts'
-import { Mat4, Vec3 } from '../math/MV.ts'
+import { Mat4, Vec2, Vec3 } from '../math/MV.ts'
 import { ScriptableEntity } from './ScriptableEntity.ts'
 import { Body2D } from '../physics/Body.ts'
 
@@ -260,9 +260,17 @@ export class Body2DComponent extends Component {
 
     constructor() {
         super();
-        this.body2d = Body2D.CreateBoxBody2D(100, 100, 2, true, 0.5);
+        this.body2d = Body2D.CreateBoxBody2D(2, 2, 2, true, 0.5);
 
         this.type = ComponentType.Body2DComponent;
+    }
+
+    public move(transform: TransformComponent) {
+        this.body2d.move(transform);
+    }
+
+    public set linearVelocity(v: Vec2) {
+        this.body2d.linearVelocity = v;
     }
 }
 
