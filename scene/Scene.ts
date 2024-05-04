@@ -99,6 +99,8 @@ export class Scene
             // physics
             const groupedEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.Body2DComponent);
 
+            console.log(groupedEntities);
+
             groupedEntities.forEach(entity => {
                 const transformComponent = this.registry.get(entity, ComponentType.TransformComponent) as TransformComponent;
                 const bodyComponent = this.registry.get(entity, ComponentType.Body2DComponent) as Body2DComponent;
