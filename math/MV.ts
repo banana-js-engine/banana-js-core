@@ -47,6 +47,10 @@ export class Vec2 {
         this.data[1] = y;
     }
 
+    public static copy(vec: Vec2) {
+        return new Vec2(vec.x, vec.y);
+    }
+
     public get x() {
         return this.data[0];
     }

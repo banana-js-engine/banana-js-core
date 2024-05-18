@@ -1,6 +1,6 @@
-import { Vec2, PhysicsWorld, Log, Utils, TransformComponent } from "../banana.js";
+import { Vec2, PhysicsWorld, Log, Utils, TransformComponent, Vec4 } from "../banana.js";
 
-enum ShapeType {
+export enum ShapeType {
     Circle,
     Box,
 }
@@ -19,6 +19,8 @@ export class Body2D {
     public readonly radius: number;
     public readonly width: number;
     public readonly height: number;
+
+    public readonly vertices: Vec4[];
 
     public readonly shapeType: ShapeType;
 
@@ -40,6 +42,14 @@ export class Body2D {
         this.height = height;
 
         this.shapeType = shapeType;
+
+        this.vertices = [];
+        if (this.shapeType == ShapeType.Box) {
+            this.vertices[0] = new Vec4(width / -2, height / -2, 0, 1);
+            this.vertices[1] = new Vec4(width / 2, height / -2, 0, 1);
+            this.vertices[2] = new Vec4(width / 2, height / 2, 0, 1);
+            this.vertices[3] = new Vec4(width / -2, height / 2, 0, 1);
+        }
     }
 
     public static CreateCircleBody2D(radius: number, density: number, isStatic: boolean, restitution: number): Body2D {
@@ -76,10 +86,10 @@ export class Body2D {
             Log.Core_Warn(`Area is too small. Min area is ${PhysicsWorld.minBodySize}`);
             area = PhysicsWorld.minBodySize;
         }
-        else if (area > PhysicsWorld.maxBodySize) {
-            Log.Core_Warn(`Area is too large. Max area is ${PhysicsWorld.maxBodySize}`);
-            area = PhysicsWorld.maxBodySize;
-        }
+        // else if (area > PhysicsWorld.maxBodySize) {
+        //     Log.Core_Warn(`Area is too large. Max area is ${PhysicsWorld.maxBodySize}`);
+        //     area = PhysicsWorld.maxBodySize;
+        // }
 
         if (density < PhysicsWorld.minDensity) {
             Log.Core_Warn(`Density is too small. Min density is ${PhysicsWorld.minDensity}`);

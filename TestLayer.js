@@ -29,12 +29,12 @@ export class TestLayer extends banana.Layer {
         this.camera.addComponent(banana.ComponentType.CameraComponent);
 
         this.circleA = this.scene.createEntity('circleA');
-        this.circleA.addComponent(banana.ComponentType.CircleRendererComponent);
+        const spriteA = this.circleA.addComponent(banana.ComponentType.SpriteRendererComponent);
         this.circleA.addComponent(banana.ComponentType.NativeScriptComponent).bind(TextScript);
         this.circleA.addComponent(banana.ComponentType.Body2DComponent);
         
         this.circleB = this.scene.createEntity('circleB');
-        this.circleB.addComponent(banana.ComponentType.CircleRendererComponent);
+        this.circleB.addComponent(banana.ComponentType.SpriteRendererComponent);
         this.circleB.addComponent(banana.ComponentType.Body2DComponent);
         this.circleBTransform = this.circleB.getComponent(banana.ComponentType.TransformComponent);
         this.circleBTransform.translate(150, 0, 0);

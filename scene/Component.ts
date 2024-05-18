@@ -2,7 +2,6 @@ import { Color } from '../render/Color.js'
 import { ComponentType } from '../core/Type.js'
 import { SceneCamera } from '../render/Camera.js'
 import { Movement } from './Movement.js'
-import RigidBody2D from '../physics/RigidBody2D.js'
 import { Mat4, Vec2, Vec3 } from '../math/MV.js'
 import { ScriptableEntity } from './ScriptableEntity.js'
 import { Body2D } from '../physics/Body.js'
@@ -85,6 +84,7 @@ export class TransformComponent extends Component {
         this.rotation.x = angleX;
         this.rotation.y = angleY;
         this.rotation.z = angleZ;
+
     }
 
     rotate(angleX, angleY, angleZ) {
@@ -260,7 +260,9 @@ export class Body2DComponent extends Component {
 
     constructor() {
         super();
-        this.body2d = Body2D.CreateCircleBody2D(50, 2, false, 0.5);
+        //this.body2d = Body2D.CreateCircleBody2D(50, 2, false, 0.5);
+        this.body2d = Body2D.CreateBoxBody2D(100, 100, 1, false, 0.5);
+
 
         this.type = ComponentType.Body2DComponent;
     }
