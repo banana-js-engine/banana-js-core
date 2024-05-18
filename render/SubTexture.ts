@@ -1,6 +1,6 @@
-import { Vec2 } from '../math/MV.ts';
-import { Renderer2D } from './Renderer2D.ts'
-import { Texture } from './Texture.ts';
+import { Vec2 } from '../math/MV.js';
+import { Renderer2D } from './Renderer2D.js'
+import { Texture } from './Texture.js';
 
 const defaultTexCoords = [
     new Vec2(0, 0), 

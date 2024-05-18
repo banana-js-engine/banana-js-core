@@ -1,4 +1,4 @@
-import { gl } from "./WebGLContext.ts"
+import { gl } from "./WebGLContext.js"
 
 export class RenderCommand {
     static setViewport(width, height) {

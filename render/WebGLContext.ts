@@ -1,4 +1,4 @@
-import { Log } from "../core/Log.ts"
+import { Log } from "../core/Log.js"
 
 export let gl;
 

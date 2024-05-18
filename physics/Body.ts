@@ -1,4 +1,4 @@
-import { Vec2, PhysicsWorld, Log, Utils, TransformComponent } from "../banana";
+import { Vec2, PhysicsWorld, Log, Utils, TransformComponent } from "../banana.js";
 
 enum ShapeType {
     Circle,
@@ -49,10 +49,10 @@ export class Body2D {
             Log.Core_Warn(`Area is too small. Min area is ${PhysicsWorld.minBodySize}`);
             area = PhysicsWorld.minBodySize;
         }
-        else if (area > PhysicsWorld.maxBodySize) {
-            Log.Core_Warn(`Area is too large. Max area is ${PhysicsWorld.maxBodySize}`);
-            area = PhysicsWorld.maxBodySize;
-        }
+        // else if (area > PhysicsWorld.maxBodySize) {
+        //     Log.Core_Warn(`Area is too large. Max area is ${PhysicsWorld.maxBodySize}`);
+        //     area = PhysicsWorld.maxBodySize;
+        // }
 
         if (density < PhysicsWorld.minDensity) {
             Log.Core_Warn(`Density is too small. Min density is ${PhysicsWorld.minDensity}`);
@@ -98,6 +98,10 @@ export class Body2D {
 
     public move(transform: TransformComponent) {
         transform.translate(this._linearVelocity.x, this._linearVelocity.y, 0);
+    }
+
+    public moveBy(v: Vec2, transform: TransformComponent) {
+        transform.translate(v.x, v.y, 0);
     }
 
     public set linearVelocity(v: Vec2) {

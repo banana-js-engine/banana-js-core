@@ -1,11 +1,11 @@
-import { Color } from '../render/Color.ts'
-import { ComponentType } from '../core/Type.ts'
-import { SceneCamera } from '../render/Camera.ts'
-import { Movement } from './Movement.ts'
-import RigidBody2D from '../physics/RigidBody2D.ts'
-import { Mat4, Vec2, Vec3 } from '../math/MV.ts'
-import { ScriptableEntity } from './ScriptableEntity.ts'
-import { Body2D } from '../physics/Body.ts'
+import { Color } from '../render/Color.js'
+import { ComponentType } from '../core/Type.js'
+import { SceneCamera } from '../render/Camera.js'
+import { Movement } from './Movement.js'
+import RigidBody2D from '../physics/RigidBody2D.js'
+import { Mat4, Vec2, Vec3 } from '../math/MV.js'
+import { ScriptableEntity } from './ScriptableEntity.js'
+import { Body2D } from '../physics/Body.js'
 
 export class Component {
     type: ComponentType;
@@ -260,13 +260,21 @@ export class Body2DComponent extends Component {
 
     constructor() {
         super();
-        this.body2d = Body2D.CreateBoxBody2D(2, 2, 2, true, 0.5);
+        this.body2d = Body2D.CreateCircleBody2D(50, 2, false, 0.5);
 
         this.type = ComponentType.Body2DComponent;
     }
 
     public move(transform: TransformComponent) {
         this.body2d.move(transform);
+    }
+
+    public moveBy(v: Vec2, transform: TransformComponent) {
+        this.body2d.moveBy(v, transform);
+    }
+
+    public get radius() {
+        return this.body2d.radius;
     }
 
     public set linearVelocity(v: Vec2) {

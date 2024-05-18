@@ -67,6 +67,23 @@ export class Vec2 {
         return new Vec2(this.x + v.x, this.y + v.y);
     }
 
+    public sub(v: Vec2) {
+        return new Vec2(this.x - v.x, this.y - v.y);
+    }
+
+    public mul(scalar: number) {
+        return new Vec2(this.x * scalar, this.y * scalar)
+    }
+
+    public div(scalar: number) {
+        if (scalar == 0) {
+            Log.Core_Error('Division by 0!');
+            return Vec2.ZERO;
+        }
+
+        return new Vec2(this.x / scalar, this.y / scalar);
+    }
+
     public length(): number {
         return Math.sqrt( this.x ** 2 + this.y ** 2 );
     }

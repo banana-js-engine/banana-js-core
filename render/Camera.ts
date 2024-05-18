@@ -1,7 +1,7 @@
-import { canvas } from '../core/Window.ts'
-import { Log } from '../core/Log.ts'
-import { Event, EventType, EventDispatcher } from '../event/Event.ts'
-import { Utils, Vec3, Mat4 } from '../math/MV.ts';
+import { canvas } from '../core/Window.js'
+import { Log } from '../core/Log.js'
+import { Event, EventType, EventDispatcher } from '../event/Event.js'
+import { Utils, Vec3, Mat4 } from '../math/MV.js';
 
 export enum CameraType {
     Orthographic = 0, 

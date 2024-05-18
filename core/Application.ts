@@ -1,9 +1,9 @@
-import { Log } from "./Log.ts"
-import { Window, canvas } from "./Window.ts"
-import { Event, EventDispatcher, EventType } from "../event/Event.ts"
-import { LayerStack } from "./LayerStack.ts"
-import { RenderCommand } from "../render/RenderCommand.ts"
-import { Gamepad } from "./Gamepad.ts"
+import { Log } from "./Log.js"
+import { Window, canvas } from "./Window.js"
+import { Event, EventDispatcher, EventType } from "../event/Event.js"
+import { LayerStack } from "./LayerStack.js"
+import { RenderCommand } from "../render/RenderCommand.js"
+import { Gamepad } from "./Gamepad.js"
 import { Mat4 } from "../banana.js"
 
 

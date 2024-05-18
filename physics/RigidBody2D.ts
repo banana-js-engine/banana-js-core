@@ -1,5 +1,5 @@
 import { TransformComponent } from "../banana.js";
-import { Vec3 } from "../math/MV.ts";
+import { Vec3 } from "../math/MV.js";
 
 class RigidBody2D {
     mass: number;

@@ -1,9 +1,9 @@
-import { IndexBuffer, VertexBuffer } from "./Buffer.ts"
-import { Color } from "./Color.ts"
-import { Shader } from "./Shader.ts"
-import { Texture } from "./Texture.ts"
-import { gl } from "./WebGLContext.ts"
-import { Mat4, Vec2, Vec3, Vec4 } from "../math/MV.ts"
+import { IndexBuffer, VertexBuffer } from "./Buffer.js"
+import { Color } from "./Color.js"
+import { Shader } from "./Shader.js"
+import { Texture } from "./Texture.js"
+import { gl } from "./WebGLContext.js"
+import { Mat4, Vec2, Vec3, Vec4 } from "../math/MV.js"
 import { SubTexture, TransformComponent } from "../banana.js"
 
 class Render2DData

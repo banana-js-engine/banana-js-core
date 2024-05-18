@@ -1,7 +1,7 @@
-import { ntt } from './ntt.ts'
-import { ComponentType } from '../core/Type.ts'
-import { Renderer2D } from '../render/Renderer2D.ts'
-import { Entity } from './Entity.ts'
+import { ntt } from './ntt.js'
+import { ComponentType } from '../core/Type.js'
+import { Renderer2D } from '../render/Renderer2D.js'
+import { Entity } from './Entity.js'
 import { CameraComponent, 
          CircleRendererComponent, 
          Color, 
@@ -13,7 +13,8 @@ import { CameraComponent,
          TagComponent, 
          TransformComponent, 
          PhysicsWorld} from '../banana.js'
-import { Mat4, Vec2, Vec3 } from '../math/MV.ts'
+import { Mat4, Vec2, Vec3 } from '../math/MV.js'
+import { Collisions } from '../physics/Collisions.js'
  
 export class Scene 
 {
@@ -21,7 +22,7 @@ export class Scene
     private _name: string;
     private _view: Mat4;
 
-    constructor(name: string) 
+    constructor(name: string)
     {
         this.registry = new ntt();
         this._name = name;
@@ -100,10 +101,28 @@ export class Scene
             const groupedEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.Body2DComponent);
 
             groupedEntities.forEach(entity => {
-                const transformComponent = this.registry.get(entity, ComponentType.TransformComponent) as TransformComponent;
-                const bodyComponent = this.registry.get(entity, ComponentType.Body2DComponent) as Body2DComponent;
+                const transformComponentA = this.registry.get(entity, ComponentType.TransformComponent) as TransformComponent;
+                const bodyComponentA = this.registry.get(entity, ComponentType.Body2DComponent) as Body2DComponent;
 
-                PhysicsWorld.update(bodyComponent, transformComponent);
+                PhysicsWorld.update(bodyComponentA, transformComponentA);
+
+                const entityIndex = groupedEntities.indexOf(entity);
+
+                for (let i = entityIndex + 1; i < groupedEntities.length; i++) {
+                    const transformComponentB = this.registry.get(groupedEntities[i], ComponentType.TransformComponent) as TransformComponent;
+                    const bodyComponentB = this.registry.get(groupedEntities[i], ComponentType.Body2DComponent) as Body2DComponent;
+
+                    const collInfo = Collisions.checkCircleCollision(
+                        new Vec2(transformComponentA.getPosition().x, transformComponentA.getPosition().y),
+                        bodyComponentA.radius,
+                        new Vec2(transformComponentB.getPosition().x, transformComponentB.getPosition().y),
+                        bodyComponentB.radius
+                    );
+
+                    bodyComponentA.moveBy(collInfo.normal.mul(collInfo.depth).div(-2), transformComponentA);
+                    bodyComponentB.moveBy(collInfo.normal.mul(collInfo.depth).div(2), transformComponentB);
+                    
+                };
             });
         }
 
@@ -135,11 +154,6 @@ export class Scene
         Renderer2D.beginScene(mainCamera, this._view);
 
         this.renderScene();
-
-        Renderer2D.drawLine(new Vec3(100, 200, 0), new Vec3(-100, 200, 0), Color.RED);
-
-        Renderer2D.drawRectangle(new Vec3(0, 0, 0), new Vec2(100, 100), Color.GREEN);
-        Renderer2D.drawRectangle(new Vec3(0, 0, 0), new Vec2(200, 200), Color.BLUE);
 
         Renderer2D.endScene();
     }

@@ -1,5 +1,5 @@
 import { Layer } from "../banana.js";
-import { Log } from "./Log.ts";
+import { Log } from "./Log.js";
 
 export class LayerStack {
 

@@ -1,6 +1,6 @@
-import { Vec2 } from '../math/MV.ts';
-import { Gamepad } from './Gamepad.ts'
-import { Log } from './Log.ts'
+import { Vec2 } from '../math/MV.js';
+import { Gamepad } from './Gamepad.js'
+import { Log } from './Log.js'
 
 export class Input {
     private static _gamepadWarningFlag = true;

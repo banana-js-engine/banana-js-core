@@ -1,5 +1,5 @@
 import { KeyCode } from "../banana.js";
-import { Event, EventCategory, EventType } from "./Event.ts"
+import { Event, EventCategory, EventType } from "./Event.js"
 
 class KeyboardEvent extends Event {
     

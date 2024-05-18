@@ -1,5 +1,5 @@
 import { ComponentType, Log, Scene } from "../banana.js"
-import { ComponentCreator } from "./Component.ts"
+import { ComponentCreator } from "./Component.js"
 
 export class Entity {
 

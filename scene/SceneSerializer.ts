@@ -1,8 +1,8 @@
 import { CameraType, Color, Vec3, Vec4 } from "../banana.js";
-import { ComponentType } from "../core/Type.ts";
-import { CameraComponent, ComponentCreator, SpriteRendererComponent, TagComponent, TransformComponent } from "./Component.ts";
-import { Entity } from "./Entity.ts";
-import { Scene } from "./Scene.ts";
+import { ComponentType } from "../core/Type.js";
+import { CameraComponent, ComponentCreator, SpriteRendererComponent, TagComponent, TransformComponent } from "./Component.js";
+import { Entity } from "./Entity.js";
+import { Scene } from "./Scene.js";
 
 export class SceneSerializer {
     static serialize(scene: Scene): string {
