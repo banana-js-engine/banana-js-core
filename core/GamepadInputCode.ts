@@ -1,4 +1,5 @@
-export enum GamepadButtonCode {
+export enum GamepadInputCode {
+    //Digital
     A = 0, // for xbox
     Cross = 0, // for ps
 
@@ -28,4 +29,10 @@ export enum GamepadButtonCode {
     Dpad_Right = 15,
 
     Home = 16,
+
+    //Analog
+    Left_Stick_Strength_Horizontal = 0,
+    Left_Stick_Strength_Vertical = 1,
+    Right_Stick_Strength_Horizontal = 2,
+    Right_Stick_Strength_Vertical = 3,
 }

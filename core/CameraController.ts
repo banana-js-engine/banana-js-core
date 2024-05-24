@@ -4,7 +4,7 @@ import { MouseButton } from "./MouseButtonCode.ts"
 import { Event, EventDispatcher, EventType } from "../event/Event.ts"
 import { canvas } from "./Window.ts"
 import { KeyCode } from "./KeyCode.ts"
-import { GamepadButtonCode } from "./GamepadButtonCode.ts"
+import { GamepadInputCode } from "./GamepadInputCode.ts"
 import { Vec2, Vec3 } from "../math/MV.ts"
 
 export class EditorCameraController 
