@@ -13,7 +13,7 @@ import { CameraComponent,
          TagComponent, 
          TransformComponent, 
          PhysicsWorld} from '../banana.js'
-import { Mat4, Vec2, Vec3, Vec4 } from '../math/MV.js'
+import { Mat4, Vec2, Vec3, Vec4 } from '../math/BananaMath.js'
  
 export class Scene 
 {
@@ -112,6 +112,7 @@ export class Scene
             
             //PhysicsWorld.contactPoints = [];
 
+            // TODO: SHOULD BE IMPROVED
             for (let it = 0; it < this.physicsIterations; it++) {
                 for (let i = 0; i < groupedEntities.length; i++) {
                     const transformComponentA = this.registry.get<TransformComponent>(groupedEntities[i], ComponentType.TransformComponent);
@@ -168,11 +169,6 @@ export class Scene
         Renderer2D.beginScene(editorCameraController.getCamera());
 
         this.renderScene();
-
-        Renderer2D.drawLine(new Vec3(100, 200, 0), new Vec3(-100, 200, 0), Color.RED);
-
-        Renderer2D.drawRectangle(new Vec3(0, 0, 0), new Vec2(100, 100), Color.GREEN);
-        Renderer2D.drawRectangle(new Vec3(0, 0, 0), new Vec2(200, 200), Color.BLUE);
 
         Renderer2D.endScene();
     }

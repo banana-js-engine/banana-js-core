@@ -3,7 +3,7 @@ import { Body2DComponent, CameraComponent, ComponentType, Entity, ShapeType, Tag
 export class ScriptableEntity {
 
     entity: Entity;
-    tag: TagComponent
+    tag: TagComponent;
     transform: TransformComponent;
 
     constructor() {

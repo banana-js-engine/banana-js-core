@@ -1,5 +1,17 @@
 import { Log } from "../banana.js";
 
+/*
+    BananaMath consists of:
+        - Utils
+        - Vec2
+        - Vec3
+        - Vec4
+        - Mat4
+*/
+
+/**
+ * Random math utility methods
+ */
 export class Utils {
 
     public static readonly tolerance = 0.0005;

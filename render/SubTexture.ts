@@ -1,4 +1,4 @@
-import { Vec2 } from '../math/MV.js';
+import { Vec2 } from '../math/BananaMath.js';
 import { Renderer2D } from './Renderer2D.js'
 import { Texture } from './Texture.js';
 

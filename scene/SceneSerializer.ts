@@ -101,7 +101,7 @@ export class SceneSerializer {
                 cameraComponent.sceneCamera.size = size;
                 cameraComponent.sceneCamera.orthographicNear = orthographicNear;
                 cameraComponent.sceneCamera.orthographicFar = orthographicFar;
-                cameraComponent.setPrimary(primary);
+                cameraComponent.isPrimary = primary;
             }
         }
     

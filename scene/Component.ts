@@ -2,9 +2,9 @@ import { Color } from '../render/Color.js'
 import { ComponentType } from '../core/Type.js'
 import { SceneCamera } from '../render/Camera.js'
 import { Movement } from './Movement.js'
-import { Mat4, Vec2, Vec3 } from '../math/MV.js'
+import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
 import { ScriptableEntity } from './ScriptableEntity.js'
-import { Body2D, ShapeType } from '../physics/Body.js'
+import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Scene } from './Scene.js'
 
 export class Component {
@@ -204,10 +204,6 @@ export class CameraComponent extends Component {
         this.isPrimary = true;
 
         this.type = ComponentType.CameraComponent;
-    }
-
-    primary(scene: Scene) {
-        
     }
 
     get isPrimary(): boolean {

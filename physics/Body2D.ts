@@ -200,7 +200,7 @@ export class Body2D {
     }
 
     public addForce(amount: Vec2) {
-        this._force = amount.mul(PhysicsWorld.smoothnessFactor);
+        this._force = amount;
     }
 
     public get linearVelocity() {

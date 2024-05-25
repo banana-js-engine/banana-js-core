@@ -12,8 +12,6 @@ export class PhysicsWorld {
     public static readonly minIterations = 1;
     public static readonly maxIterations = 64;
 
-    public static readonly smoothnessFactor = 1;
-
     public gravity: Vec2;
 
     private contactList: CollisionInformation[];
@@ -21,7 +19,7 @@ export class PhysicsWorld {
     public static contactPoints = []; // for debug purposes
 
     constructor() {
-        this.gravity = new Vec2(0, 9.81 * PhysicsWorld.smoothnessFactor);
+        this.gravity = new Vec2(0, 9.81);
     
         this.contactList = [];
     }
@@ -53,6 +51,7 @@ export class PhysicsWorld {
         const shapeTypeA = bodyA.body2d.shapeType;
         const shapeTypeB = bodyB.body2d.shapeType;
 
+        // TODO: Make it so that you can pass in Vec3 as Vec2.
         if (shapeTypeA == ShapeType.Circle && shapeTypeB == ShapeType.Circle) {
             collInfo = Collisions.checkCircleCollision(
                 new Vec2(transformA.getPosition().x, transformA.getPosition().y),
@@ -136,7 +135,7 @@ export class PhysicsWorld {
 
     private narrowPhase() {
         for (const collInfo of this.contactList) {
-            this.resolveCollisionWithRotationAndFriction(collInfo);
+            this.resolveCollision(collInfo);
 
             // if (collInfo.contactCount > 1) {
             //     PhysicsWorld.contactPoints.push(collInfo.contact1);
@@ -148,7 +147,20 @@ export class PhysicsWorld {
         }
     }
 
-    private resolveCollision(collInfo: CollisionInformation) {
+    private resolveCollision(collInfo: CollisionInformation, withFriction: boolean = true, withRotation: boolean = true) {
+        if (withFriction && withRotation) {
+            this.resolveCollisionWithRotationAndFriction(collInfo);
+            return;
+        }
+        else if (withRotation) {
+            this.resolveCollisionWithRotation(collInfo);
+            return;
+        }
+
+        this.resolveCollisionBasic(collInfo);
+    }
+
+    private resolveCollisionBasic(collInfo: CollisionInformation) {
 
         const bodyA = collInfo.bodyA;
         const bodyB = collInfo.bodyB;
@@ -171,6 +183,17 @@ export class PhysicsWorld {
     }
 
     private resolveCollisionWithRotation(collInfo: CollisionInformation) {
+        this.resolveContactPoints(collInfo);
+    }
+
+    private resolveCollisionWithRotationAndFriction(collInfo: CollisionInformation) {
+
+        const jList = this.resolveContactPoints(collInfo);        
+
+        this.resolveFriction(collInfo, jList);
+    }
+
+    resolveContactPoints(collInfo: CollisionInformation) {
         const bodyA = collInfo.bodyA;
         const bodyB = collInfo.bodyB;
         const bodyAPos = new Vec2(collInfo.bodyAPos.x, collInfo.bodyAPos.y);
@@ -182,76 +205,9 @@ export class PhysicsWorld {
         const impulseList: Vec2[] = [];
         const raList: Vec2[] = [];
         const rbList: Vec2[] = [];
-
-        const e = Math.min(bodyA.restitution, bodyB.restitution);
-
-        for (let i = 0; i < contactCount; i++) {
-            const ra = contactList[i].sub(bodyAPos);
-            const rb = contactList[i].sub(bodyBPos);
-
-            raList.push(ra);
-            rbList.push(rb);
-
-            const raPerp = new Vec2(-ra.y, ra.x);
-            const rbPerp = new Vec2(-rb.y, rb.x);
-
-            const angularVelocityA = raPerp.mul(bodyA.rotationalVelocity);
-            const angularVelocityB = rbPerp.mul(bodyB.rotationalVelocity);
-
-            const relativeVelocity = new Vec2(0, 0);
-            relativeVelocity.x = (bodyB.linearVelocity.x + angularVelocityB.x) - (bodyA.linearVelocity.x + angularVelocityA.x);
-            relativeVelocity.y = (bodyB.linearVelocity.y + angularVelocityB.y) - (bodyA.linearVelocity.y + angularVelocityA.y);
-
-            const magnitude = relativeVelocity.dot(normal);
-
-            if (magnitude > 0) {
-                continue;
-            }
-
-            const raPerpDotN = raPerp.dot(normal);
-            const rbPerpDotN = rbPerp.dot(normal);
-
-            const denom = bodyA.inverseMass + bodyB.inverseMass +
-                (raPerpDotN * raPerpDotN) * bodyA.inverseInertia +
-                (rbPerpDotN * rbPerpDotN) * bodyB.inverseInertia;
-
-
-            let j = (- 1 - e) * magnitude;
-            j /= denom;
-            j /= contactCount;
-
-            const impulse = normal.mul(j);
-            
-            impulseList.push(impulse);
-        }
-
-        for (let i = 0; i < impulseList.length; i++) {
-            bodyA.linearVelocity = bodyA.linearVelocity.sub(impulseList[i].mul(bodyA.inverseMass));
-            bodyA.rotationalVelocity += -raList[i].cross(impulseList[i]) * bodyA.inverseInertia; 
-            
-            bodyB.linearVelocity = bodyB.linearVelocity.add(impulseList[i].mul(bodyB.inverseMass));
-            bodyB.rotationalVelocity += rbList[i].cross(impulseList[i]) * bodyB.inverseInertia;
-        }
-    }
-
-    private resolveCollisionWithRotationAndFriction(collInfo: CollisionInformation) {
-        const bodyA = collInfo.bodyA;
-        const bodyB = collInfo.bodyB;
-        const bodyAPos = new Vec2(collInfo.bodyAPos.x, collInfo.bodyAPos.y);
-        const bodyBPos = new Vec2(collInfo.bodyBPos.x, collInfo.bodyBPos.y);
-        const normal = collInfo.normal;
-        const contactList = [ collInfo.contact1, collInfo.contact2 ];
-        const contactCount = collInfo.contactCount;
-
-        let impulseList: Vec2[] = [];
-        let raList: Vec2[] = [];
-        let rbList: Vec2[] = [];
         let jList: number[] = [];
 
         const e = Math.min(bodyA.restitution, bodyB.restitution);
-
-        const sf = (bodyA.staticFriction + bodyB.staticFriction) * 0.5;
-        const df = (bodyA.dynamicFriction + bodyB.dynamicFriction) * 0.5;
 
         for (let i = 0; i < contactCount; i++) {
             const ra = contactList[i].sub(bodyAPos);
@@ -303,15 +259,35 @@ export class PhysicsWorld {
             bodyB.rotationalVelocity += rbList[i].cross(impulseList[i]) * bodyB.inverseInertia;
         }
 
-        impulseList = [];
+        return jList;
+    }
+
+    resolveFriction(collInfo: CollisionInformation, jList: number[]) {
+        const bodyA = collInfo.bodyA;
+        const bodyB = collInfo.bodyB;
+        const bodyAPos = new Vec2(collInfo.bodyAPos.x, collInfo.bodyAPos.y);
+        const bodyBPos = new Vec2(collInfo.bodyBPos.x, collInfo.bodyBPos.y);
+        const normal = collInfo.normal;
+        const contactList = [ collInfo.contact1, collInfo.contact2 ];
+        const contactCount = collInfo.contactCount;
+
+        let impulseList: Vec2[] = [];
+        let raList: Vec2[] = [];
+        let rbList: Vec2[] = [];
+
+        const sf = (bodyA.staticFriction + bodyB.staticFriction) * 0.5;
+        const df = (bodyA.dynamicFriction + bodyB.dynamicFriction) * 0.5;
 
         for (let i = 0; i < contactCount; i++) {
             if (typeof jList[i] == 'undefined') {
                 continue;
             }
 
-            const ra = raList[i];
-            const rb = rbList[i];
+            const ra = contactList[i].sub(bodyAPos);
+            const rb = contactList[i].sub(bodyBPos);
+
+            raList.push(ra);
+            rbList.push(rb);
 
             const raPerp = new Vec2(-ra.y, ra.x);
             const rbPerp = new Vec2(-rb.y, rb.x);
@@ -363,7 +339,5 @@ export class PhysicsWorld {
             bodyB.linearVelocity = bodyB.linearVelocity.add(impulseList[i].mul(bodyB.inverseMass));
             bodyB.rotationalVelocity += rbList[i].cross(impulseList[i]) * bodyB.inverseInertia;
         }
-
-        console.log(bodyB.rotationalVelocity);
     }
 }

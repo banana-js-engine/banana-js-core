@@ -86,8 +86,8 @@ export * from './scene/Entity.js'
 export * from './scene/ScriptableEntity.js'
 
 // math
-export * from './math/MV.js'
+export * from './math/BananaMath.js'
 
 // physics
 export * from './physics/PhysicsWorld.js'
-export * from './physics/Body.js'
+export * from './physics/Body2D.js'

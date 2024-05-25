@@ -1,7 +1,7 @@
 import { canvas } from '../core/Window.js'
 import { Log } from '../core/Log.js'
 import { Event, EventType, EventDispatcher } from '../event/Event.js'
-import { Utils, Vec3, Mat4 } from '../math/MV.js';
+import { Utils, Vec3, Mat4 } from '../math/BananaMath.js';
 
 export enum CameraType {
     Orthographic = 0, 
@@ -13,7 +13,7 @@ class Camera {
     cameraType: CameraType;
     aspectRatio: number;
 
-    size: number = 1;
+    size: number = 10;
     orthographicNear: number = -1;
     orthographicFar: number = 1;
     

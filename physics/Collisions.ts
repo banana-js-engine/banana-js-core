@@ -17,6 +17,16 @@ export type CollisionInformation = {
 
 export class Collisions {
     
+    /**
+     * Finds the if two circle bodies are colliding by checking:
+     *      if distance(centerA, centerB) < radiusA + radiusB.
+     * Funfact: checking collision between circle bodies is easier and more efficient than polygons bodies.
+     * @param centerA position of the first circle body
+     * @param radiusA radius of the first circle body
+     * @param centerB position of the second circle body
+     * @param radiusB radius of the second circle body
+     * @returns information about the collision for resolving it
+     */
     static checkCircleCollision(centerA: Vec2, radiusA: number, centerB: Vec2, radiusB: number): CollisionInformation {
         const distance = centerA.distanceTo(centerB);
         const radii = radiusA + radiusB;
@@ -40,12 +50,34 @@ export class Collisions {
         normal = centerB.sub(centerA).normalize();
         depth = radii - distance;
 
-        contact1 = centerA.add(normal.mul(radiusA));
-        contactCount = 1;
+        const contactInfo = this.findCircleContactPoints(centerA, radiusA, normal);
+
+        contact1 = contactInfo.contact1; 
+        contactCount = contactInfo.contactCount;
     
         return { bodyA, bodyB, bodyAPos, bodyBPos, isColliding, normal, depth, contact1, contact2, contactCount };
     }
 
+    /**
+     * finds the contact point between two circle bodies
+     * @param centerA center of one of the bodies
+     * @param radiusA radius of one of the bodies
+     * @param normal normal of collision
+     * @returns one contact point
+     */
+    private static findCircleContactPoints(centerA: Vec2, radiusA: number, normal: Vec2) {
+        const contact1 = centerA.add(normal.mul(radiusA));
+        const contactCount = 1;
+
+        return { contact1, contactCount };
+    }
+
+    /**
+     * AABB collision check
+     * @param a axis-aligned bounding box of body a
+     * @param b axis-aligned bounding box of body b
+     * @returns if the two AABBs are colliding or not.
+     */
     static checkAABBCollision(a: AABB, b: AABB) {
         if (a.max.x <= b.min.x || b.max.x <= a.min.x 
             || a.max.y <= b.min.y || b.max.y <= a.min.y
@@ -56,6 +88,12 @@ export class Collisions {
         return true;
     }
 
+    /**
+     * Finds if two polygon bodies are colliding using SAT => {@link https://en.wikipedia.org/wiki/Hyperplane_separation_theorem#:~:text=Separating%20axis%20theorem%20%E2%80%94%20Two%20closed,axis%20is%20always%20a%20line.}.
+     * @param verticesA vertices of the first polygon
+     * @param verticesB vertices of the second polygon
+     * @returns information about the collision for resolving it
+     */
     static checkPolygonCollision(verticesA: Vec4[], verticesB: Vec4[]): CollisionInformation {
         const origin = new Vec2(0, 0);
         const terminus = new Vec2(0, 0);
@@ -131,10 +169,31 @@ export class Collisions {
         if (direction.dot(normal) < 0) {
             normal = normal.mul(-1);
         }
-
-        
-        
+  
         // contact point(s)
+        const contactInfo = this.findPolygonContactPoints(verticesA, verticesB);
+        contact1 = contactInfo.contact1;
+        contact2 = contactInfo.contact2;
+        contactCount = contactInfo.contactCount;
+
+        return { bodyA, bodyB, bodyAPos, bodyBPos, isColliding, normal, depth, contact1, contact2, contactCount };
+    }
+
+    /**
+     * finds the contact point(s) between two polygon bodies
+     * @param verticesA vertices of polygon A
+     * @param verticesB vertices of polygon B
+     * @returns one or two contact points
+     */
+    private static findPolygonContactPoints(verticesA: Vec4[], verticesB: Vec4[]) {
+
+        const origin = new Vec2(0, 0);
+        const terminus = new Vec2(0, 0);
+
+        let contact1 = new Vec2(0, 0);
+        let contact2 = new Vec2(0, 0);
+        let contactCount = 0;
+
         const p = new Vec2(0, 0);
         let minDistanceSquared = Number.MAX_SAFE_INTEGER;
         for (let i = 0; i < verticesA.length; i++) {
@@ -148,20 +207,20 @@ export class Collisions {
                 terminus.x = verticesB[(j + 1) % verticesB.length].x;
                 terminus.y = verticesB[(j + 1) % verticesB.length].y;
 
-                const contactInfo = Collisions.pointSegmentDistance(p, origin, terminus);
+                const point = Collisions.pointLineSegmentDistance(p, origin, terminus);
 
-                if (contactInfo.distanceSquared == minDistanceSquared
-                && !contact1.equals(contactInfo.contact)) {
-                    contact2.x = contactInfo.contact.x;
-                    contact2.y = contactInfo.contact.y;
+                if (point.distanceSquared == minDistanceSquared
+                && !contact1.equals(point.contact)) {
+                    contact2.x = point.contact.x;
+                    contact2.y = point.contact.y;
 
                     contactCount = 2;
                 }
-                else if (contactInfo.distanceSquared < minDistanceSquared) {
-                    minDistanceSquared = contactInfo.distanceSquared;
+                else if (point.distanceSquared < minDistanceSquared) {
+                    minDistanceSquared = point.distanceSquared;
 
-                    contact1.x = contactInfo.contact.x;
-                    contact1.y = contactInfo.contact.y;
+                    contact1.x = point.contact.x;
+                    contact1.y = point.contact.y;
 
                     contactCount = 1;
 
@@ -180,21 +239,21 @@ export class Collisions {
                 terminus.x = verticesA[(j + 1) % verticesA.length].x;
                 terminus.y = verticesA[(j + 1) % verticesA.length].y;
 
-                const contactInfo = Collisions.pointSegmentDistance(p, origin, terminus);
+                const point = Collisions.pointLineSegmentDistance(p, origin, terminus);
 
-                if (contactInfo.distanceSquared == minDistanceSquared
-                && !contact1.equals(contactInfo.contact)) {
-                    contact2.x = contactInfo.contact.x;
-                    contact2.y = contactInfo.contact.y;
+                if (point.distanceSquared == minDistanceSquared
+                && !contact1.equals(point.contact)) {
+                    contact2.x = point.contact.x;
+                    contact2.y = point.contact.y;
 
                     contactCount = 2;
 
                 }
-                else if (contactInfo.distanceSquared < minDistanceSquared) {
-                    minDistanceSquared = contactInfo.distanceSquared;
+                else if (point.distanceSquared < minDistanceSquared) {
+                    minDistanceSquared = point.distanceSquared;
 
-                    contact1.x = contactInfo.contact.x;
-                    contact1.y = contactInfo.contact.y;
+                    contact1.x = point.contact.x;
+                    contact1.y = point.contact.y;
 
                     contactCount = 1; 
 
@@ -202,9 +261,16 @@ export class Collisions {
             } 
         }
 
-        return { bodyA, bodyB, bodyAPos, bodyBPos, isColliding, normal, depth, contact1, contact2, contactCount };
+        return { contact1, contact2, contactCount };
     }
 
+    /**
+     * Checks if a circle body and a polygon body is colliding using SAT
+     * @param center center of the circle body
+     * @param radius radius of the circle body
+     * @param vertices vertices of the polygon body
+     * @returns information about the collision for resolving it
+     */
     static checkCirclePolygonCollision(center: Vec2, radius: number, vertices: Vec4[]): CollisionInformation {
         const origin = new Vec2(0, 0);
         const terminus = new Vec2(0, 0);
@@ -275,7 +341,26 @@ export class Collisions {
         }
 
         // contact point
+        const contactInfo = this.findCirclePolygonContactPoints(center, vertices);
+        contact1 = contactInfo.contact1;
+        contactCount = contactInfo.contactCount;
+
+        return { bodyA, bodyB, bodyAPos, bodyBPos, isColliding, normal, depth, contact1, contact2, contactCount };
+    }
+
+    /**
+     * finds the contact point between a circle and a polygon body
+     * @param center center of the circle body
+     * @param vertices vertices of the polygon body
+     * @returns one contact point
+     */
+    private static findCirclePolygonContactPoints(center: Vec2, vertices: Vec4[]) {
         let minDistanceSquared = Number.MAX_SAFE_INTEGER;
+
+        const origin = new Vec2(0, 0);
+        const terminus = new Vec2(0, 0);
+
+        let contact1 = new Vec2(0, 0);
 
         for (let i = 0; i < vertices.length; i++) {
             origin.x = vertices[i].x;
@@ -284,18 +369,19 @@ export class Collisions {
             terminus.x = vertices[(i + 1) % vertices.length].x;
             terminus.y = vertices[(i + 1) % vertices.length].y;
 
-            const contactInfo = Collisions.pointSegmentDistance(center, origin, terminus);
+            const point = Collisions.pointLineSegmentDistance(center, origin, terminus);
 
-            if (contactInfo.distanceSquared < minDistanceSquared) {
-                minDistanceSquared = contactInfo.distanceSquared;
-                contact1.x = contactInfo.contact.x;
-                contact1.y = contactInfo.contact.y;
+            if (point.distanceSquared < minDistanceSquared) {
+                minDistanceSquared = point.distanceSquared;
+                contact1.x = point.contact.x;
+                contact1.y = point.contact.y;
             }
 
         }
-        contactCount = 1;
 
-        return { bodyA, bodyB, bodyAPos, bodyBPos, isColliding, normal, depth, contact1, contact2, contactCount };
+        const contactCount = 1;
+
+        return { contact1, contactCount };
     }
 
     private static findClosestPointOnPolygon(center: Vec2, vertices: Vec4[]) {
@@ -373,7 +459,7 @@ export class Collisions {
         return new Vec2(totalX / vertices.length, totalY / vertices.length);
     }
 
-    private static pointSegmentDistance(p: Vec2, a: Vec2, b: Vec2) {
+    private static pointLineSegmentDistance(p: Vec2, a: Vec2, b: Vec2) {
         const ab = b.sub(a);
         const ap = p.sub(a);
 

@@ -1,4 +1,4 @@
-import { Vec3 } from '../math/MV.js';
+import { Vec3 } from '../math/BananaMath.js';
 import { Gamepad } from './Gamepad.js'
 import { Log } from './Log.js'
 

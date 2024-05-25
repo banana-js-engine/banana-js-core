@@ -5,7 +5,7 @@ import { Event, EventDispatcher, EventType } from "../event/Event.js"
 import { canvas } from "./Window.js"
 import { KeyCode } from "./KeyCode.js"
 import { GamepadButtonCode } from "./GamepadButtonCode.js"
-import { Vec2, Vec3 } from "../math/MV.js"
+import { Vec2, Vec3 } from "../math/BananaMath.js"
 
 export class EditorCameraController 
 {

@@ -3,7 +3,7 @@ import { Color } from "./Color.js"
 import { Shader } from "./Shader.js"
 import { Texture } from "./Texture.js"
 import { gl } from "./WebGLContext.js"
-import { Mat4, Vec2, Vec3, Vec4 } from "../math/MV.js"
+import { Mat4, Vec2, Vec3, Vec4 } from "../math/BananaMath.js"
 import { SubTexture, TransformComponent } from "../banana.js"
 
 class Render2DData
@@ -311,25 +311,6 @@ export class Renderer2D {
         Render2DData.CircleVertexCount = 0;
 
         Render2DData.TextureSlotIndex = 1;
-    }
-
-    static drawPoint(point: Vec2, color: Color) {
-
-        if (Render2DData.QuadIndexCount >= Render2DData.MaxIndices) {
-            Renderer2D.flush();
-            Renderer2D.newBatch();
-        }
-
-        for (let i = 0; i < 4; i++) {
-            this.quadVertex.position = point.add(new Vec2(Render2DData.QuadVertexPositions[i].x, Render2DData.QuadVertexPositions[i].y));
-            this.quadVertex.texCoord = Render2DData.QuadTextureCoords[i];
-            this.quadVertex.texIndex = 0;
-            this.quadVertex.color = color;
-            Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-            Render2DData.QuadVertexCount++;
-        }
-
-        Render2DData.QuadIndexCount += 6;
     }
 
     static drawColorQuad(transform: TransformComponent, color: Color) {
