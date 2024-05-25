@@ -522,11 +522,6 @@ export class Mat4 {
         return this;
     }
 
-    invertSIMD(): Mat4 {
-
-        return null;
-    }
-
     setTranslation(vec3: Vec3): Mat4 {
         this.identity();
         this.data[3] = vec3.x;
