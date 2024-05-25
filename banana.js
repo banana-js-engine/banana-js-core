@@ -90,3 +90,4 @@ export * from './math/MV.js'
 
 // physics
 export * from './physics/PhysicsWorld.js'
+export * from './physics/Body.js'

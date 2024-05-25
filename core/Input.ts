@@ -1,4 +1,4 @@
-import { Vec2 } from '../math/MV.js';
+import { Vec3 } from '../math/MV.js';
 import { Gamepad } from './Gamepad.js'
 import { Log } from './Log.js'
 
@@ -20,6 +20,22 @@ export class Input {
             Input.buttonStates[key] = false;
         }
 
+        return Input.buttonStates[key];
+    }
+
+    public static isMouseButtonPressedOnce(button) {
+        let key = `${button}`;
+        
+        if (typeof Input.buttonStates[key] == 'undefined') {
+            Input.buttonStates[key] = false;
+            Input.mouseInputFlag[key] = true;
+        }
+
+        if (this.mouseInputFlag[key]) {
+            return false;
+        }
+
+        this.mouseInputFlag[key] = true;
         return Input.buttonStates[key];
     }
 
@@ -49,8 +65,9 @@ export class Input {
         return Gamepad.Instance.currentGamepad.axes[axis];
     }
 
-    public static mousePosition = new Vec2(0, 0);
+    public static mousePosition = new Vec3(0, 0, 0);
 
     public static keyStates = {};
     public static buttonStates = {};
+    public static mouseInputFlag = {};
 }

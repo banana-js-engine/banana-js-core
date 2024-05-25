@@ -1,4 +1,4 @@
-import { ComponentType, Entity, TagComponent, TransformComponent } from "../banana.js"
+import { Body2DComponent, CameraComponent, ComponentType, Entity, ShapeType, TagComponent, TransformComponent, Vec2 } from "../banana.js"
 
 export class ScriptableEntity {
 
@@ -10,8 +10,35 @@ export class ScriptableEntity {
         this.entity = null;
     }
 
+    public get mainCamera() {
+        const cameras = this.entity.scene.registry.get_all<CameraComponent>(ComponentType.CameraComponent);
+        for (const camera of cameras) {
+            if (camera.isPrimary) {
+                return camera.getCamera();
+            }
+        }
+
+        return null;
+    }
+
     getComponent<T>(componentType): T {
         return this.entity.getComponent(componentType);
+    }
+
+    instantiate(position: Vec2, flag: boolean = false) {
+        const clonedEntity = this.entity.scene.createEntity('test');
+        const clonedEntityTransform = clonedEntity.getComponent<TransformComponent>(ComponentType.TransformComponent);
+        clonedEntityTransform.setPosition(position.x, position.y, 0);
+        
+        const body = clonedEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);
+
+        if (flag) {
+            body.setShape(ShapeType.Circle);
+            clonedEntity.addComponent(ComponentType.CircleRendererComponent);
+        }
+        else {
+            clonedEntity.addComponent(ComponentType.SpriteRendererComponent);
+        }        
     }
 
     onCreate() {}

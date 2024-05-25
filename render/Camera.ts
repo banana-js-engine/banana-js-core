@@ -13,14 +13,13 @@ class Camera {
     cameraType: CameraType;
     aspectRatio: number;
 
-    size: number = 466;
+    size: number = 1;
     orthographicNear: number = -1;
     orthographicFar: number = 1;
     
     fovy: number = 45;
     perspectiveNear: number = 10;
     perspectiveFar: number = 1000;
-
 
     constructor() {
         this.projectionMatrix = new Mat4();  
@@ -64,6 +63,14 @@ class Camera {
 
         this.projectionMatrix.setOrtho(orthoLeft, orthoRight, orthoBottom, orthoTop, this.orthographicNear, this.orthographicFar);
     }
+
+    screenToViewportSpace(vector: Vec3) {
+        return new Vec3(
+            (vector.x - canvas.width / 2) / (canvas.height / this.size),
+            (vector.y - canvas.height / 2) / (canvas.height / this.size),
+            vector.z
+        );
+    }
 }
 
 export class SceneCamera extends Camera {
@@ -72,7 +79,7 @@ export class SceneCamera extends Camera {
 
         this.onWindowResized = this.onWindowResized.bind(this);
 
-        this.setOrthographic(446, -1, 1);
+        this.setOrthographic(10, -1, 1);
     }
 
     onEvent(event) {
@@ -153,7 +160,5 @@ export class EditorCamera extends Camera {
 
         this.setView();
         this.recalculateViewProjectionMatrix();
-
-        
     }
 }

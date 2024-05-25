@@ -1,18 +1,37 @@
 import * as banana from './banana.js';
 
-class TextScript extends banana.ScriptableEntity {
+class TestScript extends banana.ScriptableEntity {
+    onCreate() {
+        this.body = this.getComponent(banana.ComponentType.Body2DComponent);
+    }
+
     onUpdate(deltaTime) {
-        if (banana.Input.isKeyPressed(banana.KeyCode.D) || banana.Input.isGamepadButtonPressed(banana.GamepadButtonCode.Dpad_Right)) {
-            this.transform.translate(2, 0, 0);
+        if (banana.Input.isKeyPressed(banana.KeyCode.D)) {
+            //this.transform.translate(2, 0, 0);
+            this.body.addForce(new banana.Vec2(60, 0));
         }
-        if (banana.Input.isKeyPressed(banana.KeyCode.A) || banana.Input.isGamepadButtonPressed(banana.GamepadButtonCode.Dpad_Left)) {
-            this.transform.translate(-2, 0, 0);
+        if (banana.Input.isKeyPressed(banana.KeyCode.A)) {
+            //this.transform.translate(-2, 0, 0);
+            this.body.addForce(new banana.Vec2(-60, 0));
         }
-        if (banana.Input.isKeyPressed(banana.KeyCode.S) || banana.Input.isGamepadButtonPressed(banana.GamepadButtonCode.Dpad_Down)) {
-            this.transform.translate(0, 2, 0);
+        if (banana.Input.isKeyPressed(banana.KeyCode.S)) {
+            //this.transform.translate(0, 2, 0);
+            this.body.addForce(new banana.Vec2(0, 60));
         }
-        if (banana.Input.isKeyPressed(banana.KeyCode.W) || banana.Input.isGamepadButtonPressed(banana.GamepadButtonCode.Dpad_Up)) {
-            this.transform.translate(0, -2, 0);
+        if (banana.Input.isKeyPressed(banana.KeyCode.W)) {
+            //this.transform.translate(0, -2, 0);
+            this.body.addForce(new banana.Vec2(0, -60));
+        }
+    }
+}
+
+class ObjectSpawner extends banana.ScriptableEntity {
+    onUpdate(deltaTime) {
+        if (banana.Input.isMouseButtonPressedOnce(banana.MouseButton.MOUSE_RIGHT)) { 
+            this.instantiate(this.mainCamera.screenToViewportSpace( banana.Input.mousePosition ), true);
+        }
+        if (banana.Input.isMouseButtonPressedOnce(banana.MouseButton.MOUSE_LEFT)) {
+            this.instantiate(this.mainCamera.screenToViewportSpace( banana.Input.mousePosition ));
         }
     }
 }
@@ -27,17 +46,32 @@ export class TestLayer extends banana.Layer {
         
         this.camera = this.scene.createEntity('camera');
         this.camera.addComponent(banana.ComponentType.CameraComponent);
-
-        this.circleA = this.scene.createEntity('circleA');
-        const spriteA = this.circleA.addComponent(banana.ComponentType.SpriteRendererComponent);
-        this.circleA.addComponent(banana.ComponentType.NativeScriptComponent).bind(TextScript);
-        this.circleA.addComponent(banana.ComponentType.Body2DComponent);
         
-        this.circleB = this.scene.createEntity('circleB');
-        this.circleB.addComponent(banana.ComponentType.SpriteRendererComponent);
-        this.circleB.addComponent(banana.ComponentType.Body2DComponent);
-        this.circleBTransform = this.circleB.getComponent(banana.ComponentType.TransformComponent);
-        this.circleBTransform.translate(150, 0, 0);
+        this.objectSpawner = this.scene.createEntity('object spawner');
+        this.objectSpawner.addComponent(banana.ComponentType.NativeScriptComponent).bind(ObjectSpawner);
+
+        this.ground = this.scene.createEntity('ground');
+        const groundSprite = this.ground.addComponent(banana.ComponentType.SpriteRendererComponent);
+        groundSprite.setColor(banana.Color.BLUE);
+        const groundTransform = this.ground.getComponent(banana.ComponentType.TransformComponent);
+        groundTransform.setScale(15, 2, 1);
+        groundTransform.translate(0, 5, 0);
+        const groundBody = this.ground.addComponent(banana.ComponentType.Body2DComponent);
+        groundBody.body2d.isStatic = true;
+        groundBody.body2d.inverseMass = 0;
+        groundBody.body2d.inverseInertia = 0;
+
+        this.static1 = this.scene.createEntity('static1');
+        const static1Sprite = this.static1.addComponent(banana.ComponentType.SpriteRendererComponent);
+        static1Sprite.setColor(banana.Color.GREEN);
+        const static1Transform = this.static1.getComponent(banana.ComponentType.TransformComponent);
+        static1Transform.setScale(5, 1, 1);
+        static1Transform.translate(-5, -2, 0);
+        static1Transform.rotate(0, 0, 30);
+        const static1Body = this.static1.addComponent(banana.ComponentType.Body2DComponent);
+        static1Body.body2d.isStatic = true;
+        static1Body.body2d.inverseMass = 0;
+        static1Body.body2d.inverseInertia = 0;
 
         banana.RenderCommand.setClearColor( new banana.Color(0, 0, 0, 0) );
     }

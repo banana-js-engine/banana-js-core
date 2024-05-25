@@ -48,6 +48,7 @@ export class Window {
 
             this.eventCallbackFn(mouseButtonClickedEvent);
 
+            Input.mouseInputFlag[`${event.button}`] = false;
             Input.buttonStates[`${event.button}`] = true;
         });
 

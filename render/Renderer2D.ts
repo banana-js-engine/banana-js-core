@@ -16,10 +16,10 @@ class Render2DData
     static MaxVertices = Render2DData.MaxQuads * 4;
     static MaxIndices = Render2DData.MaxQuads * 6; 
     static QuadVertexPositions = [
-        new Vec4(-50, -50, 0, 1),
-        new Vec4(50, -50, 0, 1),
-        new Vec4(50, 50, 0, 1),
-        new Vec4(-50, 50, 0, 1),
+        new Vec4(-0.5, -0.5, 0, 1),
+        new Vec4(0.5, -0.5, 0, 1),
+        new Vec4(-0.5, 0.5, 0, 1),
+        new Vec4(0.5, 0.5, 0, 1),
     ];
 
     static QuadTextureCoords = [
@@ -182,7 +182,7 @@ export class Renderer2D {
             quadIndices[i + 1] = offset + 1;
             quadIndices[i + 2] = offset + 2;
             
-            quadIndices[i + 3] = offset + 0;
+            quadIndices[i + 3] = offset + 1;
             quadIndices[i + 4] = offset + 2;
             quadIndices[i + 5] = offset + 3;
             
@@ -280,6 +280,15 @@ export class Renderer2D {
             gl.drawElements(gl.TRIANGLES, Render2DData.QuadIndexCount, gl.UNSIGNED_SHORT, 0);
             Renderer2D.Stats.BatchCount++;
         }
+        if (Render2DData.CircleIndexCount) {
+
+            Render2DData.CircleVertexBuffer.bind();
+            Render2DData.CircleVertexBuffer.linkAttributes();
+            Render2DData.CircleShader.bind();
+            Render2DData.CircleShader.setUniformMatrix4fv('u_ViewProjectionMatrix', Render2DData.ViewProj.data);
+
+            gl.drawElements(gl.TRIANGLES, Render2DData.CircleIndexCount, gl.UNSIGNED_SHORT, 0);
+        }
         if (Render2DData.LineVertexCount) {
             
             Render2DData.LineVertexBuffer.bind();
@@ -289,15 +298,6 @@ export class Renderer2D {
     
             gl.drawArrays(gl.LINES, 0, Render2DData.LineVertexCount);
             Renderer2D.Stats.BatchCount++;
-        }
-        if (Render2DData.CircleIndexCount) {
-
-            Render2DData.CircleVertexBuffer.bind();
-            Render2DData.CircleVertexBuffer.linkAttributes();
-            Render2DData.CircleShader.bind();
-            Render2DData.CircleShader.setUniformMatrix4fv('u_ViewProjectionMatrix', Render2DData.ViewProj.data);
-
-            gl.drawElements(gl.TRIANGLES, Render2DData.CircleIndexCount, gl.UNSIGNED_SHORT, 0);
         }
     }
 
@@ -311,6 +311,25 @@ export class Renderer2D {
         Render2DData.CircleVertexCount = 0;
 
         Render2DData.TextureSlotIndex = 1;
+    }
+
+    static drawPoint(point: Vec2, color: Color) {
+
+        if (Render2DData.QuadIndexCount >= Render2DData.MaxIndices) {
+            Renderer2D.flush();
+            Renderer2D.newBatch();
+        }
+
+        for (let i = 0; i < 4; i++) {
+            this.quadVertex.position = point.add(new Vec2(Render2DData.QuadVertexPositions[i].x, Render2DData.QuadVertexPositions[i].y));
+            this.quadVertex.texCoord = Render2DData.QuadTextureCoords[i];
+            this.quadVertex.texIndex = 0;
+            this.quadVertex.color = color;
+            Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
+            Render2DData.QuadVertexCount++;
+        }
+
+        Render2DData.QuadIndexCount += 6;
     }
 
     static drawColorQuad(transform: TransformComponent, color: Color) {

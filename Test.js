@@ -3,14 +3,9 @@ import * as banana from './banana.js';
 
 class TestApplication extends banana.Application {
     constructor() {
-        super('test', 600, 600);
+        super('banana test', window.innerWidth, window.innerHeight);
 
         this.pushLayer(new TestLayer());
-    }
-
-    onWindowResized(event) {
-        banana.RenderCommand.setViewport(banana.canvas.width, banana.canvas.height);
-        return true;
     }
 }
 

@@ -14,20 +14,23 @@ import { CameraComponent,
          TransformComponent, 
          PhysicsWorld} from '../banana.js'
 import { Mat4, Vec2, Vec3, Vec4 } from '../math/MV.js'
-import { Collisions } from '../physics/Collisions.js'
-import { ShapeType } from '../physics/Body.js'
  
 export class Scene 
 {
     registry: ntt;
+    world: PhysicsWorld;
+    physicsIterations: number;
+
     private _name: string;
     private _view: Mat4;
 
     constructor(name: string)
     {
         this.registry = new ntt();
+        this.world = new PhysicsWorld();
         this._name = name;
         this._view = new Mat4();
+        this.physicsIterations = 10;
     }
 
     public get name(): string {
@@ -77,6 +80,12 @@ export class Scene
 
             Renderer2D.drawCircle(transform, circle.color, circle.thickness, circle.fade);
         });
+
+        // DEBUG CODE
+        // for (const contactPoint of PhysicsWorld.contactPoints) {
+        //     const v1 = new Vec3(contactPoint.x, contactPoint.y, 0);
+        //     Renderer2D.drawRectangle(v1, new Vec2(0.2, 0.2), Color.ORANGE);
+        // }
     }
 
     onUpdateRuntime(deltaTime) {
@@ -97,26 +106,51 @@ export class Scene
             }
         }
 
+        {
+            // physics
+            const groupedEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.Body2DComponent);
+            
+            //PhysicsWorld.contactPoints = [];
+
+            for (let it = 0; it < this.physicsIterations; it++) {
+                for (let i = 0; i < groupedEntities.length; i++) {
+                    const transformComponentA = this.registry.get<TransformComponent>(groupedEntities[i], ComponentType.TransformComponent);
+                    const bodyComponentA = this.registry.get<Body2DComponent>(groupedEntities[i], ComponentType.Body2DComponent);
+    
+                    this.world.update(deltaTime, bodyComponentA, transformComponentA, this.physicsIterations);
+                };
+                
+                for (let i = 0; i < groupedEntities.length; i++) {
+                    const transformComponentA = this.registry.get<TransformComponent>(groupedEntities[i], ComponentType.TransformComponent);
+                    const bodyComponentA = this.registry.get<Body2DComponent>(groupedEntities[i], ComponentType.Body2DComponent);
+                    
+                    for (let j = i + 1; j < groupedEntities.length; j++) {
+                        const transformComponentB = this.registry.get<TransformComponent>(groupedEntities[j], ComponentType.TransformComponent);
+                        const bodyComponentB = this.registry.get<Body2DComponent>(groupedEntities[j], ComponentType.Body2DComponent);
+    
+                        this.world.collide(deltaTime, bodyComponentA, transformComponentA, bodyComponentB, transformComponentB, this.physicsIterations);
+                    };
+                };
+            }
+        }
+
         let mainCamera: SceneCamera = null;
         let mainCameraTransform: TransformComponent = null;
 
         const cameraEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.CameraComponent);
         cameraEntities.forEach(cameraEntity => {
-            const transform = this.registry.get(cameraEntity, ComponentType.TransformComponent) as TransformComponent;
-            const camera = this.registry.get(cameraEntity, ComponentType.CameraComponent) as CameraComponent;
+            const transform = this.registry.get<TransformComponent>(cameraEntity, ComponentType.TransformComponent);
+            const camera = this.registry.get<CameraComponent>(cameraEntity, ComponentType.CameraComponent);
 
-            if (camera.isPrimary()) 
-            {
+            if (camera.isPrimary) {
                 mainCameraTransform = transform;
                 mainCamera = camera.getCamera();
             }
         });
 
-
         if (!mainCamera) {
             return;
         }
-
 
         this._view.identity();
         this._view.setTranslation(mainCameraTransform.getPosition());
@@ -127,52 +161,6 @@ export class Scene
         this.renderScene();
 
         Renderer2D.endScene();
-
-        {
-            // physics
-            const groupedEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.Body2DComponent);
-            
-            groupedEntities.forEach(entity => {
-                const transformComponentA = this.registry.get(entity, ComponentType.TransformComponent) as TransformComponent;
-                const bodyComponentA = this.registry.get(entity, ComponentType.Body2DComponent) as Body2DComponent;
-
-                PhysicsWorld.update(bodyComponentA, transformComponentA);
-
-                const entityIndex = groupedEntities.indexOf(entity);
-
-                for (let i = entityIndex + 1; i < groupedEntities.length; i++) {
-                    const transformComponentB = this.registry.get(groupedEntities[i], ComponentType.TransformComponent) as TransformComponent;
-                    const bodyComponentB = this.registry.get(groupedEntities[i], ComponentType.Body2DComponent) as Body2DComponent;
-
-                    if (bodyComponentA.body2d.shapeType == ShapeType.Circle || bodyComponentB.body2d.shapeType == ShapeType.Circle) {
-                        const collInfo = Collisions.checkCircleCollision(
-                            new Vec2(transformComponentA.getPosition().x, transformComponentA.getPosition().y),
-                            bodyComponentA.radius,
-                            new Vec2(transformComponentB.getPosition().x, transformComponentB.getPosition().y),
-                            bodyComponentB.radius
-                        );
-
-                        bodyComponentA.moveBy(collInfo.normal.mul(collInfo.depth).div(-2), transformComponentA);
-                        bodyComponentB.moveBy(collInfo.normal.mul(collInfo.depth).div(2), transformComponentB);
-                    }
-
-                    else if (bodyComponentA.body2d.shapeType == ShapeType.Box || bodyComponentB.body2d.shapeType == ShapeType.Box) {
-                        const transformA = transformComponentA.getTransform();
-                        const transformB = transformComponentB.getTransform();
-
-                        const verticesA = [];
-                        const verticesB = [];
-
-                        for (let i = 0; i < 4; i++) {
-                            verticesA.push(transformA.mulVec4(bodyComponentA.body2d.vertices[i]));
-                            verticesB.push(transformB.mulVec4(bodyComponentB.body2d.vertices[i]));
-                        }
-
-                        const collInfo = Collisions.checkPolygonCollision(verticesA, verticesB);
-                    }
-                };
-            });
-        }
     }
 
     onUpdateEditor(deltaTime, editorCameraController) 
