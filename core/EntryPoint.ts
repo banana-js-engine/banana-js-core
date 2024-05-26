@@ -1,10 +1,20 @@
-import { Mat4 } from "../banana.js";
 import { Application } from "./Application.js"
 import { Log } from "./Log.js"
 import { Profiler } from "./Profiler.js";
 
-export function main() {
+import { loadImgui, loadImguiImpl } from "../editor/src/loadImgui.js"
+
+export let ImGui;
+export let ImGui_Impl;
+
+export async function main() {
     Log.Core_Info('Engine initialized');
+
+    ImGui = await loadImgui();
+
+    await ImGui.default();
+
+    ImGui_Impl = await loadImguiImpl();
 
     // init profiling
     //Profiler.BeginProfile('Application Init');

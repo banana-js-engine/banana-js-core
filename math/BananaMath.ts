@@ -296,7 +296,7 @@ export class Mat4 {
             }
         }
 
-        WebAssembly.instantiateStreaming(fetch('./matrix.wasm'), importObject).then(
+        WebAssembly.instantiateStreaming(fetch('/matrix.wasm'), importObject).then(
             (obj) => {
                 this.mat4_multiply = obj.instance.exports.mat4_multiply as CallableFunction;
                 this.mat4_apply_rotation_z = obj.instance.exports.mat4_apply_rotation_z as CallableFunction;

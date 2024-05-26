@@ -5,6 +5,7 @@ import { LayerStack } from "./LayerStack.js"
 import { RenderCommand } from "../render/RenderCommand.js"
 import { Gamepad } from "./Gamepad.js"
 import { Mat4, Utils } from "../banana.js"
+import { ImGUILayer } from "./ImGUILayer.js"
 
 
 export class Application
@@ -33,6 +34,8 @@ export class Application
         this.lastFrameTime = 0;
 
         this.window.resize(windowWidth, windowHeight);
+
+        this.pushLayer(new ImGUILayer());
     }
 
     public run() {
@@ -55,18 +58,17 @@ export class Application
         let deltaTimeMilliseconds = currentFrameTime - this.lastFrameTime;
         let deltaTimeSeconds = deltaTimeMilliseconds / 1000;
         this.lastFrameTime = currentFrameTime;
-        let fps = 1 / deltaTimeSeconds;
 
         //Log.Core_Info(`Delta time: ${deltaTimeSeconds}s (${deltaTimeMilliseconds}ms)`);
         //Log.Core_Info(`FPS: ${fps}`);
 
         deltaTimeSeconds = Utils.clamp(deltaTimeSeconds, 0.01, 0.1);
 
-        this.onUpdate(deltaTimeSeconds);
+        this.onUpdate(1 / 75);
 
         this.layerStack.getLayers().forEach(layer => 
         {
-            layer.onUpdate(deltaTimeSeconds);
+            layer.onUpdate(1 / 75);
         });
         
         requestAnimationFrame(this._onTick);

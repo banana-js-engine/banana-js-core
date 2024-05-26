@@ -12,7 +12,10 @@ import { CameraComponent,
          SpriteRendererComponent, 
          TagComponent, 
          TransformComponent, 
-         PhysicsWorld} from '../banana.js'
+         PhysicsWorld,
+         ImGui_Impl,
+         ImGui,
+         RenderCommand} from '../banana.js'
 import { Mat4, Vec2, Vec3, Vec4 } from '../math/BananaMath.js'
  
 export class Scene 
@@ -61,8 +64,8 @@ export class Scene
         return true;
     }
 
-    renderScene() {
-        
+    renderScene(deltaTime: number) {
+
         const sprites = this.registry.group(ComponentType.TransformComponent, ComponentType.SpriteRendererComponent);
 
         sprites.forEach(entity => {
@@ -159,7 +162,7 @@ export class Scene
 
         Renderer2D.beginScene(mainCamera, this._view);
 
-        this.renderScene();
+        this.renderScene(deltaTime);
 
         Renderer2D.endScene();
     }
@@ -168,7 +171,7 @@ export class Scene
     {
         Renderer2D.beginScene(editorCameraController.getCamera());
 
-        this.renderScene();
+        this.renderScene(deltaTime);
 
         Renderer2D.endScene();
     }
