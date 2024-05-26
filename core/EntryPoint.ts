@@ -1,7 +1,7 @@
 import { Mat4 } from "../banana.js";
-import { Application } from "./Application.ts"
-import { Log } from "./Log.ts"
-import { Profiler } from "./Profiler.ts";
+import { Application } from "./Application.js"
+import { Log } from "./Log.js"
+import { Profiler } from "./Profiler.js";
 
 export function main() {
     Log.Core_Info('Engine initialized');
@@ -18,4 +18,4 @@ export function main() {
 
 }
 
-//window.onload = main;
+window.onload = main;

@@ -1,10 +1,10 @@
-import { Log } from "./Log.ts"
-import { Window, canvas } from "./Window.ts"
-import { Event, EventDispatcher, EventType } from "../event/Event.ts"
-import { LayerStack } from "./LayerStack.ts"
-import { RenderCommand } from "../render/RenderCommand.ts"
-import { Gamepad } from "./Gamepad.ts"
-import { Mat4 } from "../banana.js"
+import { Log } from "./Log.js"
+import { Window, canvas } from "./Window.js"
+import { Event, EventDispatcher, EventType } from "../event/Event.js"
+import { LayerStack } from "./LayerStack.js"
+import { RenderCommand } from "../render/RenderCommand.js"
+import { Gamepad } from "./Gamepad.js"
+import { Mat4, Utils } from "../banana.js"
 
 
 export class Application
@@ -50,7 +50,8 @@ export class Application
     }
 
     private _onTick() {
-        let currentFrameTime = Date.now();
+
+        let currentFrameTime = performance.now();
         let deltaTimeMilliseconds = currentFrameTime - this.lastFrameTime;
         let deltaTimeSeconds = deltaTimeMilliseconds / 1000;
         this.lastFrameTime = currentFrameTime;
@@ -59,9 +60,7 @@ export class Application
         //Log.Core_Info(`Delta time: ${deltaTimeSeconds}s (${deltaTimeMilliseconds}ms)`);
         //Log.Core_Info(`FPS: ${fps}`);
 
-        if (deltaTimeSeconds > 1) {
-            deltaTimeSeconds = 0.13;
-        }
+        deltaTimeSeconds = Utils.clamp(deltaTimeSeconds, 0.01, 0.1);
 
         this.onUpdate(deltaTimeSeconds);
 

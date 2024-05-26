@@ -1,10 +1,10 @@
-import { WebGLContext } from '../render/WebGLContext.ts' 
-import { Log } from './Log.ts'
-import { Input } from './Input.ts'
-import * as mouse from '../event/MouseEvent.ts'
-import * as keyboard from '../event/KeyboardEvent.ts'
-import * as application from '../event/ApplicationEvent.ts'
-import * as gamepad from '../event/GamepadEvent.ts'
+import { WebGLContext } from '../render/WebGLContext.js' 
+import { Log } from './Log.js'
+import { Input } from './Input.js'
+import * as mouse from '../event/MouseEvent.js'
+import * as keyboard from '../event/KeyboardEvent.js'
+import * as application from '../event/ApplicationEvent.js'
+import * as gamepad from '../event/GamepadEvent.js'
 
 export let canvas;
 
@@ -48,6 +48,7 @@ export class Window {
 
             this.eventCallbackFn(mouseButtonClickedEvent);
 
+            Input.mouseInputFlag[`${event.button}`] = false;
             Input.buttonStates[`${event.button}`] = true;
         });
 

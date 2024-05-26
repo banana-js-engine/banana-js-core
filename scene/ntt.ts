@@ -1,5 +1,5 @@
 import { Component, ComponentType } from "../banana.js";
-import { GUID } from "../core/GUID.ts"
+import { GUID } from "../core/GUID.js"
 
 export class ntt {
     count: number;

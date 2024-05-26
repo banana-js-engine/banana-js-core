@@ -1,6 +1,6 @@
-import { initShadersFromHTML, initShadersFromFiles } from "./initShaders.ts"
-import { gl } from "./WebGLContext.ts"
-import { Log } from "../core/Log.ts"
+import { initShadersFromHTML, initShadersFromFiles } from "./initShaders.js"
+import { gl } from "./WebGLContext.js"
+import { Log } from "../core/Log.js"
 
 export class Shader {
     shaderId: number;

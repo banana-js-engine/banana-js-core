@@ -1,11 +1,11 @@
-import { Color } from '../render/Color.ts'
-import { ComponentType } from '../core/Type.ts'
-import { SceneCamera } from '../render/Camera.ts'
-import { Movement } from './Movement.ts'
-import RigidBody2D from '../physics/RigidBody2D.ts'
-import { Mat4, Vec2, Vec3 } from '../math/MV.ts'
-import { ScriptableEntity } from './ScriptableEntity.ts'
-import { Body2D } from '../physics/Body.ts'
+import { Color } from '../render/Color.js'
+import { ComponentType } from '../core/Type.js'
+import { SceneCamera } from '../render/Camera.js'
+import { Movement } from './Movement.js'
+import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
+import { ScriptableEntity } from './ScriptableEntity.js'
+import { Body2D, ShapeType } from '../physics/Body2D.js'
+import { Scene } from './Scene.js'
 
 export class Component {
     type: ComponentType;
@@ -38,7 +38,12 @@ export class TagComponent extends Component {
 
 export class TransformComponent extends Component {
 
+
     transform: Mat4;
+    positionMat: Mat4;
+    rotationMat: Mat4;
+    scaleMat: Mat4;
+    
     position: Vec3;
     rotation: Vec3;
     scale: Vec3;
@@ -46,6 +51,10 @@ export class TransformComponent extends Component {
     constructor() {
         super();
         this.transform = new Mat4();
+        this.positionMat = new Mat4();
+        this.rotationMat = new Mat4();
+        this.scaleMat = new Mat4();
+
         this.position = new Vec3(0, 0, 0);
         this.rotation = new Vec3(0, 0, 0);
         this.scale = new Vec3(1, 1, 1);
@@ -54,9 +63,14 @@ export class TransformComponent extends Component {
     }
 
     getTransform(): Mat4 {
-        this.transform.setTranslation(this.position);
-        this.transform.applyRotationZ(this.rotation.z);
-        this.transform.applyScale(this.scale);
+        this.positionMat.setTranslation(this.position);
+        this.rotationMat.setRotationZ(this.rotation.z);
+        this.scaleMat.setScale(this.scale);
+
+        this.transform.identity();
+        this.transform.mul(this.scaleMat);
+        this.transform.mul(this.rotationMat);
+        this.transform.mul(this.positionMat);
 
         return this.transform;
     }
@@ -85,6 +99,7 @@ export class TransformComponent extends Component {
         this.rotation.x = angleX;
         this.rotation.y = angleY;
         this.rotation.z = angleZ;
+
     }
 
     rotate(angleX, angleY, angleZ) {
@@ -179,24 +194,24 @@ export class CircleRendererComponent extends Component {
 
 export class CameraComponent extends Component {
 
+    private _isPrimary: boolean
     sceneCamera: SceneCamera;
-    primary: boolean
 
     constructor() {
         super();
         this.sceneCamera = new SceneCamera();
 
-        this.primary = true;
+        this.isPrimary = true;
 
         this.type = ComponentType.CameraComponent;
     }
 
-    isPrimary(): boolean {
-        return this.primary;
+    get isPrimary(): boolean {
+        return this._isPrimary;
     }
 
-    setPrimary(flag: boolean) {
-        this.primary = flag;
+    set isPrimary(flag: boolean) {
+        this._isPrimary = flag;
     }
 
     getCamera(): SceneCamera {
@@ -218,7 +233,7 @@ export class CameraComponent extends Component {
         const oNear = `OrthographicNear: ${this.getCamera().orthographicNear}`;
         const oFar = `OrthographicFar: ${this.getCamera().orthographicFar}`;
         
-        const primary = `Primary: ${this.isPrimary()}`;
+        const primary = `Primary: ${this.isPrimary}`;
 
         return `CameraComponent:\n  Camera:\n   ${type}\n   ${fov}\n   ${pNear}\n   ${pFar}\n   ${size}\n   ${oNear}\n   ${oFar}\n  ${primary}\n`;
     }
@@ -260,17 +275,48 @@ export class Body2DComponent extends Component {
 
     constructor() {
         super();
-        this.body2d = Body2D.CreateBoxBody2D(2, 2, 2, true, 0.5);
+
+        this.body2d = Body2D.CreateBoxBody2D(1, 1, 1, false, 0.1);
 
         this.type = ComponentType.Body2DComponent;
     }
 
-    public move(transform: TransformComponent) {
-        this.body2d.move(transform);
+    public update(deltaTime: number, transform: TransformComponent, gravity: Vec2, iterations: number) {
+        this.body2d.update(deltaTime, transform, gravity, iterations);
+    }
+
+    public moveBy(v: Vec2, transform: TransformComponent) {
+        this.body2d.moveBy(v, transform);
+    }
+
+    public addForce(amount: Vec2) {
+        this.body2d.addForce(amount);
+    }
+
+    public get radius() {
+        return this.body2d.radius;
+    }
+
+    public get linearVelocity() {
+        return this.body2d.linearVelocity;
     }
 
     public set linearVelocity(v: Vec2) {
         this.body2d.linearVelocity = v;
+    }
+
+    public set gravityScale(newValue: number) {
+        this.body2d.gravityScale = newValue;
+    }
+    
+    public setShape(shapeType: ShapeType) {
+        this.body2d.shapeType = shapeType;
+        if (shapeType == ShapeType.Circle) {
+            this.body2d = Body2D.CreateCircleBody2D(0.5, 1, false, 0.1);
+        }
+        else {
+            this.body2d = Body2D.CreateBoxBody2D(1, 1, 1, false, 0.1);
+        }
     }
 }
 

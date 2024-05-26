@@ -1,4 +1,4 @@
-import { Event, EventDispatcher, EventType } from "../event/Event.ts"
+import { Event, EventDispatcher, EventType } from "../event/Event.js"
 
 export class Gamepad 
 {
