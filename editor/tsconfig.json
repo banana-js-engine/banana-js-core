@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "allowJs": true,
+    "target": "ES2016",
+    "module": "System",
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "build",
+    "baseUrl": ".",
+    "paths": {
+      "imgui-js": [ "../ext/imgui-js/build/imgui" ],
+    },
+    "typeRoots": ["../node_modules/@types", "../banana.d.ts"]
+  },
+  "files": [
+    "./src/imgui_impl.ts"
+  ],
+}
