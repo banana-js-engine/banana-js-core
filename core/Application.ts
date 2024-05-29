@@ -64,6 +64,7 @@ export class Application
 
         deltaTimeSeconds = Utils.clamp(deltaTimeSeconds, 0.01, 0.1);
 
+        // TODO: try to separate ImGUI render loop and other loops, (physics, etc.)
         this.onUpdate(1 / 75);
 
         this.layerStack.getLayers().forEach(layer => 
