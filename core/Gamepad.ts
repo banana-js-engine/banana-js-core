@@ -1,17 +1,18 @@
-import { Event, EventDispatcher, EventType } from "../event/Event.js"
+import { EventDispatcher, EventType } from "../event/Event.js";
 
-export class Gamepad 
-{
+export class Gamepad {
     public static Instance: Gamepad;
 
     private _isGamepadConnected: boolean;
-    private _currentGamepad: GamepadEvent['gamepad'];
+    private _currentGamepadIndex: number | null;
 
     constructor() {
         if (!Gamepad.Instance) {
             Gamepad.Instance = this;
 
             this._isGamepadConnected = false;
+            this._currentGamepadIndex = null;
+
             this.onGamepadConnected = this.onGamepadConnected.bind(this);
             this.onGamepadDisconnected = this.onGamepadDisconnected.bind(this);
         }
@@ -27,19 +28,23 @@ export class Gamepad
     }
 
     private onGamepadConnected(event) {
-        this._currentGamepad = event.getGamepad(); 
-
+        this._currentGamepadIndex = event.gamepad.index;
         this._isGamepadConnected = true;
     }
     
     private onGamepadDisconnected(event) {
-        this._currentGamepad = undefined;
-
-        this._isGamepadConnected = false;
+        if (this._currentGamepadIndex === event.gamepad.index) {
+            this._currentGamepadIndex = null;
+            this._isGamepadConnected = false;
+        }
     }
 
     public get currentGamepad() {
-        return navigator.getGamepads()[this._currentGamepad.index];
+        if (!this.isGamepadConnected || this._currentGamepadIndex === null) {
+            return null;
+        }
+
+        return navigator.getGamepads()[this._currentGamepadIndex];
     }
 
     public get isGamepadConnected() {

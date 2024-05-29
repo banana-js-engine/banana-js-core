@@ -4,6 +4,7 @@ export * from "./core/Log.js";
 export * from "./core/Input.js";
 export * from "./core/KeyCode.js";
 export * from "./core/MouseButtonCode.js";
+export * from "./core/GamepadInputCode.js"
 export * from "./core/CameraController.js";
 export * from "./core/Application.js";
 export * from "./core/Window.js";

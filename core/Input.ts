@@ -47,9 +47,15 @@ export class Input {
             }
             return false;
         } 
+
+        const currentGamepad = Gamepad.Instance.currentGamepad;
+    
+        if (!currentGamepad || !currentGamepad.buttons || currentGamepad.buttons.length <= button) {
+            return 0;
+        }
         
         this._gamepadWarningFlag = true;
-        return Gamepad.Instance.currentGamepad.buttons[button].pressed;
+        return currentGamepad.buttons[button].pressed;
     }
 
     public static getJoystickStrength(axis: number): number {
@@ -60,10 +66,17 @@ export class Input {
             }
             return 0;
         } 
-
+    
+        const currentGamepad = Gamepad.Instance.currentGamepad;
+    
+        if (!currentGamepad || !currentGamepad.axes || currentGamepad.axes.length <= axis) {
+            return 0;
+        }
+    
         this._gamepadWarningFlag = true;
-        return Gamepad.Instance.currentGamepad.axes[axis];
+        return currentGamepad.axes[axis];
     }
+    
 
     public static mousePosition = new Vec3(0, 0, 0);
 
