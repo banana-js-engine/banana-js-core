@@ -1,4 +1,4 @@
-import { Event, EventCategory, EventType } from "./Event.ts"
+import { Event, EventCategory, EventType } from "./Event.js"
 
 class GamepadEventt extends Event {
     

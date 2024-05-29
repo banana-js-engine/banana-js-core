@@ -1,9 +1,9 @@
-import { IndexBuffer, VertexBuffer } from "./Buffer.ts"
-import { Color } from "./Color.ts"
-import { Shader } from "./Shader.ts"
-import { Texture } from "./Texture.ts"
-import { gl } from "./WebGLContext.ts"
-import { Mat4, Vec2, Vec3, Vec4 } from "../math/MV.ts"
+import { IndexBuffer, VertexBuffer } from "./Buffer.js"
+import { Color } from "./Color.js"
+import { Shader } from "./Shader.js"
+import { Texture } from "./Texture.js"
+import { gl } from "./WebGLContext.js"
+import { Mat4, Vec2, Vec3, Vec4 } from "../math/BananaMath.js"
 import { SubTexture, TransformComponent } from "../banana.js"
 
 class Render2DData
@@ -16,10 +16,10 @@ class Render2DData
     static MaxVertices = Render2DData.MaxQuads * 4;
     static MaxIndices = Render2DData.MaxQuads * 6; 
     static QuadVertexPositions = [
-        new Vec4(-50, -50, 0, 1),
-        new Vec4(50, -50, 0, 1),
-        new Vec4(-50, 50, 0, 1),
-        new Vec4(50, 50, 0, 1)
+        new Vec4(-0.5, -0.5, 0, 1),
+        new Vec4(0.5, -0.5, 0, 1),
+        new Vec4(-0.5, 0.5, 0, 1),
+        new Vec4(0.5, 0.5, 0, 1),
     ];
 
     static QuadTextureCoords = [
@@ -51,7 +51,6 @@ class Render2DData
     static CircleIndexCount = 0;
 
     static CircleShader: Shader = null;
-    static CircleIndexBuffer: IndexBuffer = null;
     static CircleVertexBuffer: VertexBuffer = null;
 
     static CircleFragCoords = [
@@ -225,7 +224,6 @@ export class Renderer2D {
         Render2DData.CircleShader = new Shader('/shader/Renderer2D_Circle.glsl');
 
         Render2DData.CircleVertexBuffer = new VertexBuffer(Render2DData.MaxVertices * CircleVertex.VertexSize);
-        //Render2DData.CircleIndexBuffer = new IndexBuffer( quadIndices );
 
         const aCirclePosition = Render2DData.CircleShader.getAttributeLocation('a_Position');
         const aCircleFragCoord = Render2DData.CircleShader.getAttributeLocation('a_FragCoord');
@@ -274,22 +272,12 @@ export class Renderer2D {
                 Render2DData.TextureSlots[i].bind(i);
             }
 
-            Render2DData.QuadShader.bind();
             Render2DData.QuadVertexBuffer.bind();
             Render2DData.QuadVertexBuffer.linkAttributes();
+            Render2DData.QuadShader.bind();
             Render2DData.QuadShader.setUniformMatrix4fv('u_ViewProjectionMatrix', Render2DData.ViewProj.data);
             
             gl.drawElements(gl.TRIANGLES, Render2DData.QuadIndexCount, gl.UNSIGNED_SHORT, 0);
-            Renderer2D.Stats.BatchCount++;
-        }
-        if (Render2DData.LineVertexCount) {
-            
-            Render2DData.LineVertexBuffer.bind();
-            Render2DData.LineVertexBuffer.linkAttributes();
-            Render2DData.LineShader.bind();
-            Render2DData.LineShader.setUniformMatrix4fv('u_ViewProjectionMatrix', Render2DData.ViewProj.data);
-    
-            gl.drawArrays(gl.LINES, 0, Render2DData.LineVertexCount);
             Renderer2D.Stats.BatchCount++;
         }
         if (Render2DData.CircleIndexCount) {
@@ -300,6 +288,16 @@ export class Renderer2D {
             Render2DData.CircleShader.setUniformMatrix4fv('u_ViewProjectionMatrix', Render2DData.ViewProj.data);
 
             gl.drawElements(gl.TRIANGLES, Render2DData.CircleIndexCount, gl.UNSIGNED_SHORT, 0);
+        }
+        if (Render2DData.LineVertexCount) {
+            
+            Render2DData.LineVertexBuffer.bind();
+            Render2DData.LineVertexBuffer.linkAttributes();
+            Render2DData.LineShader.bind();
+            Render2DData.LineShader.setUniformMatrix4fv('u_ViewProjectionMatrix', Render2DData.ViewProj.data);
+    
+            gl.drawArrays(gl.LINES, 0, Render2DData.LineVertexCount);
+            Renderer2D.Stats.BatchCount++;
         }
     }
 
@@ -317,40 +315,23 @@ export class Renderer2D {
 
     static drawColorQuad(transform: TransformComponent, color: Color) {
 
-        Renderer2D.newBatch();
         if (Render2DData.QuadIndexCount >= Render2DData.MaxIndices) {
             Renderer2D.flush();
+            Renderer2D.newBatch();
         }
 
-        let t = transform.getTransform();
+        const t = transform.getTransform();
 
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[0]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[0];
-        this.quadVertex.texIndex = 0;
-        this.quadVertex.color = color;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
+        for (let i = 0; i < 4; i++) {
+            const transformedPosition = t.mulVec4(Render2DData.QuadVertexPositions[i]);
 
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[1]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[1];
-        this.quadVertex.texIndex = 0;
-        this.quadVertex.color = color;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[2]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[2];
-        this.quadVertex.texIndex = 0;
-        this.quadVertex.color = color;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[3]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[3];
-        this.quadVertex.texIndex = 0;
-        this.quadVertex.color = color;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
+            this.quadVertex.position = transformedPosition;
+            this.quadVertex.texCoord = Render2DData.QuadTextureCoords[i];
+            this.quadVertex.texIndex = 0;
+            this.quadVertex.color = color;
+            Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
+            Render2DData.QuadVertexCount++;
+        }
         
         Render2DData.QuadIndexCount += 6;
 

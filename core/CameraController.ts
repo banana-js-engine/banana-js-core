@@ -1,11 +1,11 @@
-import { Input } from "./Input.ts"
-import { EditorCamera } from "../render/Camera.ts"
-import { MouseButton } from "./MouseButtonCode.ts"
-import { Event, EventDispatcher, EventType } from "../event/Event.ts"
-import { canvas } from "./Window.ts"
-import { KeyCode } from "./KeyCode.ts"
-import { GamepadButtonCode } from "./GamepadButtonCode.ts"
-import { Vec2, Vec3 } from "../math/MV.ts"
+import { Input } from "./Input.js"
+import { EditorCamera } from "../render/Camera.js"
+import { MouseButton } from "./MouseButtonCode.js"
+import { Event, EventDispatcher, EventType } from "../event/Event.js"
+import { canvas } from "./Window.js"
+import { KeyCode } from "./KeyCode.js"
+import { GamepadInputCode } from "./GamepadInputCode.js"
+import { Vec2, Vec3 } from "../math/BananaMath.js"
 
 export class EditorCameraController 
 {

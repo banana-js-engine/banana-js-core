@@ -1,5 +1,5 @@
-import { Writer } from "./FileManager.ts";
-import { Log } from "./Log.ts"
+import { Writer } from "./FileManager.js";
+import { Log } from "./Log.js"
 
 export class Profiler {
     public static beginProfile(name: string, filepath: string = 'results.json') {

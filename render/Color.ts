@@ -1,4 +1,4 @@
-import { Vec4 } from '../math/MV.ts';
+import { Vec4 } from '../math/BananaMath.js';
 
 export class Color
 {

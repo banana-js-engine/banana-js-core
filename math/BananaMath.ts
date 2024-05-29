@@ -1,6 +1,21 @@
 import { Log } from "../banana.js";
 
+/*
+    BananaMath consists of:
+        - Utils
+        - Vec2
+        - Vec3
+        - Vec4
+        - Mat4
+*/
+
+/**
+ * Random math utility methods
+ */
 export class Utils {
+
+    public static readonly tolerance = 0.0005;
+
     static toRadians(x: number): number {
         return x * (Math.PI / 180);
     }
@@ -27,6 +42,10 @@ export class Utils {
 
         return value;
     } 
+
+    static nearlyEqual(a: number, b: number) {
+        return Math.abs(a - b) < this.tolerance;
+    }
 }
 
 // VECTORS
@@ -45,6 +64,10 @@ export class Vec2 {
 
         this.data[0] = x;
         this.data[1] = y;
+    }
+
+    public static copy(vec: Vec2) {
+        return new Vec2(vec.x, vec.y);
     }
 
     public get x() {
@@ -67,12 +90,37 @@ export class Vec2 {
         return new Vec2(this.x + v.x, this.y + v.y);
     }
 
+    public sub(v: Vec2) {
+        return new Vec2(this.x - v.x, this.y - v.y);
+    }
+
+    public mul(scalar: number) {
+        return new Vec2(this.x * scalar, this.y * scalar);
+    }
+
+    public div(scalar: number) {
+        if (scalar == 0) {
+            Log.Core_Error('Division by 0!');
+            return Vec2.ZERO;
+        }
+
+        return new Vec2(this.x / scalar, this.y / scalar);
+    }
+
     public length(): number {
         return Math.sqrt( this.x ** 2 + this.y ** 2 );
     }
 
+    public lengthSquared(): number {
+        return this.x ** 2 + this.y ** 2;
+    }
+
     public distanceTo(v: Vec2): number {
         return Math.sqrt( (this.x - v.x) ** 2 + (this.y - v.y) ** 2 );
+    }
+
+    public distanceToSquared(v: Vec2): number {
+        return (this.x - v.x) ** 2 + (this.y - v.y) ** 2;
     }
 
     public normalize(): Vec2 {
@@ -90,6 +138,14 @@ export class Vec2 {
 
     public equals(other: Vec2): boolean {
         return this.x == other.x && this.y == other.y;
+    }
+
+    public nearlyEquals(other: Vec2): boolean {
+        return Utils.nearlyEqual(this.x, other.x) && Utils.nearlyEqual(this.y, other.y);
+    }
+
+    public toString() {
+        return `[${this.x}, ${this.y}]`;
     }
 }
 
@@ -240,7 +296,7 @@ export class Mat4 {
             }
         }
 
-        WebAssembly.instantiateStreaming(fetch('./matrix.wasm'), importObject).then(
+        WebAssembly.instantiateStreaming(fetch('/matrix.wasm'), importObject).then(
             (obj) => {
                 this.mat4_multiply = obj.instance.exports.mat4_multiply as CallableFunction;
                 this.mat4_apply_rotation_z = obj.instance.exports.mat4_apply_rotation_z as CallableFunction;
@@ -466,16 +522,27 @@ export class Mat4 {
         return this;
     }
 
-    invertSIMD(): Mat4 {
-
-        return null;
-    }
-
     setTranslation(vec3: Vec3): Mat4 {
         this.identity();
         this.data[3] = vec3.x;
         this.data[7] = vec3.y;
         this.data[11] = vec3.z;
+        return this;
+    }
+
+    setRotationZ(ang: number): Mat4 {
+        this.identity();
+
+        ang = Utils.toRadians(ang);
+
+        const cos = Math.cos(ang);
+        const sin = Math.sin(ang);
+
+        this.data[0] = cos;
+        this.data[1] = -sin;
+        this.data[4] = sin;
+        this.data[5] = cos;
+
         return this;
     }
 
@@ -553,6 +620,16 @@ export class Mat4 {
         this.data[ 9] = this.data[ 9] * vec3.z;
         this.data[10] = this.data[10] * vec3.z;
         this.data[11] = this.data[11] * vec3.z;
+
+        return this;
+    }
+
+    setScale(vec3: Vec3): Mat4 {
+        this.identity();
+
+        this.data[0] = vec3.x;
+        this.data[5] = vec3.y;
+        this.data[10] = vec3.z;
 
         return this;
     }
