@@ -13,8 +13,6 @@ import { CameraComponent,
          TagComponent, 
          TransformComponent, 
          PhysicsWorld,
-         ImGui_Impl,
-         ImGui,
          RenderCommand} from '../banana.js'
 import { Mat4, Vec2, Vec3, Vec4 } from '../math/BananaMath.js'
  
