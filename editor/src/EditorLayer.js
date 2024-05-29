@@ -1,4 +1,5 @@
 import * as banana from "../../build/banana.js";
+import { GamepadTestScript } from "./GamepadTestScript.js";
 
 /**
  * Example layer which demonstrates a simple ImGUI Panel
@@ -13,8 +14,11 @@ export class EditorLayer extends banana.Layer {
         this.counter = 0;
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
-        
+
         this.scene = new banana.Scene('test scene');
+
+        this.gamepadTest = this.scene.createEntity('gamepad test');
+        this.gamepadTest.addComponent( banana.ComponentType.NativeScriptComponent ).bind(GamepadTestScript);
 
         banana.RenderCommand.setClearColor( banana.Color.RED );
     }
