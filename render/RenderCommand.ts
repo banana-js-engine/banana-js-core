@@ -6,14 +6,14 @@ export class RenderCommand {
     }
 
     static setClearColor(color) {
-        gl.clearColor(color[0], color[1], color[2], color[3]);
+        gl.clearColor(color.x, color.y, color.z, color.w);
     }
 
     /**
      * Clears the canvas.
      */
     static clear() {
-        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+        gl.clear( gl.COLOR_BUFFER_BIT );
     }
 
 }

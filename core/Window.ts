@@ -5,6 +5,7 @@ import * as mouse from '../event/MouseEvent.js'
 import * as keyboard from '../event/KeyboardEvent.js'
 import * as application from '../event/ApplicationEvent.js'
 import * as gamepad from '../event/GamepadEvent.js'
+import { ImGUILayer } from './ImGUILayer.js'
 
 export let canvas;
 
@@ -15,7 +16,7 @@ export class Window {
     eventCallbackFn: Function;
     context: WebGLContext;
 
-    constructor(title, width, height) {
+    constructor(title: string, width: number, height: number) {
         this.title = title;
         this.width = width;
         this.height = height;
@@ -41,6 +42,9 @@ export class Window {
         this.context = new WebGLContext(canvas);
 
         // mouse events
+        canvas.addEventListener('dblclick', (event) => {
+            event.preventDefault();
+        })
 
         canvas.addEventListener('mousedown', (event) => 
         {
