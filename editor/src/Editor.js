@@ -6,7 +6,7 @@ import { EditorLayer } from './EditorLayer.js';
  */
 class EditorApplication extends banana.Application {
     constructor() {
-        super('banana test', window.innerWidth, window.innerHeight);
+        super('banana editor', window.innerWidth, window.innerHeight);
         
         this.pushLayer(new EditorLayer());
     }

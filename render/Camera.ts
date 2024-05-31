@@ -8,7 +8,7 @@ export enum CameraType {
     Perspective = 1,
 };
 
-class Camera {
+export class Camera {
     projectionMatrix: Mat4;
     cameraType: CameraType;
     aspectRatio: number;
