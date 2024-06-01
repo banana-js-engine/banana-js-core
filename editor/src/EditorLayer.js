@@ -15,15 +15,17 @@ export class EditorLayer extends banana.Layer {
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
 
-        this.scene = new banana.Scene('test scene');
+        this.scene = new banana.Scene('scene');
 
         this.gamepadTest = this.scene.createEntity('gamepad test');
         this.gamepadTest.addComponent( banana.ComponentType.NativeScriptComponent ).bind(GamepadTestScript);
 
-        banana.RenderCommand.setClearColor( banana.Color.RED );
+        banana.RenderCommand.setClearColor( banana.Color.BLACK );
     }
 
     onUpdate(deltaTime) {
+
+        banana.RenderCommand.clear();
         
         this.scene.onUpdateRuntime(deltaTime);
         
@@ -45,8 +47,6 @@ export class EditorLayer extends banana.Layer {
         banana.ImGui.EndFrame();
         
         banana.ImGui.Render();
-        
-        banana.RenderCommand.clear();
 
         banana.ImGui_Impl.RenderDrawData(banana.ImGui.GetDrawData());
 

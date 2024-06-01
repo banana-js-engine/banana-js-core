@@ -1,12 +1,13 @@
+import { Color } from "./Color.js";
 import { gl } from "./WebGLContext.js"
 
 export class RenderCommand {
-    static setViewport(width, height) {
+    static setViewport(width: number, height: number) {
         gl.viewport(0, 0, width, height);
     }
 
-    static setClearColor(color) {
-        gl.clearColor(color.x, color.y, color.z, color.w);
+    static setClearColor(color: Color) {
+        gl.clearColor(color.r, color.g, color.b, color.a);
     }
 
     /**
