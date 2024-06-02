@@ -151,7 +151,7 @@ export class EditorCamera extends Camera {
         this.recalculateViewProjectionMatrix();
     }
 
-    GetRotation() {
+    getRotation() {
         return this.cameraRotation;
     }
 
