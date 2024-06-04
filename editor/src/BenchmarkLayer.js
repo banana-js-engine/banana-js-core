@@ -2,7 +2,7 @@ import * as banana from "../../build/banana.js";
 
 /**
  * Benchmark layer which is used to test the limits of the engine by rendering 
- * and/or enabling the physics of many entities at once and   
+ * and/or enabling the physics of many entities at once and measure performance  
  */
 export class BenchmarkLayer extends banana.Layer {
 
