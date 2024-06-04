@@ -5,6 +5,9 @@ import { Texture } from "./Texture.js"
 import { gl } from "./WebGLContext.js"
 import { Mat4, Vec2, Vec3, Vec4 } from "../math/BananaMath.js"
 import { Camera, Log, SubTexture, TransformComponent } from "../banana.js"
+import { Font } from "./Font.js"
+
+import { defaultFontData } from "./data/defaultFontData.js";
 
 class Render2DData
 {
@@ -185,6 +188,7 @@ export class Renderer2D {
     static init() {
         // empty constructor of Texture will produce 1x1 white texture
         Renderer2D.White_Texture = new Texture();
+        Font.defaultFont = new Font('/render/data/defaultFont.png', defaultFontData);
 
         // prepare indices for index buffer creation
         let quadIndices = new Uint16Array( Render2DData.MaxIndices );
@@ -407,7 +411,7 @@ export class Renderer2D {
             this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[i]);
             this.quadVertex.texCoord = Render2DData.QuadTextureCoords[i];
             this.quadVertex.texIndex = useTextureSlot;
-            this.quadVertex.color = Color.TRANSPARENT;
+            this.quadVertex.color = Color.WHITE;
             Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
             Render2DData.QuadVertexCount++;
         }
@@ -456,7 +460,7 @@ export class Renderer2D {
             this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[i]);
             this.quadVertex.texCoord = texCoords[i];
             this.quadVertex.texIndex = useTextureSlot;
-            this.quadVertex.color = Color.TRANSPARENT;
+            this.quadVertex.color = Color.WHITE;
             Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
             Render2DData.QuadVertexCount++;
         }
@@ -528,6 +532,36 @@ export class Renderer2D {
         }
 
         Render2DData.CircleIndexCount += 6;
+    }
+
+    /**
+     * Adds vertex data for rendering strings/(texts).
+     * TODO: right now, text is rendered through a texture atlas, in the future read the information from a font (.ttf) file.
+     * @param transform transform of the text
+     * @param text the string to be rendered
+     * @param font the font to be used.
+     * Font.defaultFont consists of these characters: abcdefghijklmnopqrstuvwxyz123456789-*!?
+     */
+    static drawText(transform: TransformComponent, text: string, font: Font = Font.defaultFont) {
+
+        text = text.toLowerCase();
+
+        const t = new TransformComponent();
+
+        t.setPosition( transform.getPosition() );
+        t.setRotation( transform.getRotation() );
+        t.setScale( transform.getScale() );
+
+        for (let i = 0; i < text.length; i++) {
+
+            const glyph = font.glyphs[text.charAt(i)];
+
+            if (glyph) {
+                this.drawSubTextureQuad(t, glyph);
+            } 
+            t.translate(font.glyphData.spaceWidth, 0, 0);
+        }
+
     }
 
     // following functions only exist within the engine, once the game is built they shouldn't be called

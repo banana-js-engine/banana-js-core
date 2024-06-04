@@ -79,7 +79,15 @@ export class TransformComponent extends Component {
         return this.position;
     }
 
-    setPosition(x: number, y: number, z: number) {
+    setPosition(x: number | Vec3, y?: number, z?: number) {
+
+        if (x instanceof Vec3) {
+            this.position.x = x.x;
+            this.position.y = x.y;
+            this.position.z = x.z;
+            return;
+        }
+
         this.position.x = x;
         this.position.y = y;
         this.position.z = z;
@@ -95,14 +103,22 @@ export class TransformComponent extends Component {
         return this.rotation;
     }
 
-    setRotation(angleX, angleY, angleZ) {
+    setRotation(angleX: number | Vec3, angleY?: number, angleZ?: number) {
+
+        if (angleX instanceof Vec3) {
+            this.rotation.x = angleX.x;
+            this.rotation.y = angleX.y;
+            this.rotation.z = angleX.z;
+            return;
+        }
+
         this.rotation.x = angleX;
         this.rotation.y = angleY;
         this.rotation.z = angleZ;
 
     }
 
-    rotate(angleX, angleY, angleZ) {
+    rotate(angleX: number, angleY: number, angleZ: number) {
         this.rotation.x += angleX;
         this.rotation.y += angleY;
         this.rotation.z += angleZ;
@@ -112,7 +128,15 @@ export class TransformComponent extends Component {
         return this.scale;
     }
 
-    setScale(x, y, z) {
+    setScale(x: number | Vec3, y?: number, z?: number) {
+
+        if (x instanceof Vec3) {
+            this.scale.x = x.x;
+            this.scale.y = x.y;
+            this.scale.z = x.z;
+            return;
+        }
+
         this.scale.x = x;
         this.scale.y = y;
         this.scale.z = z;
@@ -189,6 +213,21 @@ export class CircleRendererComponent extends Component {
 
     public set fade(newFade) {
         this._fade = newFade;
+    }
+}
+
+export class TextRendererComponent extends Component {
+    text: string;
+
+    constructor() {
+        super();
+        this.text = '';
+
+        this.type = ComponentType.TextRendererComponent;
+    }
+
+    setText(text: string) {
+        this.text = text;
     }
 }
 
@@ -325,6 +364,7 @@ ComponentCreator[ComponentType.TagComponent] = TagComponent;
 ComponentCreator[ComponentType.TransformComponent] = TransformComponent;
 ComponentCreator[ComponentType.SpriteRendererComponent] = SpriteRendererComponent;
 ComponentCreator[ComponentType.CircleRendererComponent] = CircleRendererComponent;
+ComponentCreator[ComponentType.TextRendererComponent] = TextRendererComponent;
 ComponentCreator[ComponentType.CameraComponent] = CameraComponent;
 ComponentCreator[ComponentType.NativeScriptComponent] = NativeScriptComponent;
 ComponentCreator[ComponentType.MovementComponent] = MovementComponent;

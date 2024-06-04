@@ -104,7 +104,7 @@ export class Application
         canvas.height = event.getHeight();
         RenderCommand.setViewport(event.getWidth(), event.getHeight());
 
-        return true;
+        return false;
     }
 
     public pushLayer(layer) {

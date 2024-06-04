@@ -21,6 +21,10 @@ export class TestLayer extends banana.Layer {
         this.square = this.scene.createEntity('square');
         this.square.addComponent(banana.ComponentType.SpriteRendererComponent);
         this.square.getComponent(banana.ComponentType.TransformComponent).translate(1.5, 0, 0);
+
+        this.text = this.scene.createEntity('text');
+        this.text.addComponent(banana.ComponentType.TextRendererComponent).setText('deniz!');
+        this.text.getComponent(banana.ComponentType.TransformComponent).translate(0, 1.5, 0);
         
         banana.RenderCommand.setClearColor(banana.Color.BLACK);
     }

@@ -3,6 +3,7 @@ export enum ComponentType {
     TransformComponent,
     SpriteRendererComponent,
     CircleRendererComponent,
+    TextRendererComponent,
     CameraComponent,
     NativeScriptComponent,
     MovementComponent,
