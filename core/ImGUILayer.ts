@@ -4,8 +4,13 @@ import { ImGui, ImGui_Impl } from "./EntryPoint.js";
 import { gl } from "../render/WebGLContext.js";
 
 export class ImGUILayer extends Layer {
+
+    imGuiRefreshRate: number;
+
     constructor() {
         super('ImGUILayer');
+
+        this.imGuiRefreshRate = (1 / 75);
     }
     
     onAttach() {
@@ -19,6 +24,17 @@ export class ImGUILayer extends Layer {
         io.WantCaptureKeyboard = true;
 
         ImGui_Impl.Init(gl);
+    }
+
+    begin() {
+        ImGui_Impl.NewFrame(this.imGuiRefreshRate);
+        ImGui.NewFrame();
+    }
+
+    end() {
+        ImGui.EndFrame();
+        ImGui.Render();
+        ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
     }
 
     onDetach() {

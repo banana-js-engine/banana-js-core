@@ -14,6 +14,7 @@ export class EditorLayer extends banana.Layer {
         this.counter = 0;
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
+        this.fps = 75;
 
         this.scene = new banana.Scene('scene');
 
@@ -28,27 +29,8 @@ export class EditorLayer extends banana.Layer {
         banana.RenderCommand.clear();
         
         this.scene.onUpdateRuntime(deltaTime);
-        
-        // ImGUI section
-        banana.ImGui_Impl.NewFrame(deltaTime);
-        banana.ImGui.NewFrame();
-        
-        {
-            banana.ImGui.Begin('Test Panel');
-            banana.ImGui.Text(`FPS: ${Math.floor(1 / deltaTime)}`);
-            
-            banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
 
-            banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
-
-            banana.ImGui.End();
-        }
-        
-        banana.ImGui.EndFrame();
-        
-        banana.ImGui.Render();
-
-        banana.ImGui_Impl.RenderDrawData(banana.ImGui.GetDrawData());
+        this.fps = 1 / deltaTime;
 
         banana.RenderCommand.setClearColor( new banana.Color( this.clearColorIm.x, this.clearColorIm.y, this.clearColorIm.z, this.clearColorIm.w ) );
 
@@ -58,6 +40,17 @@ export class EditorLayer extends banana.Layer {
         else { 
             banana.ImGui.StyleColorsLight();
         }
+    }
+
+    onImGuiRender() {
+        banana.ImGui.Begin('Test Panel');
+        banana.ImGui.Text(`FPS: ${this.fps.toFixed(1)}`);
+        
+        banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
+
+        banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
+
+        banana.ImGui.End();
     }
 
     onEvent(event) {
