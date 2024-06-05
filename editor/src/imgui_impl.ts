@@ -503,8 +503,10 @@ export function RenderDrawData(draw_data: ImGui.DrawData | null = ImGui.GetDrawD
     const gl2: WebGL2RenderingContext | null = typeof WebGL2RenderingContext !== "undefined" && gl instanceof WebGL2RenderingContext && gl || null;
     const gl_vao: OES_vertex_array_object | null = gl && gl.getExtension("OES_vertex_array_object") || null;
 
+    
     // Backup GL state
     const last_active_texture: GLenum | null = gl && gl.getParameter(gl.ACTIVE_TEXTURE) || null;
+    gl && gl.activeTexture(gl.TEXTURE0);
     const last_program: WebGLProgram | null = gl && gl.getParameter(gl.CURRENT_PROGRAM) || null;
     const last_texture: WebGLTexture | null = gl && gl.getParameter(gl.TEXTURE_BINDING_2D) || null;
     const last_array_buffer: WebGLBuffer | null = gl && gl.getParameter(gl.ARRAY_BUFFER_BINDING) || null;
@@ -530,12 +532,12 @@ export function RenderDrawData(draw_data: ImGui.DrawData | null = ImGui.GetDrawD
     const vertex_array_object: WebGLVertexArrayObject | WebGLVertexArrayObjectOES | null = gl2 && gl2.createVertexArray() || gl_vao && gl_vao.createVertexArrayOES();
 
     // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
-    gl && gl.enable(gl.BLEND);
-    gl && gl.blendEquation(gl.FUNC_ADD);
-    gl && gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl && gl.disable(gl.CULL_FACE);
-    gl && gl.disable(gl.DEPTH_TEST);
-    gl && gl.enable(gl.SCISSOR_TEST);
+    // gl && gl.enable(gl.BLEND);
+    // gl && gl.blendEquation(gl.FUNC_ADD);
+    // gl && gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl && gl.disable(gl.CULL_FACE);
+    // gl && gl.disable(gl.DEPTH_TEST);
+    // gl && gl.enable(gl.SCISSOR_TEST);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // Setup viewport, orthographic projection matrix
