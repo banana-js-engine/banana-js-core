@@ -9,8 +9,6 @@ export class EditorLayer extends banana.Layer {
     constructor() {
         super('Editor Layer');
 
-        banana.Renderer2D.init();
-
         this.counter = 0;
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
@@ -30,14 +28,10 @@ export class EditorLayer extends banana.Layer {
 
         this.gamepadTest = this.scene.createEntity('gamepad test');
         this.gamepadTest.addComponent( banana.ComponentType.NativeScriptComponent ).bind(GamepadTestScript);
-
-        banana.RenderCommand.setClearColor( banana.Color.BLACK );
     }
 
     onUpdate(deltaTime) {
 
-        banana.RenderCommand.clear();
-        
         this.scene.onUpdateRuntime(deltaTime);
 
         this.fps = 1 / deltaTime;

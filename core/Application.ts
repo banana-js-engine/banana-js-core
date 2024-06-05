@@ -4,7 +4,7 @@ import { Event, EventDispatcher, EventType } from "../event/Event.js"
 import { LayerStack } from "./LayerStack.js"
 import { RenderCommand } from "../render/RenderCommand.js"
 import { Gamepad } from "./Gamepad.js"
-import { Mat4, Utils } from "../banana.js"
+import { Mat4, Renderer2D, Utils } from "../banana.js"
 import { ImGUILayer } from "./ImGUILayer.js"
 
 
@@ -32,6 +32,8 @@ export class Application
 
         this.layerStack = new LayerStack();
 
+        Renderer2D.init();
+
         this.lastFrameTime = 0;
 
         this.window.resize(windowWidth, windowHeight);
@@ -45,10 +47,6 @@ export class Application
         this._onTick();
     }
 
-    public onUpdate(deltaTime: number) {
-
-    }
-
     private _onTick() {
 
         let currentFrameTime = performance.now();
@@ -58,7 +56,7 @@ export class Application
 
         deltaTimeSeconds = Utils.clamp(deltaTimeSeconds, 0.01, 0.1);
 
-        this.onUpdate(deltaTimeSeconds);
+        RenderCommand.clear();
 
         // onUpdate
         this.layerStack.getLayers().forEach(layer => 

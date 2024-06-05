@@ -23,7 +23,6 @@ export class RenderCommand {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.disable(gl.CULL_FACE);
         gl.disable(gl.DEPTH_TEST);
-        gl.enable(gl.SCISSOR_TEST)
     }
 
 }

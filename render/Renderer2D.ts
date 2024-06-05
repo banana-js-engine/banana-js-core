@@ -4,7 +4,7 @@ import { Shader } from "./Shader.js"
 import { Texture } from "./Texture.js"
 import { gl } from "./WebGLContext.js"
 import { Mat4, Vec2, Vec3, Vec4 } from "../math/BananaMath.js"
-import { Camera, Log, RenderCommand, SubTexture, TransformComponent } from "../banana.js"
+import { Camera, Log, RenderCommand, SubTexture, TransformComponent, canvas } from "../banana.js"
 import { Font } from "./Font.js"
 
 import { defaultFontData } from "./data/defaultFontData.js";
