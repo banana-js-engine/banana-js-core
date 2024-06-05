@@ -18,6 +18,16 @@ export class EditorLayer extends banana.Layer {
 
         this.scene = new banana.Scene('scene');
 
+        this.camera = this.scene.createEntity('camera');
+        this.camera.addComponent(banana.ComponentType.CameraComponent);
+        
+        this.circle = this.scene.createEntity('circle');
+        this.circle.addComponent(banana.ComponentType.CircleRendererComponent);
+        
+        this.square = this.scene.createEntity('square');
+        this.square.addComponent(banana.ComponentType.SpriteRendererComponent).setColor(banana.Color.RED);
+        this.square.getComponent(banana.ComponentType.TransformComponent).translate(1.5, 0, 0);
+
         this.gamepadTest = this.scene.createEntity('gamepad test');
         this.gamepadTest.addComponent( banana.ComponentType.NativeScriptComponent ).bind(GamepadTestScript);
 
