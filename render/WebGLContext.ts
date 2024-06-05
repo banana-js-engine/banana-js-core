@@ -1,4 +1,5 @@
 import { Log } from "../core/Log.js"
+import { RenderCommand } from "./RenderCommand.js";
 
 export let gl;
 
@@ -16,10 +17,7 @@ export class WebGLContext {
 
             this.maxTextureCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
-            //gl.enable(gl.CULL_FACE);
-            //gl.enable(gl.DEPTH_TEST);
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            RenderCommand.resetState();
         }
     }
 }
