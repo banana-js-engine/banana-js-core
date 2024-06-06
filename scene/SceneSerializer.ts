@@ -1,7 +1,7 @@
-import { CameraType, Color, Vec3, Vec4 } from "../banana.js";
+import { CameraType, Color, ShapeType, Vec3, Vec4 } from "../banana.js";
 import { Writer } from "../core/FileManager.js";
 import { ComponentType } from "../core/Type.js";
-import { CameraComponent, ComponentCreator, SpriteRendererComponent, TagComponent, TransformComponent } from "./Component.js";
+import { Body2DComponent, CameraComponent, CircleRendererComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
 import { Entity } from "./Entity.js";
 import { Scene } from "./Scene.js";
 
@@ -37,9 +37,24 @@ export class SceneSerializer {
                 sceneData += ` ${spriteRendererComponent}`;
             }
 
+            if (scene.registry.has(entity, ComponentType.CircleRendererComponent)) {
+                const circleRendererComponent = scene.registry.get<CircleRendererComponent>(entity, ComponentType.CircleRendererComponent);
+                sceneData += ` ${circleRendererComponent}`;
+            }
+
+            if (scene.registry.has(entity, ComponentType.TextRendererComponent)) {
+                const textRendererComponent = scene.registry.get<TextRendererComponent>(entity, ComponentType.TextRendererComponent);
+                sceneData += ` ${textRendererComponent}`;
+            }
+
             if (scene.registry.has(entity, ComponentType.CameraComponent)) {
                 const cameraComponent = scene.registry.get<CameraComponent>(entity, ComponentType.CameraComponent);
                 sceneData += ` ${cameraComponent}`;
+            }
+
+            if (scene.registry.has(entity, ComponentType.Body2DComponent)) {
+                const body2dComponent = scene.registry.get<Body2DComponent>(entity, ComponentType.Body2DComponent);
+                sceneData += ` ${body2dComponent}`;
             }
         }
 
@@ -89,6 +104,28 @@ export class SceneSerializer {
 
                 spriteRendererComponent.setColor(new Color(color.x, color.y, color.z, color.w));
             }
+            else if (lines[i].startsWith(' CircleRendererComponent:')) {
+                const circleRendererComponent = currentEntity.addComponent<CircleRendererComponent>(ComponentType.CircleRendererComponent);
+
+                const colorString = lines[i+1].split(':')[1].trim();
+                const thicknessString = lines[i+2].split(':')[1].trim();
+                const fadeString = lines[i+3].split(':')[1].trim();
+
+                const color = this.parseVec4(colorString);
+                const thickness = parseFloat(thicknessString);
+                const fade = parseFloat(fadeString);
+
+                circleRendererComponent.color = new Color(color.x, color.y, color.z, color.w);
+                circleRendererComponent.thickness = thickness;
+                circleRendererComponent.fade = fade;
+            }
+            else if (lines[i].startsWith(' TextRendererComponent:')) {
+                const textRendererComponent = currentEntity.addComponent<TextRendererComponent>(ComponentType.TextRendererComponent);
+
+                const text = lines[i+1].split(':')[1].trim();
+
+                textRendererComponent.setText(text);
+            }
             else if (lines[i].startsWith(' CameraComponent:')) {
                 const cameraComponent = currentEntity.addComponent<CameraComponent>(ComponentType.CameraComponent);
 
@@ -109,6 +146,13 @@ export class SceneSerializer {
                 cameraComponent.sceneCamera.orthographicNear = orthographicNear;
                 cameraComponent.sceneCamera.orthographicFar = orthographicFar;
                 cameraComponent.isPrimary = primary;
+            }
+            else if (lines[i].startsWith(' Body2DComponent:')) {
+                const body2dComponent = currentEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);
+
+                const type = parseInt(lines[i+2].split(':')[1].trim()) as ShapeType;
+
+                body2dComponent.setShape(type);
             }
         }
     

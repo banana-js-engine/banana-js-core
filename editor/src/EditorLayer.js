@@ -14,20 +14,7 @@ export class EditorLayer extends banana.Layer {
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
         this.fps = 75;
 
-        this.scene = new banana.Scene('scene');
-
-        this.camera = this.scene.createEntity('camera');
-        this.camera.addComponent(banana.ComponentType.CameraComponent);
-        
-        this.circle = this.scene.createEntity('circle');
-        this.circle.addComponent(banana.ComponentType.CircleRendererComponent);
-        
-        this.square = this.scene.createEntity('square');
-        this.square.addComponent(banana.ComponentType.SpriteRendererComponent).setColor(banana.Color.RED);
-        this.square.getComponent(banana.ComponentType.TransformComponent).translate(1.5, 0, 0);
-
-        this.gamepadTest = this.scene.createEntity('gamepad test');
-        this.gamepadTest.addComponent( banana.ComponentType.NativeScriptComponent ).bind(GamepadTestScript);
+        this.scene = new banana.Scene('game scene');
     }
 
     onUpdate(deltaTime) {
@@ -53,6 +40,17 @@ export class EditorLayer extends banana.Layer {
         banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
 
         banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
+
+        if (banana.ImGui.Button('Save')) {
+            banana.SceneSerializer.save(this.scene);
+        }
+
+        if (banana.ImGui.Button('Load')) {
+            banana.Reader.readFileAsText()
+                .then(content => {
+                    this.scene = banana.SceneSerializer.deserialize(content);
+                });
+        }
 
         banana.ImGui.End();
     }
