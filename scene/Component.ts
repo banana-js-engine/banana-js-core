@@ -32,7 +32,8 @@ export class TagComponent extends Component {
     }
 
     toString() {
-        return `TagComponent:\n  Tag: ${this.name}\n`;
+        return `TagComponent:
+          Tag: ${this.name}\n`;
     }
 }
 
