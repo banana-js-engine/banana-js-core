@@ -172,7 +172,7 @@ export class SpriteRendererComponent extends Component {
     }
 
     toString() {
-        return `SpriteRendererComponent:\n  Color: ${this.color}`
+        return `SpriteRendererComponent:\n  Color: ${this.color}\n`
     }
 }
 
