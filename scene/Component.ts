@@ -32,7 +32,8 @@ export class TagComponent extends Component {
     }
 
     toString() {
-        return `TagComponent:\n  Tag: ${this.name}\n`;
+        return `TagComponent:
+          Tag: ${this.name}\n`;
     }
 }
 
@@ -148,7 +149,10 @@ export class TransformComponent extends Component {
         const rotation = `Rotation: ${this.getRotation()}`;
         const scale = `Scale: ${this.getScale()}`;
 
-        return `TransformComponent:\n  ${position}\n  ${rotation}\n  ${scale}\n`;
+        return `TransformComponent:
+          ${position}  
+          ${rotation}  
+          ${scale}\n`;
     }
 }
 
@@ -172,15 +176,16 @@ export class SpriteRendererComponent extends Component {
     }
 
     toString() {
-        return `SpriteRendererComponent:\n  Color: ${this.color}\n`
+        return `SpriteRendererComponent:
+          Color: ${this.color}\n`;
     }
 }
 
 export class CircleRendererComponent extends Component {
 
-    private _color: Color;
-    private _thickness: number;
-    private _fade: number;
+    _color: Color;
+    _thickness: number;
+    _fade: number;
 
     constructor() {
         super();
@@ -191,28 +196,35 @@ export class CircleRendererComponent extends Component {
         this.type = ComponentType.CircleRendererComponent;
     }
 
-    public get color() {
+    get color() {
         return this._color;
     }
 
-    public set color(newColor) {
+    set color(newColor) {
         this._color = newColor;
     }
 
-    public get thickness() {
+    get thickness() {
         return this._thickness;
     }
 
-    public set thickness(newThickness) {
+    set thickness(newThickness) {
         this._thickness = newThickness;
     }
 
-    public get fade() {
+    get fade() {
         return this._fade;
     }
 
-    public set fade(newFade) {
+    set fade(newFade) {
         this._fade = newFade;
+    }
+
+    toString() {
+        return `CircleRendererComponent:
+          Color: ${this.color}  
+          Thickness: ${this.thickness}  
+          Fade: ${this.fade}\n`;
     }
 }
 
@@ -229,11 +241,16 @@ export class TextRendererComponent extends Component {
     setText(text: string) {
         this.text = text;
     }
+
+    toString() {
+        return `TextRendererComponent:
+          Text: ${this.text}\n`;
+    }
 }
 
 export class CameraComponent extends Component {
 
-    private _isPrimary: boolean
+    _isPrimary: boolean
     sceneCamera: SceneCamera;
 
     constructor() {
@@ -274,7 +291,16 @@ export class CameraComponent extends Component {
         
         const primary = `Primary: ${this.isPrimary}`;
 
-        return `CameraComponent:\n  Camera:\n   ${type}\n   ${fov}\n   ${pNear}\n   ${pFar}\n   ${size}\n   ${oNear}\n   ${oFar}\n  ${primary}\n`;
+        return `CameraComponent: 
+          Camera:   
+           ${type}   
+           ${fov}   
+           ${pNear}   
+           ${pFar}   
+           ${size}   
+           ${oNear}   
+           ${oFar}  
+          ${primary}\n`;
     }
 }
 
@@ -320,35 +346,35 @@ export class Body2DComponent extends Component {
         this.type = ComponentType.Body2DComponent;
     }
 
-    public update(deltaTime: number, transform: TransformComponent, gravity: Vec2, iterations: number) {
+    update(deltaTime: number, transform: TransformComponent, gravity: Vec2, iterations: number) {
         this.body2d.update(deltaTime, transform, gravity, iterations);
     }
 
-    public moveBy(v: Vec2, transform: TransformComponent) {
+    moveBy(v: Vec2, transform: TransformComponent) {
         this.body2d.moveBy(v, transform);
     }
 
-    public addForce(amount: Vec2) {
+    addForce(amount: Vec2) {
         this.body2d.addForce(amount);
     }
 
-    public get radius() {
+    get radius() {
         return this.body2d.radius;
     }
 
-    public get linearVelocity() {
+    get linearVelocity() {
         return this.body2d.linearVelocity;
     }
 
-    public set linearVelocity(v: Vec2) {
+    set linearVelocity(v: Vec2) {
         this.body2d.linearVelocity = v;
     }
 
-    public set gravityScale(newValue: number) {
+    set gravityScale(newValue: number) {
         this.body2d.gravityScale = newValue;
     }
     
-    public setShape(shapeType: ShapeType) {
+    setShape(shapeType: ShapeType) {
         this.body2d.shapeType = shapeType;
         if (shapeType == ShapeType.Circle) {
             this.body2d = Body2D.CreateCircleBody2D(0.5, 1, false, 0.1);
@@ -356,6 +382,17 @@ export class Body2DComponent extends Component {
         else {
             this.body2d = Body2D.CreateBoxBody2D(1, 1, 1, false, 0.1);
         }
+    }
+
+    toString() {
+        return `Body2DComponent: 
+          ShapeType: ${this.body2d.shapeType.valueOf()}
+          Width: ${this.body2d.width}
+          Height: ${this.body2d.height}
+          Radius: ${this.body2d.radius}
+          Density: ${this.body2d.density}
+          IsStatic: ${this.body2d.isStatic ? '1' : '0'}
+          Restitution: ${this.body2d.restitution}\n`
     }
 }
 

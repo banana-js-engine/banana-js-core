@@ -164,6 +164,7 @@ export class Renderer2D {
     static quadVertex = new QuadVertex();
     static lineVertex = new LineVertex();
     static circleVertex = new CircleVertex();
+    static tempTransform: TransformComponent;
 
     /**
      * This object is used to display rendering/batching data to the developer.
@@ -189,6 +190,7 @@ export class Renderer2D {
         // empty constructor of Texture will produce 1x1 white texture
         Renderer2D.White_Texture = new Texture();
         Font.defaultFont = new Font('/render/data/defaultFont.png', defaultFontData);
+        this.tempTransform = new TransformComponent();
 
         // prepare indices for index buffer creation
         let quadIndices = new Uint16Array( Render2DData.MaxIndices );
@@ -545,22 +547,24 @@ export class Renderer2D {
      */
     static drawText(transform: TransformComponent, text: string, font: Font = Font.defaultFont) {
 
+        if (!text) {
+            return;
+        }
+
         text = text.toLowerCase();
 
-        const t = new TransformComponent();
-
-        t.setPosition( transform.getPosition() );
-        t.setRotation( transform.getRotation() );
-        t.setScale( transform.getScale() );
+        this.tempTransform.setPosition( transform.getPosition() );
+        this.tempTransform.setRotation( transform.getRotation() );
+        this.tempTransform.setScale( transform.getScale() );
 
         for (let i = 0; i < text.length; i++) {
 
             const glyph = font.glyphs[text.charAt(i)];
 
             if (glyph) {
-                this.drawSubTextureQuad(t, glyph);
+                this.drawSubTextureQuad(this.tempTransform, glyph);
             } 
-            t.translate(font.glyphData.spaceWidth, 0, 0);
+            this.tempTransform.translate(font.glyphData.spaceWidth, 0, 0);
         }
 
     }
