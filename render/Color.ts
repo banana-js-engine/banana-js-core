@@ -23,4 +23,7 @@ export class Color
         this.a = a;
     }
     
+    toString() {
+        return `[${this.r}, ${this.g}, ${this.b}, ${this.a}]`;
+    }
 }

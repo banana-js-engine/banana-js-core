@@ -10,6 +10,7 @@ export * from "./core/Application.js";
 export * from "./core/Window.js";
 export * from "./core/Profiler.js";
 export * from "./core/Type.js";
+export * from './core/FileManager.js'
 export * from "./event/Event.js";
 export * from "./event/KeyboardEvent.js";
 export * from "./event/MouseEvent.js";

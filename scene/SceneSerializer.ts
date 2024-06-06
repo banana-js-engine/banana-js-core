@@ -1,10 +1,17 @@
 import { CameraType, Color, Vec3, Vec4 } from "../banana.js";
+import { Writer } from "../core/FileManager.js";
 import { ComponentType } from "../core/Type.js";
 import { CameraComponent, ComponentCreator, SpriteRendererComponent, TagComponent, TransformComponent } from "./Component.js";
 import { Entity } from "./Entity.js";
 import { Scene } from "./Scene.js";
 
 export class SceneSerializer {
+    static save(scene: Scene) {
+        const sceneData = this.serialize(scene);
+
+        Writer.saveStringAsFile(sceneData, `${scene.name}.banana`)
+    }
+
     static serialize(scene: Scene): string {
 
         let sceneData: string = '';
