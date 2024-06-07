@@ -11,6 +11,7 @@ export class EditorLayer extends banana.Layer {
 
         banana.Renderer2D.init();
 
+        this.defaultVolume[0] = 50;
         this.counter = 0;
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
@@ -40,7 +41,9 @@ export class EditorLayer extends banana.Layer {
             banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
 
             banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
-
+            
+            banana.ImGui.SliderInt('Volume', defaultVolume[0], 0, 100);
+            
             banana.ImGui.End();
         }
         
@@ -51,6 +54,9 @@ export class EditorLayer extends banana.Layer {
         banana.ImGui_Impl.RenderDrawData(banana.ImGui.GetDrawData());
 
         banana.RenderCommand.setClearColor( new banana.Color( this.clearColorIm.x, this.clearColorIm.y, this.clearColorIm.z, this.clearColorIm.w ) );
+
+        
+
 
         if (this.darkMode) {
             banana.ImGui.StyleColorsDark();
