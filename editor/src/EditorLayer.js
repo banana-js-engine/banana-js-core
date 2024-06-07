@@ -1,5 +1,5 @@
 import * as banana from "../../build/banana.js";
-import { GamepadTestScript } from "./GamepadTestScript.js";
+import { SceneHierarchyPanel } from "./panels/SceneHierarchyPanel.js";
 
 /**
  * Example layer which demonstrates a simple ImGUI Panel
@@ -14,7 +14,10 @@ export class EditorLayer extends banana.Layer {
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
         this.fps = 75;
 
+        
         this.scene = new banana.Scene('game scene');
+
+        this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene);
     }
 
     onUpdate(deltaTime) {
@@ -49,10 +52,13 @@ export class EditorLayer extends banana.Layer {
             banana.Reader.readFileAsText()
                 .then(content => {
                     this.scene = banana.SceneSerializer.deserialize(content);
+                    this.sceneHierarchyPanel.setRefScene(this.scene);
                 });
         }
 
         banana.ImGui.End();
+
+        this.sceneHierarchyPanel.onImGuiRender();
     }
 
     onEvent(event) {
