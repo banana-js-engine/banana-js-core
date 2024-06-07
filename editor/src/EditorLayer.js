@@ -1,6 +1,7 @@
 import * as banana from "../../build/banana.js";
 import { GamepadTestScript } from "./GamepadTestScript.js";
-
+import { Audio } from "../../core/Audio.js"
+ 
 /**
  * Example layer which demonstrates a simple ImGUI Panel
  */
@@ -11,7 +12,8 @@ export class EditorLayer extends banana.Layer {
 
         banana.Renderer2D.init();
 
-        this.defaultVolume[0] = 50;
+        this.playText = "Play";
+        this.audioVolume[0] = 50;
         this.counter = 0;
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
@@ -42,8 +44,24 @@ export class EditorLayer extends banana.Layer {
 
             banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
             
-            banana.ImGui.SliderInt('Volume', defaultVolume[0], 0, 100);
+            banana.ImGui.SliderInt('Volume', audioVolume[0], 0, 100);
             
+            
+            if (banana.ImGui.Button(this.playText)){
+                if (this.playText === "Play") {
+                    this.playText = 'Pause';
+                } else {
+                    this.playText = 'Play';
+                }
+
+            }
+
+            banana.ImGui.sameLine();
+
+            if (banana.ImGui.Button("Restart")){
+
+            }
+
             banana.ImGui.End();
         }
         
