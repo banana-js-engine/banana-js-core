@@ -74,6 +74,20 @@ export class SceneHierarchyPanel {
             tag.setName(newTag);
         }
 
+        if (banana.ImGui.Button('Add Component')) {
+            banana.ImGui.OpenPopup('AddComponent');
+        }
+
+        if (banana.ImGui.BeginPopup('AddComponent')) {
+            this.drawAddComponent(banana.ComponentType.CameraComponent, 'Camera');
+            this.drawAddComponent(banana.ComponentType.SpriteRendererComponent, 'Sprite Renderer');
+            this.drawAddComponent(banana.ComponentType.CircleRendererComponent, 'Circle Renderer');
+            this.drawAddComponent(banana.ComponentType.TextRendererComponent, 'Text Renderer');
+            this.drawAddComponent(banana.ComponentType.Body2DComponent, 'Body2D');
+
+            banana.ImGui.EndPopup();
+        }
+
         // Transform Component
         if (banana.ImGui.TreeNodeEx('TransformComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Transform')) {
             const transform = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.TransformComponent);
@@ -89,6 +103,7 @@ export class SceneHierarchyPanel {
         if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.SpriteRendererComponent)) {
             if (banana.ImGui.TreeNodeEx('SpriteRendererComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Sprite Renderer')) {
                 const sprite = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                console.log(sprite.getColor());
 
                 banana.ImGui.ColorEdit4('Color', sprite.getColor());
 
@@ -219,6 +234,16 @@ export class SceneHierarchyPanel {
                 }
 
                 banana.ImGui.TreePop();
+            }
+        }
+    }
+
+    drawAddComponent(componentType, componentName) {
+        if (!this.refScene.registry.has(this.selectedEntity, componentType)) {
+            if (banana.ImGui.MenuItem(componentName)) {
+                const entity = new banana.Entity(this.selectedEntity, this.refScene);
+                entity.addComponent(componentType);
+                banana.ImGui.CloseCurrentPopup();
             }
         }
     }
