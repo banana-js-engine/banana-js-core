@@ -1,3 +1,5 @@
+import { Event } from "../event/Event.js";
+
 export class Layer {
     debugName: string
 
@@ -7,9 +9,9 @@ export class Layer {
 
     onAttach() {}
     onDetach() {}
-    onUpdate(deltaTime) {}
-    onGUIRender() {}
-    onEvent(event) {}
+    onUpdate(deltaTime: number) {}
+    onImGuiRender() {}
+    onEvent(event: Event) {}
 
     getDebugName() {
         return this.debugName;

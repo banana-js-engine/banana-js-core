@@ -1,7 +1,9 @@
 import * as banana from "../../build/banana.js";
+
 import { GamepadTestScript } from "./GamepadTestScript.js";
-import { Audio } from "../../core/Audio.js"
- 
+
+import { SceneHierarchyPanel } from "./panels/SceneHierarchyPanel.js";
+
 /**
  * Example layer which demonstrates a simple ImGUI Panel
  */
@@ -10,41 +12,46 @@ export class EditorLayer extends banana.Layer {
     constructor() {
         super('Editor Layer');
 
-        banana.Renderer2D.init();
-
         this.playText = "Play";
-        this.audioVolume[0] = 50;
+        this.audioVolume = [50];
         this.counter = 0;
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
+        this.fps = 75;
 
-        this.scene = new banana.Scene('scene');
+        
+        this.scene = new banana.Scene('game scene');
 
-        this.gamepadTest = this.scene.createEntity('gamepad test');
-        this.gamepadTest.addComponent( banana.ComponentType.NativeScriptComponent ).bind(GamepadTestScript);
-
-        banana.RenderCommand.setClearColor( banana.Color.BLACK );
+        this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene);
     }
 
     onUpdate(deltaTime) {
 
-        banana.RenderCommand.clear();
-        
         this.scene.onUpdateRuntime(deltaTime);
-        
-        // ImGUI section
-        banana.ImGui_Impl.NewFrame(deltaTime);
-        banana.ImGui.NewFrame();
-        
-        {
-            banana.ImGui.Begin('Test Panel');
-            banana.ImGui.Text(`FPS: ${Math.floor(1 / deltaTime)}`);
-            
-            banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
 
-            banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
-            
-            banana.ImGui.SliderInt('Volume', audioVolume[0], 0, 100);
+    }
+
+    onImGuiRender() {
+        banana.ImGui.Begin('Test Panel');
+        banana.ImGui.Text(`FPS: ${this.fps.toFixed(1)}`);
+        
+        banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
+
+        banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
+
+        if (banana.ImGui.Button('Save')) {
+            banana.SceneSerializer.save(this.scene);
+        }
+
+        if (banana.ImGui.Button('Load')) {
+            banana.Reader.readFileAsText()
+                .then(content => {
+                    this.scene = banana.SceneSerializer.deserialize(content);
+                    this.sceneHierarchyPanel.setRefScene(this.scene);
+                });
+        }
+
+        banana.ImGui.SliderInt('Volume', this.audioVolume[0], [min=0, max=100, formatString= "%d", ImGuiSliderFlags=0]);
             
             
             if (banana.ImGui.Button(this.playText)){
@@ -62,26 +69,9 @@ export class EditorLayer extends banana.Layer {
 
             }
 
-            banana.ImGui.End();
-        }
-        
-        banana.ImGui.EndFrame();
-        
-        banana.ImGui.Render();
+        banana.ImGui.End();
 
-        banana.ImGui_Impl.RenderDrawData(banana.ImGui.GetDrawData());
-
-        banana.RenderCommand.setClearColor( new banana.Color( this.clearColorIm.x, this.clearColorIm.y, this.clearColorIm.z, this.clearColorIm.w ) );
-
-        
-
-
-        if (this.darkMode) {
-            banana.ImGui.StyleColorsDark();
-        }
-        else { 
-            banana.ImGui.StyleColorsLight();
-        }
+        this.sceneHierarchyPanel.onImGuiRender();
     }
 
     onEvent(event) {

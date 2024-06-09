@@ -4,7 +4,7 @@ import { Event, EventDispatcher, EventType } from "../event/Event.js"
 import { LayerStack } from "./LayerStack.js"
 import { RenderCommand } from "../render/RenderCommand.js"
 import { Gamepad } from "./Gamepad.js"
-import { Mat4, Utils } from "../banana.js"
+import { Mat4, Renderer2D, Utils } from "../banana.js"
 import { ImGUILayer } from "./ImGUILayer.js"
 
 
@@ -15,6 +15,7 @@ export class Application
     gamepad: Gamepad;
     layerStack: LayerStack;
     lastFrameTime: number;
+    imGuiLayer: ImGUILayer;
 
     public constructor(appName, windowWidth, windowHeight) {
         this.onEvent = this.onEvent.bind(this);
@@ -31,25 +32,19 @@ export class Application
 
         this.layerStack = new LayerStack();
 
+        Renderer2D.init();
+
         this.lastFrameTime = 0;
 
         this.window.resize(windowWidth, windowHeight);
 
-        this.pushLayer(new ImGUILayer());
+        this.imGuiLayer = new ImGUILayer();
+        this.pushOverlay(this.imGuiLayer);
     }
 
     public run() {
         Mat4.init();
-
-        this.layerStack.getLayers().forEach(layer => {
-            layer.onGUIRender();
-        });
-
         this._onTick();
-    }
-
-    public onUpdate(deltaTime) {
-
     }
 
     private _onTick() {
@@ -59,24 +54,29 @@ export class Application
         let deltaTimeSeconds = deltaTimeMilliseconds / 1000;
         this.lastFrameTime = currentFrameTime;
 
-        //Log.Core_Info(`Delta time: ${deltaTimeSeconds}s (${deltaTimeMilliseconds}ms)`);
-        //Log.Core_Info(`FPS: ${fps}`);
-
         deltaTimeSeconds = Utils.clamp(deltaTimeSeconds, 0.01, 0.1);
 
-        // TODO: try to separate ImGUI render loop and other loops, (physics, etc.)
-        this.onUpdate(1 / 75);
+        RenderCommand.clear();
 
+        // onUpdate
         this.layerStack.getLayers().forEach(layer => 
         {
-            layer.onUpdate(1 / 75);
+            layer.onUpdate(deltaTimeSeconds);
         });
+
+        // onImGuiRender
+        this.imGuiLayer.begin();
+        this.layerStack.getLayers().forEach(layer => 
+        {
+            layer.onImGuiRender();
+        });
+        this.imGuiLayer.end();
         
         requestAnimationFrame(this._onTick);
     }
 
 
-    public onEvent(event) {
+    public onEvent(event: Event) {
         let dispatcher = new EventDispatcher(event);
 
         dispatcher.dispatch(this.onWindowClosed, EventType.WindowClosedEvent);
@@ -93,7 +93,7 @@ export class Application
         Log.Core_Info(event);
     }
 
-    public onWindowClosed(event) {
+    public onWindowClosed(event: Event) {
         //Profiler.EndProfile();
         
         return true;
@@ -121,7 +121,7 @@ export class Application
         Log.Core_Info(`${overlay.getDebugName()} is attached`);
     }
 
-    public setTitle(title) {
+    public setTitle(title: string) {
         this.window.setTitle(title);
     }
 
