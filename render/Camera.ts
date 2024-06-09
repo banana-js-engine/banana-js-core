@@ -28,6 +28,17 @@ export class Camera {
         this.aspectRatio = parseFloat(canvas.width) / parseFloat(canvas.height);
     }
 
+    set projType(projType: CameraType | string | number) {
+        if (projType == CameraType.Orthographic || projType == 'Orthographic' || projType == 0) {
+            this.cameraType = CameraType.Orthographic;
+        }
+        else if (projType == CameraType.Perspective || projType == 'Perspective' || projType == 1) {
+            this.cameraType = CameraType.Perspective;
+        }
+
+        this.setViewportSize();
+    }
+
     setOrthographic(size, near, far) {
         this.cameraType = CameraType.Orthographic;
 
@@ -41,10 +52,11 @@ export class Camera {
     setPerspective(fovy, near, far) {
         this.cameraType = CameraType.Perspective;
 
-        this.projectionMatrix.setPerspective(Utils.toRadians(fovy), this.aspectRatio, near, far);
         this.fovy = fovy;
         this.perspectiveNear = near;
         this.perspectiveFar = far;
+
+        this.setViewportSize();
     }
 
     getViewProjectionMatrix() {
@@ -56,12 +68,17 @@ export class Camera {
     }
 
     setViewportSize() {
-        let orthoLeft = -this.size * this.aspectRatio * 0.5;
-        let orthoRight = this.size * this.aspectRatio * 0.5;
-        let orthoBottom = this.size * 0.5;
-        let orthoTop = -this.size * 0.5;
-
-        this.projectionMatrix.setOrtho(orthoLeft, orthoRight, orthoBottom, orthoTop, this.orthographicNear, this.orthographicFar);
+        if (this.cameraType == CameraType.Orthographic) {
+            let orthoLeft = -this.size * this.aspectRatio * 0.5;
+            let orthoRight = this.size * this.aspectRatio * 0.5;
+            let orthoBottom = this.size * 0.5;
+            let orthoTop = -this.size * 0.5;
+    
+            this.projectionMatrix.setOrtho(orthoLeft, orthoRight, orthoBottom, orthoTop, this.orthographicNear, this.orthographicFar);
+        }
+        else if (this.cameraType == CameraType.Perspective) {
+            this.projectionMatrix.setPerspective(Utils.toRadians(this.fovy), this.aspectRatio, this.perspectiveNear, this.perspectiveFar);
+        }
     }
 
     screenToViewportSpace(vector: Vec3) {

@@ -280,6 +280,7 @@ export class Renderer2D {
             this.viewProj.identity();
             this.viewProj.mul(camera.getViewProjectionMatrix());
             this.viewProj.mul(transform.invert());
+            this.viewProj.transpose();
         
             Render2DData.ViewProj = this.viewProj;
         }
