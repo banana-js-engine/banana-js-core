@@ -170,9 +170,10 @@ export class SceneSerializer {
                 body2dComponent.density = density;
                 body2dComponent.isStatic = isStatic;
                 body2dComponent.restitution = restitution;
-                body2dComponent.gravityScale = gravityScale;
-
+                
                 body2dComponent.setShape(type);
+                
+                body2dComponent.gravityScale = gravityScale;
             }
         }
     
