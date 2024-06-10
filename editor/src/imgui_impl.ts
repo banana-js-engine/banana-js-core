@@ -347,7 +347,7 @@ export function NewFrame(time: number): void {
 
     const dt: number = time - prev_time;
     prev_time = time;
-    io.DeltaTime = dt / 1000;
+    io.DeltaTime = 1/75;
 
     if (io.WantSetMousePos) {
         console.log("TODO: MousePos", io.MousePos.x, io.MousePos.y);
