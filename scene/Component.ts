@@ -162,7 +162,7 @@ export class SpriteRendererComponent extends Component {
     
     constructor() {
         super();
-        this.color = Color.WHITE;
+        this.color = new Color(1, 1, 1, 1);
 
         this.type = ComponentType.SpriteRendererComponent;
     }
@@ -189,7 +189,7 @@ export class CircleRendererComponent extends Component {
 
     constructor() {
         super();
-        this._color = Color.WHITE;
+        this._color = new Color(1, 1, 1, 1);
         this._thickness = 1.0;
         this._fade = 0.0;
 
@@ -270,6 +270,10 @@ export class CameraComponent extends Component {
         this._isPrimary = flag;
     }
 
+    get clearColor(): Color {
+        return this.sceneCamera.clearColor;
+    }
+
     getCamera(): SceneCamera {
         return this.sceneCamera;
     }
@@ -290,6 +294,7 @@ export class CameraComponent extends Component {
         const oFar = `OrthographicFar: ${this.getCamera().orthographicFar}`;
         
         const primary = `Primary: ${this.isPrimary}`;
+        const clearColor = `ClearColor: ${this.clearColor}`
 
         return `CameraComponent: 
           Camera:   
@@ -300,7 +305,8 @@ export class CameraComponent extends Component {
            ${size}   
            ${oNear}   
            ${oFar}  
-          ${primary}\n`;
+          ${primary}
+          ${clearColor}\n`;
     }
 }
 

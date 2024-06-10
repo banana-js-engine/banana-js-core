@@ -1,7 +1,7 @@
 import { canvas } from '../core/Window.js'
-import { Log } from '../core/Log.js'
-import { Event, EventType, EventDispatcher } from '../event/Event.js'
+import { EventType, EventDispatcher } from '../event/Event.js'
 import { Utils, Vec3, Mat4 } from '../math/BananaMath.js';
+import { Color } from './Color.js';
 
 export enum CameraType {
     Orthographic = 0, 
@@ -12,6 +12,7 @@ export class Camera {
     projectionMatrix: Mat4;
     cameraType: CameraType;
     aspectRatio: number;
+    clearColor: Color;
 
     size: number = 10;
     orthographicNear: number = -1;
@@ -26,6 +27,18 @@ export class Camera {
     
         this.cameraType = CameraType.Orthographic;      
         this.aspectRatio = parseFloat(canvas.width) / parseFloat(canvas.height);
+        this.clearColor = new Color(0.345, 0.588, 0.809, 1);
+    }
+
+    set projType(projType: CameraType | string | number) {
+        if (projType == CameraType.Orthographic || projType == 'Orthographic' || projType == 0) {
+            this.cameraType = CameraType.Orthographic;
+        }
+        else if (projType == CameraType.Perspective || projType == 'Perspective' || projType == 1) {
+            this.cameraType = CameraType.Perspective;
+        }
+
+        this.setViewportSize();
     }
 
     setOrthographic(size, near, far) {
@@ -41,10 +54,11 @@ export class Camera {
     setPerspective(fovy, near, far) {
         this.cameraType = CameraType.Perspective;
 
-        this.projectionMatrix.setPerspective(Utils.toRadians(fovy), this.aspectRatio, near, far);
         this.fovy = fovy;
         this.perspectiveNear = near;
         this.perspectiveFar = far;
+
+        this.setViewportSize();
     }
 
     getViewProjectionMatrix() {
@@ -56,12 +70,17 @@ export class Camera {
     }
 
     setViewportSize() {
-        let orthoLeft = -this.size * this.aspectRatio * 0.5;
-        let orthoRight = this.size * this.aspectRatio * 0.5;
-        let orthoBottom = this.size * 0.5;
-        let orthoTop = -this.size * 0.5;
-
-        this.projectionMatrix.setOrtho(orthoLeft, orthoRight, orthoBottom, orthoTop, this.orthographicNear, this.orthographicFar);
+        if (this.cameraType == CameraType.Orthographic) {
+            let orthoLeft = -this.size * this.aspectRatio * 0.5;
+            let orthoRight = this.size * this.aspectRatio * 0.5;
+            let orthoBottom = this.size * 0.5;
+            let orthoTop = -this.size * 0.5;
+    
+            this.projectionMatrix.setOrtho(orthoLeft, orthoRight, orthoBottom, orthoTop, this.orthographicNear, this.orthographicFar);
+        }
+        else if (this.cameraType == CameraType.Perspective) {
+            this.projectionMatrix.setPerspective(Utils.toRadians(this.fovy), this.aspectRatio, this.perspectiveNear, this.perspectiveFar);
+        }
     }
 
     screenToViewportSpace(vector: Vec3) {
@@ -114,7 +133,7 @@ export class EditorCamera extends Camera {
         this.cameraRotation = 0;
 
         this.setView();
-        this.setOrthographic(446, -1, 1);
+        this.setOrthographic(10, -1, 1);
         this.recalculateViewProjectionMatrix();
     }
 

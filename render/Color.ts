@@ -22,6 +22,10 @@ export class Color
         this.b = b;
         this.a = a;
     }
+
+    static copy(color: Color) {
+        return new Color(color.r, color.g, color.b, color.a);
+    }
     
     toString() {
         return `[${this.r}, ${this.g}, ${this.b}, ${this.a}]`;
