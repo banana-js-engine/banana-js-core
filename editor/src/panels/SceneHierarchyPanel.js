@@ -101,9 +101,20 @@ export class SceneHierarchyPanel {
 
         // Sprite Renderer Component
         if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.SpriteRendererComponent)) {
-            if (banana.ImGui.TreeNodeEx('SpriteRendererComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Sprite Renderer')) {
+            let opened = banana.ImGui.TreeNodeEx('SpriteRendererComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Sprite Renderer');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
                 const sprite = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
-                console.log(sprite.getColor());
 
                 banana.ImGui.ColorEdit4('Color', sprite.getColor());
 
@@ -113,7 +124,19 @@ export class SceneHierarchyPanel {
 
         // Circle Renderer Component
         if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.CircleRendererComponent)) {
-            if (banana.ImGui.TreeNodeEx('CircleRendererComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Circle Renderer')) {
+            let opened = banana.ImGui.TreeNodeEx('CircleRendererComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Circle Renderer');
+                
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.CircleRendererComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
                 const circle = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.CircleRendererComponent);
 
                 const circleThickness = [ circle.thickness ];
@@ -132,7 +155,19 @@ export class SceneHierarchyPanel {
 
         // Text Renderer Component
         if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.TextRendererComponent)) {
-            if (banana.ImGui.TreeNodeEx('TextRendererComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Text Renderer')) {
+            let opened = banana.ImGui.TreeNodeEx('TextRendererComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Text Renderer');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.TextRendererComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
                 const textRenderer = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.TextRendererComponent);
 
                 let newText = textRenderer.text;
@@ -147,7 +182,19 @@ export class SceneHierarchyPanel {
 
         // Camera Component
         if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.CameraComponent)) {
-            if (banana.ImGui.TreeNodeEx('CameraComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Camera')) {
+            let opened = banana.ImGui.TreeNodeEx('CameraComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Camera');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.CameraComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
                 const camera = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.CameraComponent);
 
                 const projectionTypes = [ 'Orthographic', 'Perspective' ];
@@ -212,7 +259,19 @@ export class SceneHierarchyPanel {
 
         // Body2D Component
         if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.Body2DComponent)) {
-            if (banana.ImGui.TreeNodeEx('Body2DComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Body2D')) {
+            let opened = banana.ImGui.TreeNodeEx('Body2DComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Body2D');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.Body2DComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
                 const body2d = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.Body2DComponent);
 
                 const bodyTypes = [ 'Circle', 'Box' ];

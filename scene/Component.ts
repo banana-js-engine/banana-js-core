@@ -162,7 +162,7 @@ export class SpriteRendererComponent extends Component {
     
     constructor() {
         super();
-        this.color = Color.WHITE;
+        this.color = new Color(1, 1, 1, 1);
 
         this.type = ComponentType.SpriteRendererComponent;
     }
@@ -189,7 +189,7 @@ export class CircleRendererComponent extends Component {
 
     constructor() {
         super();
-        this._color = Color.WHITE;
+        this._color = new Color(1, 1, 1, 1);
         this._thickness = 1.0;
         this._fade = 0.0;
 

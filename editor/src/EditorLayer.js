@@ -60,6 +60,6 @@ export class EditorLayer extends banana.Layer {
 
         setTimeout(() => {
             gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
-        }, 300);
+        }, 250);
     }
 }

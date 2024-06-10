@@ -51,15 +51,6 @@ export class EditorCameraController
             this.previousMousePosition.x = currentMousePos.x;
             this.previousMousePosition.y = currentMousePos.y;
         }
-
-        if (Input.isKeyPressed(KeyCode.Q)) {
-            this.cameraAngle--;
-            this.editorCamera.setRotation(this.cameraAngle);
-        }
-        if (Input.isKeyPressed(KeyCode.E)) {
-            this.cameraAngle++;
-            this.editorCamera.setRotation(this.cameraAngle);
-        }
     }
 
     onEvent(event) {
