@@ -131,7 +131,7 @@ export class EditorCamera extends Camera {
         this.cameraRotation = 0;
 
         this.setView();
-        this.setOrthographic(446, -1, 1);
+        this.setOrthographic(10, -1, 1);
         this.recalculateViewProjectionMatrix();
     }
 
