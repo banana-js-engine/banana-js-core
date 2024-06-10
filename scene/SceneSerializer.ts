@@ -137,6 +137,7 @@ export class SceneSerializer {
                 const orthographicNear = parseFloat(lines[i+7].split(':')[1].trim());
                 const orthographicFar = parseFloat(lines[i+8].split(':')[1].trim());
                 const primary = lines[i+9].split(':')[1].trim() == 'true';
+                const clearColorString = lines[i+10].split(':')[1].trim();
 
                 cameraComponent.sceneCamera.cameraType = type;
                 cameraComponent.sceneCamera.fovy = fovy;
@@ -146,6 +147,10 @@ export class SceneSerializer {
                 cameraComponent.sceneCamera.orthographicNear = orthographicNear;
                 cameraComponent.sceneCamera.orthographicFar = orthographicFar;
                 cameraComponent.isPrimary = primary;
+
+                const clearColor = this.parseVec4(clearColorString);
+
+                cameraComponent.sceneCamera.clearColor = new Color(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
             }
             else if (lines[i].startsWith(' Body2DComponent:')) {
                 const body2dComponent = currentEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);

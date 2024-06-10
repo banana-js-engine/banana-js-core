@@ -17,7 +17,7 @@ export class EditorLayer extends banana.Layer {
 
         this.menuBarPanel = new MenuBarPanel(this);
         this.projectSettingsPanel = new ProjectSettingsPanel();
-        this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene);
+        this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene, this.editorCameraController);
     }
 
     onUpdate(deltaTime) {
@@ -60,6 +60,6 @@ export class EditorLayer extends banana.Layer {
 
         setTimeout(() => {
             gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
-        }, 250);
+        }, 300);
     }
 }
