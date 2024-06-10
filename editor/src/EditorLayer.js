@@ -13,13 +13,14 @@ export class EditorLayer extends banana.Layer {
         super('Editor Layer');
 
         this.playText = "Play";
-        this.audioVolume = [50];
+        this.audioVolume = 50;
         this.counter = 0;
         this.darkMode = true;
         this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
         this.fps = 75;
-
         
+        banana.setAudio('/editor/src/testMaterial/testAudio.mp3');
+
         this.scene = new banana.Scene('game scene');
 
         this.menuBarPanel = new MenuBarPanel(this);
@@ -28,7 +29,6 @@ export class EditorLayer extends banana.Layer {
     }
 
     onUpdate(deltaTime) {
-
         this.scene.onUpdateRuntime(deltaTime);
 
     }
@@ -53,23 +53,26 @@ export class EditorLayer extends banana.Layer {
                 });
         }
 
-        banana.ImGui.SliderInt('Volume', this.audioVolume[0], [min=0, max=100, formatString= "%d", ImGuiSliderFlags=0]);
+        if (banana.ImGui.SliderInt('Volume', (value = this.audioVolume) => this.audioVolume = value, 0, 100)){
+            banana.ModifyVolume(this.audioVolume);
+        }
             
             
-            if (banana.ImGui.Button(this.playText)){
-                if (this.playText === "Play") {
-                    this.playText = 'Pause';
-                } else {
-                    this.playText = 'Play';
-                }
-
+        if (banana.ImGui.Button(this.playText)){
+            if (this.playText === "Play") {
+                this.playText = 'Pause';
+                banana.Play();
+            } else {
+                this.playText = 'Play';
+                banana.Pause()
             }
+        }
 
-            banana.ImGui.sameLine();
+        banana.ImGui.SameLine();
 
-            if (banana.ImGui.Button("Restart")){
-
-            }
+        if (banana.ImGui.Button("Restart")){
+            banana.Reset();
+        }
 
         banana.ImGui.End();
 

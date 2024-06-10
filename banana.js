@@ -28,6 +28,7 @@
 export * from './core/EntryPoint.js'
 export * from './core/Layer.js'
 export * from './core/Log.js'
+export * from './core/Audio.js'
 export * from './core/Input.js'
 export * from './core/KeyCode.js'
 export * from './core/MouseButtonCode.js'
