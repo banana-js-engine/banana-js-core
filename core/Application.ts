@@ -56,8 +56,6 @@ export class Application
 
         deltaTimeSeconds = Utils.clamp(deltaTimeSeconds, 0.01, 0.1);
 
-        RenderCommand.clear();
-
         // onUpdate
         this.layerStack.getLayers().forEach(layer => 
         {

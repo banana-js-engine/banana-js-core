@@ -1,7 +1,7 @@
 import { canvas } from '../core/Window.js'
-import { Log } from '../core/Log.js'
-import { Event, EventType, EventDispatcher } from '../event/Event.js'
+import { EventType, EventDispatcher } from '../event/Event.js'
 import { Utils, Vec3, Mat4 } from '../math/BananaMath.js';
+import { Color } from './Color.js';
 
 export enum CameraType {
     Orthographic = 0, 
@@ -12,6 +12,7 @@ export class Camera {
     projectionMatrix: Mat4;
     cameraType: CameraType;
     aspectRatio: number;
+    clearColor: Color;
 
     size: number = 10;
     orthographicNear: number = -1;
@@ -26,6 +27,7 @@ export class Camera {
     
         this.cameraType = CameraType.Orthographic;      
         this.aspectRatio = parseFloat(canvas.width) / parseFloat(canvas.height);
+        this.clearColor = new Color(0.345, 0.588, 0.809, 1);
     }
 
     set projType(projType: CameraType | string | number) {

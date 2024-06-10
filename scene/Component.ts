@@ -270,6 +270,10 @@ export class CameraComponent extends Component {
         this._isPrimary = flag;
     }
 
+    get clearColor(): Color {
+        return this.sceneCamera.clearColor;
+    }
+
     getCamera(): SceneCamera {
         return this.sceneCamera;
     }
@@ -290,6 +294,7 @@ export class CameraComponent extends Component {
         const oFar = `OrthographicFar: ${this.getCamera().orthographicFar}`;
         
         const primary = `Primary: ${this.isPrimary}`;
+        const clearColor = `ClearColor: ${this.clearColor}`
 
         return `CameraComponent: 
           Camera:   
@@ -300,7 +305,8 @@ export class CameraComponent extends Component {
            ${size}   
            ${oNear}   
            ${oFar}  
-          ${primary}\n`;
+          ${primary}
+          ${clearColor}\n`;
     }
 }
 

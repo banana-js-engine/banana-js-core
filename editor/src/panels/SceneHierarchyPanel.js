@@ -2,8 +2,9 @@ import * as banana from "../../../build/banana.js";
 
 export class SceneHierarchyPanel {
 
-    constructor(scene) {
+    constructor(scene, cameraController) {
         this.setRefScene(scene);
+        this.cameraController = cameraController;
 
         this.selectedEntity;
 
@@ -204,6 +205,12 @@ export class SceneHierarchyPanel {
 
                 if (banana.ImGui.Checkbox('Primary', (value = isPrimary) => isPrimary = value)) {
                     camera.isPrimary = isPrimary;
+                }
+
+                banana.ImGui.ColorEdit4('Clear color', camera.clearColor);
+
+                if (camera.isPrimary) {
+                    this.cameraController.getCamera().clearColor = banana.Color.copy(camera.clearColor);
                 }
 
                 if (banana.ImGui.BeginCombo('Proj. Type', currentProjection)) {

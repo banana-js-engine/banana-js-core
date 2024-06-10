@@ -269,6 +269,8 @@ export class Renderer2D {
      */
     static beginScene(camera: Camera, transform?: Mat4) {
         RenderCommand.resetState();
+        RenderCommand.setClearColor( camera.clearColor );
+        RenderCommand.clear();
         Renderer2D.newBatch();
 
         if (typeof transform == 'undefined') {
