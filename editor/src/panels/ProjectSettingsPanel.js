@@ -6,8 +6,6 @@ export class ProjectSettingsPanel {
         this.gameWindowHeight = [ 600 ];
 
         this.darkModeEnabled = true;
-
-        this.clearColor = new banana.Color(0, 0, 0, 1);
     }
 
     onImGuiRender() {
@@ -18,17 +16,12 @@ export class ProjectSettingsPanel {
 
         banana.ImGui.Checkbox("Dark Mode", (value = this.darkModeEnabled) => this.darkModeEnabled = value);
 
-        banana.ImGui.ColorEdit4('Clear Color', this.clearColor);
-
-
         if (this.darkModeEnabled) {
             banana.ImGui.StyleColorsDark();
         }
         else { 
             banana.ImGui.StyleColorsLight();
         }
-
-        banana.RenderCommand.setClearColor( this.clearColor );
         
         banana.ImGui.End();
     }
