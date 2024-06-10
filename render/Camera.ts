@@ -27,7 +27,7 @@ export class Camera {
     
         this.cameraType = CameraType.Orthographic;      
         this.aspectRatio = parseFloat(canvas.width) / parseFloat(canvas.height);
-        this.clearColor = new Color(0, 0, 0, 1);
+        this.clearColor = new Color(0.345, 0.588, 0.809, 1);
     }
 
     set projType(projType: CameraType | string | number) {
