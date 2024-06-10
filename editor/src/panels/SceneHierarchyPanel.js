@@ -299,6 +299,37 @@ export class SceneHierarchyPanel {
                     banana.ImGui.EndCombo();
                 }
 
+                if (body2d.body2d.shapeType == banana.ShapeType.Box) {
+                    const boxWidth = [ body2d.body2d.width ];
+                    const boxHeight = [ body2d.body2d.height ];
+
+                    banana.ImGui.DragFloat('Width', boxWidth, 0.1);
+                    banana.ImGui.DragFloat('Height', boxHeight, 0.1);
+
+                    body2d.width = boxWidth[0];
+                    body2d.height = boxHeight[0];
+                }
+                else if (body2d.body2d.shapeType == banana.ShapeType.Circle) {
+                    const circleRadius = [ body2d.body2d.radius ];
+
+                    banana.ImGui.DragFloat('Radius', circleRadius, 0.1);
+
+                    body2d.radius = circleRadius[0];
+                }
+
+                const bodyDensity = [ body2d.body2d.density ];
+                const bodyRestitution = [ body2d.body2d.restitution ];
+                const bodyGravityScale = [ body2d.body2d.gravityScale ];
+
+                banana.ImGui.DragFloat('Density', bodyDensity, 0.05);
+                banana.ImGui.Checkbox('Is Static', (value = body2d.body2d.isStatic) => body2d.isStatic = value);
+                banana.ImGui.DragFloat('Bounciness', bodyRestitution, 0.05);
+                banana.ImGui.DragFloat('Gravity Scale', bodyGravityScale, 0.05);
+
+                body2d.density = bodyDensity[0];
+                body2d.restitution = bodyRestitution[0];
+                body2d.gravityScale = bodyGravityScale[0];
+
                 banana.ImGui.TreePop();
             }
         }
