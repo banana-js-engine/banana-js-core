@@ -57,12 +57,17 @@ export class BenchmarkLayer extends banana.Layer {
 
             for (let i = 0; i < this.entityCountCurrent; i++) {
                 this.square = this.scene.createEntity('square');
+                let xPos = Math.floor(Math.random() * (-8) + 4.5);
+                let yPos = Math.floor(Math.random() * (-8) + 4.5);
+                
                 if (this.rendering) {
                     this.square.addComponent(banana.ComponentType.SpriteRendererComponent);
                 }
                 if (this.physics) {
                     this.square.addComponent(banana.ComponentType.Body2DComponent);
                 }
+                let transform = this.square.getComponent(banana.ComponentType.TransformComponent);
+                transform.setPosition(xPos, yPos, 0);
                 this.entityList.push(this.square);
             }
         }
