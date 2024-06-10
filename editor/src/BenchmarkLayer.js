@@ -9,8 +9,6 @@ export class BenchmarkLayer extends banana.Layer {
     constructor() {
         super('Benchmark Layer');
 
-        banana.Renderer2D.init();
-
         this.entityCountCurrent = 0;
         this.entityCountFormer = 0;
         this.currentCount = [0];
@@ -18,6 +16,7 @@ export class BenchmarkLayer extends banana.Layer {
         this.clicked = 0;
         this.rendering = false;
         this.physics = false;
+        this.fps = 1/60;
 
         this.scene = new banana.Scene('scene');
 
@@ -28,18 +27,15 @@ export class BenchmarkLayer extends banana.Layer {
     }
 
     onUpdate(deltaTime) {
-
-        banana.RenderCommand.clear();
-        
         this.scene.onUpdateRuntime(deltaTime);
-        
+        this.fps = 1 / deltaTime;
+    }
+
+    onImGuiRender() {
         // ImGUI section
-        banana.ImGui_Impl.NewFrame(deltaTime);
-        banana.ImGui.NewFrame();
-        
         {
             banana.ImGui.Begin('Benchmark Panel');
-            banana.ImGui.Text(`FPS: ${Math.floor(1 / deltaTime)}`);
+            banana.ImGui.Text(`FPS: ${Math.floor(this.fps)}`);
 
             banana.ImGui.InputInt("Entity Count", this.currentCount);
             if (banana.ImGui.Button("Create Entities")){
@@ -51,13 +47,6 @@ export class BenchmarkLayer extends banana.Layer {
             banana.ImGui.End();
         }
         
-        banana.ImGui.EndFrame();
-        
-        banana.ImGui.Render();
-
-        banana.ImGui_Impl.RenderDrawData(banana.ImGui.GetDrawData());
-
-
         if (this.clicked == 1) {
             this.clicked = 0;
             this.entityCountFormer = this.entityCountCurrent;
@@ -77,7 +66,7 @@ export class BenchmarkLayer extends banana.Layer {
                 this.entityList.push(this.square);
             }
         }
-   
+
     }
 
     onEvent(event) {
