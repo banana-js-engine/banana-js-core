@@ -9,7 +9,7 @@ export class WebGLContext {
     maxTextureCount: number;
 
     constructor(canvas: HTMLCanvasElement) {
-        gl = canvas.getContext('webgl2');
+        gl = canvas.getContext('webgl2', { antialias: false });
         if ( !gl ) { 
             Log.Core_Error('WebGL isn\'t available'); 
         }

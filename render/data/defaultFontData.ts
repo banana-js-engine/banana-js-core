@@ -1,6 +1,6 @@
 export const defaultFontData = {
     'letterHeight': 8,
-    'spaceWidth': 0.9,
+    'spaceWidth': 1,
     'spacing': -1,
     'textureWidth': 64,
     'textureHeight': 40,
