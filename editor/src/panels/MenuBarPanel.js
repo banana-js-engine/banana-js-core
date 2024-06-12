@@ -23,6 +23,8 @@ export class MenuBarPanel {
                 }
 
                 if (banana.ImGui.MenuItem('Load Scene')) {
+                    this.editorLayer.sceneHierarchyPanel.selectedEntity = '';
+
                     banana.Reader.readFileAsText()
                     .then(content => {
                         this.editorLayer.scene = banana.SceneSerializer.deserialize(content);

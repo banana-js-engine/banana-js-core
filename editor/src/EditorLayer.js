@@ -15,6 +15,8 @@ export class EditorLayer extends banana.Layer {
         
         this.scene = new banana.Scene('game scene');
 
+        this.gameWindow = null;
+
         this.menuBarPanel = new MenuBarPanel(this);
         this.projectSettingsPanel = new ProjectSettingsPanel();
         this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene, this.editorCameraController);
@@ -38,6 +40,14 @@ export class EditorLayer extends banana.Layer {
     }
 
     runGame() {
+        if (this.gameWindow && !this.gameWindow.closed) {
+            this.gameWindow.location.reload();
+            this.gameWindow.focus();
+
+            this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            return;
+        }
+
         const windowWidth = this.projectSettingsPanel.gameWindowWidth;
         const windowHeight = this.projectSettingsPanel.gameWindowHeight;
 
@@ -52,14 +62,14 @@ export class EditorLayer extends banana.Layer {
 
         const windowFeatures = `location=no,width=${windowWidth},height=${windowHeight},left=${left},top=${top}`;
 
-        const gameWindow = window.open('/editor/game.html', '', windowFeatures);
+        this.gameWindow = window.open('/editor/game.html', '', windowFeatures);
 
-        if (gameWindow) {
-            gameWindow.focus();
+        if (this.gameWindow) {
+            this.gameWindow.focus();
         }
 
         setTimeout(() => {
-            gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
         }, 300);
     }
 }
