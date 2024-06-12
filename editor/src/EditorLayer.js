@@ -68,8 +68,10 @@ export class EditorLayer extends banana.Layer {
             this.gameWindow.focus();
         }
 
-        setTimeout(() => {
-            this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
-        }, 300);
+        this.gameWindow.addEventListener('load', () => {
+            setTimeout(() => {
+                this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            }, 100);
+        });
     }
 }
