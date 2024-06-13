@@ -4,7 +4,6 @@ import { Renderer2D } from '../render/Renderer2D.js'
 import { Entity } from './Entity.js'
 import { CameraComponent, 
          CircleRendererComponent, 
-         Color, 
          Log, 
          NativeScriptComponent, 
          Body2DComponent, 
@@ -13,7 +12,7 @@ import { CameraComponent,
          TagComponent, 
          TransformComponent, 
          PhysicsWorld,
-         RenderCommand} from '../banana.js'
+         TextRendererComponent} from '../banana.js'
 import { Mat4, Vec2, Vec3, Vec4 } from '../math/BananaMath.js'
  
 export class Scene 
@@ -81,6 +80,15 @@ export class Scene
 
             Renderer2D.drawCircle(transform, circle.color, circle.thickness, circle.fade);
         });
+
+        const texts = this.registry.group(ComponentType.TransformComponent, ComponentType.TextRendererComponent);
+
+        texts.forEach(entity => {
+            const transform = this.registry.get<TransformComponent>(entity, ComponentType.TransformComponent);
+            const textRenderer = this.registry.get<TextRendererComponent>(entity, ComponentType.TextRendererComponent);
+
+            Renderer2D.drawText(transform, textRenderer.text);
+        })
 
         // DEBUG CODE
         // for (const contactPoint of PhysicsWorld.contactPoints) {
