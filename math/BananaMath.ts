@@ -150,6 +150,9 @@ export class Vec2 {
 }
 
 export class Vec3 {
+
+    static readonly ZERO = new Vec3(0, 0, 0);
+
     data: Float32Array;
 
     constructor(x: number, y: number, z: number) {

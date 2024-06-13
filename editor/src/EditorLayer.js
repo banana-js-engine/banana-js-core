@@ -1,5 +1,7 @@
 import * as banana from "../../build/banana.js";
-import { GamepadTestScript } from "./GamepadTestScript.js";
+import { MenuBarPanel } from "./panels/MenuBarPanel.js";
+import { ProjectSettingsPanel } from "./panels/ProjectSettingsPanel.js";
+import { SceneHierarchyPanel } from "./panels/SceneHierarchyPanel.js";
 
 /**
  * Example layer which demonstrates a simple ImGUI Panel
@@ -9,58 +11,67 @@ export class EditorLayer extends banana.Layer {
     constructor() {
         super('Editor Layer');
 
-        banana.Renderer2D.init();
+        this.editorCameraController = new banana.EditorCameraController();
+        
+        this.scene = new banana.Scene('game scene');
 
-        this.counter = 0;
-        this.darkMode = true;
-        this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
+        this.gameWindow = null;
 
-        this.scene = new banana.Scene('test scene');
-
-        this.gamepadTest = this.scene.createEntity('gamepad test');
-        this.gamepadTest.addComponent( banana.ComponentType.NativeScriptComponent ).bind(GamepadTestScript);
-
-        banana.RenderCommand.setClearColor( banana.Color.RED );
+        this.menuBarPanel = new MenuBarPanel(this);
+        this.projectSettingsPanel = new ProjectSettingsPanel();
+        this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene, this.editorCameraController);
     }
 
     onUpdate(deltaTime) {
-        
-        this.scene.onUpdateRuntime(deltaTime);
-        
-        // ImGUI section
-        banana.ImGui_Impl.NewFrame(deltaTime);
-        banana.ImGui.NewFrame();
-        
-        {
-            banana.ImGui.Begin('Test Panel');
-            banana.ImGui.Text(`FPS: ${Math.floor(1 / deltaTime)}`);
-            
-            banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
+        this.scene.onUpdateEditor(deltaTime, this.editorCameraController);
+    }
 
-            banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
+    onImGuiRender() {
+        this.editorCameraController.update();
 
-            banana.ImGui.End();
-        }
-        
-        banana.ImGui.EndFrame();
-        
-        banana.ImGui.Render();
-        
-        banana.RenderCommand.clear();
-
-        banana.ImGui_Impl.RenderDrawData(banana.ImGui.GetDrawData());
-
-        banana.RenderCommand.setClearColor( new banana.Color( this.clearColorIm.x, this.clearColorIm.y, this.clearColorIm.z, this.clearColorIm.w ) );
-
-        if (this.darkMode) {
-            banana.ImGui.StyleColorsDark();
-        }
-        else { 
-            banana.ImGui.StyleColorsLight();
-        }
+        this.menuBarPanel.onImGuiRender();
+        this.projectSettingsPanel.onImGuiRender();
+        this.sceneHierarchyPanel.onImGuiRender();
     }
 
     onEvent(event) {
         this.scene.onEvent(event);
+        this.editorCameraController.onEvent(event);
+    }
+
+    runGame() {
+        if (this.gameWindow && !this.gameWindow.closed) {
+            this.gameWindow.location.reload();
+            this.gameWindow.focus();
+
+            this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            return;
+        }
+
+        const windowWidth = this.projectSettingsPanel.gameWindowWidth;
+        const windowHeight = this.projectSettingsPanel.gameWindowHeight;
+
+        const screenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+        const screenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+        const screenWidth = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+        const screenHeight = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+        const left = screenLeft + (screenWidth - windowWidth) / 2;
+        const top = screenTop + (screenHeight - windowHeight) / 2;
+
+        const windowFeatures = `location=no,width=${windowWidth},height=${windowHeight},left=${left},top=${top}`;
+
+        this.gameWindow = window.open('/editor/game.html', '', windowFeatures);
+
+        if (this.gameWindow) {
+            this.gameWindow.focus();
+        }
+
+        this.gameWindow.addEventListener('load', () => {
+            setTimeout(() => {
+                this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            }, 100);
+        });
     }
 }

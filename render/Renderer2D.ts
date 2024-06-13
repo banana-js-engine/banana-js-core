@@ -4,7 +4,10 @@ import { Shader } from "./Shader.js"
 import { Texture } from "./Texture.js"
 import { gl } from "./WebGLContext.js"
 import { Mat4, Vec2, Vec3, Vec4 } from "../math/BananaMath.js"
-import { SubTexture, TransformComponent } from "../banana.js"
+import { Camera, Log, RenderCommand, SubTexture, TransformComponent, canvas } from "../banana.js"
+import { Font } from "./Font.js"
+
+import { defaultFontData } from "./data/defaultFontData.js";
 
 class Render2DData
 {
@@ -61,99 +64,111 @@ class Render2DData
     ];
 };
 
-function QuadVertex() {
-    this.position = null; // 4
-    this.texCoord = null; // 2
-    this.texIndex = null; // 1
-    this.color    = null; // 4
+class QuadVertex {
+    position: Vec4 | null = null;
+    texCoord: Vec2 | null = null;
+    texIndex: number | null = null;
+    color: Color | null = null;
 
-    this.flat = function() {
-        let flatArray = [];
+    flat(): number[] {
+        if (!this.position || !this.texCoord || this.texIndex === null || !this.color) {
+            Log.Core_Error('Initialize all fields before calling flat()!');
+        }
 
-        flatArray[0] = this.position.x;
-        flatArray[1] = this.position.y;
-        flatArray[2] = this.position.z;
-        flatArray[3] = this.position.w;
-
-        flatArray[4] = this.texCoord.x;
-        flatArray[5] = this.texCoord.y;
-
-        flatArray[6] = this.texIndex;
-
-        flatArray[7] = this.color.x;
-        flatArray[8] = this.color.y;
-        flatArray[9] = this.color.z;
-        flatArray[10] = this.color.w;
-
-        return flatArray;
+        return [
+            this.position.x,
+            this.position.y,
+            this.position.z,
+            this.position.w,
+            this.texCoord.x,
+            this.texCoord.y,
+            this.texIndex,
+            this.color.r,
+            this.color.g,
+            this.color.b,
+            this.color.a
+        ];
     }
 
+    static readonly VertexSize = 11;
 }
 
-QuadVertex.VertexSize = 11;
+class LineVertex {
+    position: Vec4 | null = null;
+    color: Color | null = null;
 
-function LineVertex() {
-    this.position = null;
-    this.color    = null;
+    flat(): number[] {
+        if (!this.position || !this.color) {
+            Log.Core_Error('Initialize all fields before calling flat()!');
+        }
 
-    this.flat = function() {
-        let flatArray = [];
-
-        flatArray[0] = this.position.x;
-        flatArray[1] = this.position.y;
-        flatArray[2] = this.position.z;
-        flatArray[3] = this.position.w;
-
-        flatArray[4] = this.color.x;
-        flatArray[5] = this.color.y;
-        flatArray[6] = this.color.z;
-        flatArray[7] = this.color.w;
-
-        return flatArray;
+        return [
+            this.position.x,
+            this.position.y,
+            this.position.z,
+            this.position.w,
+            this.color.r,
+            this.color.g,
+            this.color.b,
+            this.color.a
+        ];
     }
+
+    static readonly VertexSize = 8;
 }
 
-LineVertex.VertexSize = 8;
+class CircleVertex {
+    position: Vec4 | null = null;
+    fragCoord: Vec2 | null = null;
+    color: Color | null = null;
+    thickness: number | null = null;
+    fade: number | null = null;
 
-function CircleVertex() {
-    this.position  = null;
-    this.fragCoord = null;
-    this.color     = null;
-    this.thickness = null;
-    this.fade      = null;
+    flat(): number[] {
+        if (!this.position || !this.fragCoord || !this.color || this.thickness === null || this.fade === null) {
+            Log.Core_Error('Initialize all fields before calling flat()!');
+        }
 
-    this.flat = function() {
-        let flatArray = [];
-
-        flatArray[0] = this.position.x;
-        flatArray[1] = this.position.y;
-        flatArray[2] = this.position.z;
-        flatArray[3] = this.position.w;
-
-        flatArray[4] = this.fragCoord.x;
-        flatArray[5] = this.fragCoord.y;
-
-        flatArray[6] = this.color.x;
-        flatArray[7] = this.color.y;
-        flatArray[8] = this.color.z;
-        flatArray[9] = this.color.w;
-
-        flatArray[10] = this.thickness;
-        
-        flatArray[11] = this.fade;
-
-        return flatArray;
+        return [
+            this.position.x,
+            this.position.y,
+            this.position.z,
+            this.position.w,
+            this.fragCoord.x,
+            this.fragCoord.y,
+            this.color.r,
+            this.color.g,
+            this.color.b,
+            this.color.a,
+            this.thickness,
+            this.fade
+        ];
     }
+
+    static readonly VertexSize = 12;
 }
 
-CircleVertex.VertexSize = 12;
-
+/**
+ * Main 2D rendering API of banana.js, responsible for all 2D rendering.
+ * Capabilities:
+ *      - rendering quads, (colored, textured or using subtextures)
+ *      - rendering circles,
+ *      - rendering lines,
+ *      - TODO: rendering text
+ */
 export class Renderer2D {
     static White_Texture: Texture;
+    
+    // for caching purposes
     static viewProj = new Mat4();
     static quadVertex = new QuadVertex();
     static lineVertex = new LineVertex();
     static circleVertex = new CircleVertex();
+    static tempTransform: TransformComponent;
+
+    /**
+     * This object is used to display rendering/batching data to the developer.
+     */
     static Stats = {
         BatchCount: 0,
         QuadCount: 0,
@@ -172,8 +187,12 @@ export class Renderer2D {
     }
     
     static init() {
+        // empty constructor of Texture will produce 1x1 white texture
         Renderer2D.White_Texture = new Texture();
+        Font.defaultFont = new Font('/render/data/defaultFont.png', defaultFontData);
+        this.tempTransform = new TransformComponent();
 
+        // prepare indices for index buffer creation
         let quadIndices = new Uint16Array( Render2DData.MaxIndices );
         
         let offset = 0;
@@ -189,6 +208,7 @@ export class Renderer2D {
             offset += 4;
         }
         
+        // Quads
         Render2DData.QuadShader = new Shader('/shader/Renderer2D_Quad.glsl');
 
         Render2DData.QuadVertexBuffer = new VertexBuffer(Render2DData.MaxVertices * QuadVertex.VertexSize);
@@ -211,6 +231,7 @@ export class Renderer2D {
                 
         Render2DData.QuadShader.setUniform1iv('u_Textures', samplers);
 
+        // Lines
         Render2DData.LineShader = new Shader('/shader/Renderer2D_Line.glsl');
 
         Render2DData.LineVertexBuffer = new VertexBuffer(Render2DData.MaxVertices * LineVertex.VertexSize);
@@ -221,6 +242,7 @@ export class Renderer2D {
         Render2DData.LineVertexBuffer.pushAttribute(aLinePosition, 4);
         Render2DData.LineVertexBuffer.pushAttribute(aLineColor, 4);
 
+        // Circles
         Render2DData.CircleShader = new Shader('/shader/Renderer2D_Circle.glsl');
 
         Render2DData.CircleVertexBuffer = new VertexBuffer(Render2DData.MaxVertices * CircleVertex.VertexSize);
@@ -240,31 +262,44 @@ export class Renderer2D {
         Render2DData.TextureSlots[0] = Renderer2D.White_Texture;
     }
 
-    static beginScene(camera, transform?: Mat4) {
+    /**
+     * This function needs to be called before any draw calls are made.
+     * @param camera camera used to render
+     * @param transform transform of the camera, fetched from TransformComponent if it's a SceneCamera, internally if it's an EditorCamera
+     */
+    static beginScene(camera: Camera, transform?: Mat4) {
+        RenderCommand.resetState();
+        RenderCommand.setClearColor( camera.clearColor );
+        RenderCommand.clear();
         Renderer2D.newBatch();
 
         if (typeof transform == 'undefined') {
-            // Render2DData.QuadShader.setUniformMatrix4fv('u_ViewProjectionMatrix', camera.getViewProjectionMatrix().data);
-            // Render2DData.LineShader.setUniformMatrix4fv('u_ViewProjectionMatrix', camera.getViewProjectionMatrix().data);
-        
+            // this means the camera is an EditorCamera
             Render2DData.ViewProj = camera.getViewProjectionMatrix();
         }
         else {
+            // this means the camera is a SceneCamera
             this.viewProj.identity();
             this.viewProj.mul(camera.getViewProjectionMatrix());
             this.viewProj.mul(transform.invert());
-            //Render2DData.QuadShader.setUniformMatrix4fv('u_ViewProjectionMatrix', this.viewProj.data);
-            //Render2DData.LineShader.setUniformMatrix4fv('u_ViewProjectionMatrix', this.viewProj.data);
+            this.viewProj.transpose();
         
             Render2DData.ViewProj = this.viewProj;
         }
 
     }
 
+    /**
+     * Renders all the draw calls made since beginScene has been called
+     */
     static endScene() {        
         Renderer2D.flush();
     }
 
+    /**
+     * Renders all the draw calls. Also empties all the buffers, that's why it's referred to as flush.
+     * flush is called when endScene is called or the batch size exceeds the limit.
+     */
     static flush() {
         if (Render2DData.QuadIndexCount) {
 
@@ -301,6 +336,9 @@ export class Renderer2D {
         }
     }
 
+    /**
+     * If max index count has been exceeded, this function is used to reset everything, thus making way for a new batch
+     */
     static newBatch() {
         Render2DData.QuadIndexCount = 0;
         Render2DData.QuadVertexCount = 0;
@@ -313,6 +351,11 @@ export class Renderer2D {
         Render2DData.TextureSlotIndex = 1;
     }
 
+    /**
+     * Adds vertex data for rendering colored quad.
+     * @param transform transform of the quad
+     * @param color color of the quad
+     */
     static drawColorQuad(transform: TransformComponent, color: Color) {
 
         if (Render2DData.QuadIndexCount >= Render2DData.MaxIndices) {
@@ -338,6 +381,11 @@ export class Renderer2D {
         Renderer2D.Stats.QuadCount++;
     }
 
+    /**
+     * Adds vertex data for rendering a quad with a texture.
+     * @param transform transform of the quad
+     * @param texture texture of the quad
+     */
     static drawTextureQuad(transform: TransformComponent, texture: Texture) {
         if (Render2DData.QuadIndexCount >= Render2DData.MaxIndices) {
             Renderer2D.flush();
@@ -365,39 +413,25 @@ export class Renderer2D {
 
         let t = transform.getTransform();
 
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[0]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[0];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[1]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[1];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[2]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[2];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[3]);
-        this.quadVertex.texCoord = Render2DData.QuadTextureCoords[3];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
+        for (let i = 0; i < 4; i++) {
+            this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[i]);
+            this.quadVertex.texCoord = Render2DData.QuadTextureCoords[i];
+            this.quadVertex.texIndex = useTextureSlot;
+            this.quadVertex.color = Color.WHITE;
+            Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
+            Render2DData.QuadVertexCount++;
+        }
 
         Render2DData.QuadIndexCount += 6;
 
         Renderer2D.Stats.QuadCount++;
     }
 
+    /**
+     * Adds vertex data for rendering a quad with a texture from a part of the sprite sheet.
+     * @param transform transform of the quad
+     * @param subTexture sub-texture of the quad, (sub-texture is basically a part of a sprite sheet)
+     */
     static drawSubTextureQuad(transform: TransformComponent, subTexture: SubTexture) {
         const texCoords = subTexture.getTexCoords();
         const texture = subTexture.getTexture();
@@ -428,39 +462,26 @@ export class Renderer2D {
 
         let t = transform.getTransform();
 
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[0]);
-        this.quadVertex.texCoord = texCoords[0];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[1]);
-        this.quadVertex.texCoord = texCoords[1];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[2]);
-        this.quadVertex.texCoord = texCoords[2];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
-
-        this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[3]);
-        this.quadVertex.texCoord = texCoords[3];
-        this.quadVertex.texIndex = useTextureSlot;
-        this.quadVertex.color = Color.TRANSPARENT;
-        Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
-        Render2DData.QuadVertexCount++;
+        for (let i = 0; i < 4; i++) {
+            this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[i]);
+            this.quadVertex.texCoord = texCoords[i];
+            this.quadVertex.texIndex = useTextureSlot;
+            this.quadVertex.color = Color.WHITE;
+            Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
+            Render2DData.QuadVertexCount++;
+        }
 
         Render2DData.QuadIndexCount += 6;
 
         Renderer2D.Stats.QuadCount++;
     }
 
+    /**
+     * Adds vertex data for rendering a line with a color
+     * @param p0 position of start of the line
+     * @param p1 position of end of the line
+     * @param color color of the line
+     */
     static drawLine(p0: Vec3, p1: Vec3, color: Color) {
         this.lineVertex.position = new Vec4(p0.x, p0.y, p0.z, 1.0);
         this.lineVertex.color = color;
@@ -473,6 +494,12 @@ export class Renderer2D {
         Render2DData.LineVertexCount++;
     }
 
+    /**
+     * Add vertex data for rendering a non-filled rectangle, (implementation basically renders 4 lines)
+     * @param position position of the rectangle, position refers to its center
+     * @param size size of the rectangle
+     * @param color color of the rectangle
+     */
     static drawRectangle(position: Vec3, size: Vec2, color: Color) {
         const p0 = new Vec3(position.x - size.x * 0.5, position.y - size.y * 0.5, position.z);
         const p1 = new Vec3(position.x + size.x * 0.5, position.y - size.y * 0.5, position.z);
@@ -485,47 +512,64 @@ export class Renderer2D {
         this.drawLine(p3, p0, color);
     }
 
+    /**
+     * Adds vetex data for rendering a colored circle
+     * @param transform transform of the circle
+     * @param color color of the circle
+     * @param thickness refers to how thick the circle is, 
+     * thickness = 0.0 will produce a non-filled circle, 
+     * thickness = 0.5 will produce a ring with half-radius size,
+     * thickness = 1.0 will produce a filled circle.
+     * @param fade can be though of as the opacity of the circle
+     */
     static drawCircle(transform: TransformComponent, color: Color, thickness: number = 1.0, fade: number = 0.0) {
 
         let t = transform.getTransform();
-        
-        this.circleVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[0]);
-        this.circleVertex.fragCoord = Render2DData.CircleFragCoords[0];
-        this.circleVertex.color = color;
-        this.circleVertex.thickness = thickness;
-        this.circleVertex.fade = fade;
 
-        Render2DData.CircleVertexBuffer.addVertex(Render2DData.CircleVertexCount, this.circleVertex.flat());
-        Render2DData.CircleVertexCount++;
-
-        this.circleVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[1]);
-        this.circleVertex.fragCoord = Render2DData.CircleFragCoords[1];
-        this.circleVertex.color = color;
-        this.circleVertex.thickness = thickness;
-        this.circleVertex.fade = fade;
-
-        Render2DData.CircleVertexBuffer.addVertex(Render2DData.CircleVertexCount, this.circleVertex.flat());
-        Render2DData.CircleVertexCount++;
-
-        this.circleVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[2]);
-        this.circleVertex.fragCoord = Render2DData.CircleFragCoords[2];
-        this.circleVertex.color = color;
-        this.circleVertex.thickness = thickness;
-        this.circleVertex.fade = fade;
-
-        Render2DData.CircleVertexBuffer.addVertex(Render2DData.CircleVertexCount, this.circleVertex.flat());
-        Render2DData.CircleVertexCount++;
-
-        this.circleVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[3]);
-        this.circleVertex.fragCoord = Render2DData.CircleFragCoords[3];
-        this.circleVertex.color = color;
-        this.circleVertex.thickness = thickness;
-        this.circleVertex.fade = fade;
-
-        Render2DData.CircleVertexBuffer.addVertex(Render2DData.CircleVertexCount, this.circleVertex.flat());
-        Render2DData.CircleVertexCount++;
+        for (let i = 0; i < 4; i++) {
+            this.circleVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[i]);
+            this.circleVertex.fragCoord = Render2DData.CircleFragCoords[i];
+            this.circleVertex.color = color;
+            this.circleVertex.thickness = thickness;
+            this.circleVertex.fade = fade;
+    
+            Render2DData.CircleVertexBuffer.addVertex(Render2DData.CircleVertexCount, this.circleVertex.flat());
+            Render2DData.CircleVertexCount++;
+        }
 
         Render2DData.CircleIndexCount += 6;
+    }
+
+    /**
+     * Adds vertex data for rendering strings/(texts).
+     * TODO: right now, text is rendered through a texture atlas, in the future read the information from a font (.ttf) file.
+     * @param transform transform of the text
+     * @param text the string to be rendered
+     * @param font the font to be used.
+     * Font.defaultFont consists of these characters: abcdefghijklmnopqrstuvwxyz123456789-*!?
+     */
+    static drawText(transform: TransformComponent, text: string, font: Font = Font.defaultFont) {
+
+        if (!text) {
+            return;
+        }
+
+        text = text.toLowerCase();
+
+        this.tempTransform.setPosition( transform.getPosition() );
+        this.tempTransform.setRotation( transform.getRotation() );
+        this.tempTransform.setScale( transform.getScale() );
+
+        for (let i = 0; i < text.length; i++) {
+
+            const glyph = font.glyphs[text.charAt(i)];
+
+            if (glyph) {
+                this.drawSubTextureQuad(this.tempTransform, glyph);
+            } 
+            this.tempTransform.translate(font.glyphData.spaceWidth, 0, 0);
+        }
+
     }
 
     // following functions only exist within the engine, once the game is built they shouldn't be called

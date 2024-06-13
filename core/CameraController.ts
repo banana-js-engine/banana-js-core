@@ -12,7 +12,8 @@ export class EditorCameraController
     cameraPanSpeed: number;
     cameraAngle: number;
     zoomLevel: number;
-    previousMousePosition: Vec2;
+    defaultCameraSize: number;
+    previousMousePosition: Vec3;
     editorCamera: EditorCamera;
 
     constructor() {
@@ -20,10 +21,11 @@ export class EditorCameraController
         this.onMouseScrolled = this.onMouseScrolled.bind(this);
         this.onWindowResized = this.onWindowResized.bind(this);
 
-        this.cameraPanSpeed = 60;
+        this.cameraPanSpeed = 1;
         this.cameraAngle = 0;
-        this.zoomLevel = 1.0
-        this.previousMousePosition = new Vec2(Input.mousePosition.x, Input.mousePosition.y);
+        this.zoomLevel = 1.0;
+        this.defaultCameraSize = 10;
+        this.previousMousePosition = new Vec3(Input.mousePosition.x, Input.mousePosition.y, 0);
 
         this.editorCamera = new EditorCamera();
     }
@@ -32,29 +34,22 @@ export class EditorCameraController
         return this.editorCamera;
     }
 
-    update(deltaTime) {
-        if (Input.isMouseButtonPressed(MouseButton.MOUSE_MIDDLE)) {
-            let direction = new Vec2(0, 0);
-            direction.x = (this.previousMousePosition.x - Input.mousePosition.x) * this.zoomLevel / 1.5;
-            direction.y = (this.previousMousePosition.y - Input.mousePosition.y) * this.zoomLevel / 1.5;
+    update(deltaTime: number) {
+        if (Input.isMouseButtonPressed(MouseButton.MOUSE_MIDDLE)) {            
+            const direction = new Vec3(0, 0, 0);
+            const currentMousePos = this.editorCamera.screenToViewportSpace( Input.mousePosition );
 
-            if (direction.equals(Vec2.ZERO)) {
+            direction.x = (this.previousMousePosition.x - currentMousePos.x) * this.cameraPanSpeed;
+            direction.y = (this.previousMousePosition.y - currentMousePos.y) * this.cameraPanSpeed;
+
+            if (direction.equals(Vec3.ZERO)) {
                 return;
             }
 
             this.editorCamera.setPosition(this.editorCamera.getPosition().x + direction.x, this.editorCamera.getPosition().y + direction.y, 0.0);
             
-            this.previousMousePosition.x = Input.mousePosition.x;
-            this.previousMousePosition.y = Input.mousePosition.y;
-        }
-
-        if (Input.isKeyPressed(KeyCode.Q)) {
-            this.cameraAngle--;
-            this.editorCamera.setRotation(this.cameraAngle);
-        }
-        if (Input.isKeyPressed(KeyCode.E)) {
-            this.cameraAngle++;
-            this.editorCamera.setRotation(this.cameraAngle);
+            this.previousMousePosition.x = currentMousePos.x;
+            this.previousMousePosition.y = currentMousePos.y;
         }
     }
 
@@ -71,17 +66,19 @@ export class EditorCameraController
             this.zoomLevel += 0.25;
             this.zoomLevel = Math.min(2.0, this.zoomLevel);
             this.editorCamera.setOrthographic(
-                446 * this.zoomLevel,
+                this.defaultCameraSize * this.zoomLevel,
                 this.editorCamera.orthographicNear,
-                this.editorCamera.orthographicFar);
+                this.editorCamera.orthographicFar
+            );
         }
         else if (event.getOffsetY() < 0) {
             this.zoomLevel -= 0.25;
             this.zoomLevel = Math.max(0.25, this.zoomLevel);
             this.editorCamera.setOrthographic(
-                446 * this.zoomLevel,
+                this.defaultCameraSize * this.zoomLevel,
                 this.editorCamera.orthographicNear,
-                this.editorCamera.orthographicFar);
+                this.editorCamera.orthographicFar
+            );
         }
 
         this.editorCamera.recalculateViewProjectionMatrix();
@@ -90,7 +87,7 @@ export class EditorCameraController
     }
 
     onMouseButtonClicked(event) {
-        this.previousMousePosition = new Vec2(Input.mousePosition.x, Input.mousePosition.y);
+        this.previousMousePosition = this.editorCamera.screenToViewportSpace( Input.mousePosition );
 
         return true;
     }

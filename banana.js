@@ -37,6 +37,7 @@ export * from './core/Application.js'
 export * from './core/Window.js'
 export * from './core/Profiler.js'
 export * from './core/Type.js'
+export * from './core/FileManager.js'
 
 // event
 export * from './event/Event.js'

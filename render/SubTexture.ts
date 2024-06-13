@@ -17,7 +17,7 @@ export class SubTexture {
     spriteSize: Vec2;
     texCoords: Vec2[];
     
-    constructor(spriteSheet, coords, cellSize, spriteSize = new Vec2(1, 1)) {
+    constructor(spriteSheet: Texture, coords: Vec2, cellSize: Vec2, spriteSize = new Vec2(1, 1)) {
         this.spriteSheet = spriteSheet;
         this.spriteSheetCoords = coords;
         this.cellSize = cellSize;
