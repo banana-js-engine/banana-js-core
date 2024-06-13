@@ -235,24 +235,23 @@ export class PhysicsWorld {
             const raPerpDotN = raPerp.dot(normal);
             const rbPerpDotN = rbPerp.dot(normal);
 
-            const denom = bodyA.inverseMass + bodyB.inverseMass +
+            const denom = bodyA.inverseMass + bodyB.inverseMass + 
                 (raPerpDotN * raPerpDotN) * bodyA.inverseInertia +
                 (rbPerpDotN * rbPerpDotN) * bodyB.inverseInertia;
 
 
             let j = (- 1 - e) * magnitude;
             j /= denom;
-            j /= contactCount;
 
             jList.push(j);
 
             const impulse = normal.mul(j);
-            
+
             impulseList.push(impulse);
         }
 
         for (let i = 0; i < impulseList.length; i++) {
-            bodyA.linearVelocity = bodyA.linearVelocity.sub(impulseList[i].mul(bodyA.inverseMass));
+            bodyA.linearVelocity = bodyA.linearVelocity.add(impulseList[i].mul(-bodyA.inverseMass));
             bodyA.rotationalVelocity += -raList[i].cross(impulseList[i]) * bodyA.inverseInertia; 
             
             bodyB.linearVelocity = bodyB.linearVelocity.add(impulseList[i].mul(bodyB.inverseMass));
@@ -318,7 +317,6 @@ export class PhysicsWorld {
 
             let jt = -relativeVelocity.dot(tangent);
             jt /= denom;
-            jt /= contactCount;
 
             let friction: Vec2;
 
@@ -333,7 +331,7 @@ export class PhysicsWorld {
         }
 
         for (let i = 0; i < impulseList.length; i++) {
-            bodyA.linearVelocity = bodyA.linearVelocity.sub(impulseList[i].mul(bodyA.inverseMass));
+            bodyA.linearVelocity = bodyA.linearVelocity.add(impulseList[i].mul(-bodyA.inverseMass));
             bodyA.rotationalVelocity += -raList[i].cross(impulseList[i]) * bodyA.inverseInertia; 
             
             bodyB.linearVelocity = bodyB.linearVelocity.add(impulseList[i].mul(bodyB.inverseMass));
