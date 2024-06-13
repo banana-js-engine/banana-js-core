@@ -364,8 +364,32 @@ export class Body2DComponent extends Component {
         this.body2d.addForce(amount);
     }
 
+    set width(newWidth: number) {
+        this.body2d.width = newWidth;
+    }
+
+    set height(newHeight: number) {
+        this.body2d.height = newHeight;
+    }
+
     get radius() {
         return this.body2d.radius;
+    }
+
+    set radius(newRadius: number) {
+        this.body2d.radius = newRadius;
+    }
+
+    set density(newDensity: number) {
+        this.body2d.density = newDensity;
+    }
+
+    set restitution(newRestitution: number) {
+        this.body2d.restitution = newRestitution;
+    }
+
+    set isStatic(newIsStatic: boolean) {
+        this.body2d.isStatic = newIsStatic;
     }
 
     get linearVelocity() {
@@ -376,6 +400,10 @@ export class Body2DComponent extends Component {
         this.body2d.linearVelocity = v;
     }
 
+    get gravityScale() {
+        return this.body2d.gravityScale;
+    }
+
     set gravityScale(newValue: number) {
         this.body2d.gravityScale = newValue;
     }
@@ -383,10 +411,10 @@ export class Body2DComponent extends Component {
     setShape(shapeType: ShapeType) {
         this.body2d.shapeType = shapeType;
         if (shapeType == ShapeType.Circle) {
-            this.body2d = Body2D.CreateCircleBody2D(0.5, 1, false, 0.1);
+            this.body2d = Body2D.CreateCircleBody2D(this.body2d.radius, this.body2d.density, this.body2d.isStatic, this.body2d.restitution);
         }
         else {
-            this.body2d = Body2D.CreateBoxBody2D(1, 1, 1, false, 0.1);
+            this.body2d = Body2D.CreateBoxBody2D(this.body2d.width, this.body2d.height, this.body2d.density, this.body2d.isStatic, this.body2d.restitution);
         }
     }
 
@@ -398,7 +426,8 @@ export class Body2DComponent extends Component {
           Radius: ${this.body2d.radius}
           Density: ${this.body2d.density}
           IsStatic: ${this.body2d.isStatic ? '1' : '0'}
-          Restitution: ${this.body2d.restitution}\n`
+          Restitution: ${this.body2d.restitution}
+          GravityScale: ${this.gravityScale}\n`
     }
 }
 
