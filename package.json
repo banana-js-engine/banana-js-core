@@ -1,6 +1,6 @@
 {
-    "name": "banana-js",
-    "version": "0.0.2",
+    "name": "banana-js-core",
+    "version": "0.8.9",
     "description": "Game making framework in JavaScript",
     "main": "banana.js",
     "scripts": {
