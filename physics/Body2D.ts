@@ -109,7 +109,7 @@ export class Body2D {
 
         const inertia = 0.5 * mass * radius * radius;
 
-        return new Body2D(density, mass, restitution, area, isStatic, radius, 0, 0, inertia, ShapeType.Circle);
+        return new Body2D(density, mass, restitution, area, isStatic, radius, 1, 1, inertia, ShapeType.Circle);
     }
     
     public static CreateBoxBody2D(width: number, height: number, density: number, isStatic: boolean, restitution: number): Body2D {
@@ -142,7 +142,7 @@ export class Body2D {
 
         const inertia = (1.0 / 12.0) * mass * (width * width + height * height);
 
-        return new Body2D(density, mass, restitution, area, isStatic, 0, width, height, inertia, ShapeType.Box);
+        return new Body2D(density, mass, restitution, area, isStatic, 0.5, width, height, inertia, ShapeType.Box);
     }
 
     public getAABB(transform: TransformComponent): AABB {
@@ -218,6 +218,10 @@ export class Body2D {
 
     public set rotationalVelocity(ang: number) {
         this._rotationalVelocity = ang;
+    }
+
+    public get gravityScale() {
+        return this._gravityScale;
     }
 
     public set gravityScale(newValue: number) {

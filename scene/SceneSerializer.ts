@@ -155,9 +155,25 @@ export class SceneSerializer {
             else if (lines[i].startsWith(' Body2DComponent:')) {
                 const body2dComponent = currentEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);
 
-                const type = parseInt(lines[i+2].split(':')[1].trim()) as ShapeType;
+                const type = parseInt(lines[i+1].split(':')[1].trim()) as ShapeType;
+                const width = parseFloat(lines[i+2].split(':')[1].trim());
+                const height = parseFloat(lines[i+3].split(':')[1].trim());
+                const radius = parseFloat(lines[i+4].split(':')[1].trim());
+                const density = parseFloat(lines[i+5].split(':')[1].trim());
+                const isStatic = lines[i+6].split(':')[1].trim() == '1'
+                const restitution = parseFloat(lines[i+7].split(':')[1].trim());
+                const gravityScale = parseFloat(lines[i+8].split(':')[1].trim());
 
+                body2dComponent.width = width;
+                body2dComponent.height = height;
+                body2dComponent.radius = radius;
+                body2dComponent.density = density;
+                body2dComponent.isStatic = isStatic;
+                body2dComponent.restitution = restitution;
+                
                 body2dComponent.setShape(type);
+                
+                body2dComponent.gravityScale = gravityScale;
             }
         }
     
