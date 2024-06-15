@@ -151,6 +151,8 @@ export class SceneSerializer {
                 const clearColor = this.parseVec4(clearColorString);
 
                 cameraComponent.sceneCamera.clearColor = new Color(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+
+                cameraComponent.sceneCamera.setViewportSize();
             }
             else if (lines[i].startsWith(' Body2DComponent:')) {
                 const body2dComponent = currentEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);
