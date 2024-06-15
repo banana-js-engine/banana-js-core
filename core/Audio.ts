@@ -27,6 +27,9 @@ export async function setAudio(audioSource) {
       gainNode = audioContext.createGain();
     }
   
+    // This is supposed to create a media element like in html. Example here: <audio src="myCoolTrack.mp3"></audio>, 
+    // const audioElement = document.querySelector("audio");
+    // Thıs part doesn't work and is to be fixed
     const mediaElement = document.createElement('audio');
     mediaElement.src = audioSource;
   
@@ -38,6 +41,7 @@ export async function setAudio(audioSource) {
       // Optionally provide user feedback or fallback behavior
     });
   
+
     try {
       currentAudio = await audioContext.audioWorklet.addModule('audio-processor.js'); // Optional worklet for processing
       currentAudio = currentAudio ? await currentAudio.createProcessor('audioProcessor') : audioContext.createMediaElementSource(mediaElement);
