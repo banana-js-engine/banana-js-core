@@ -160,11 +160,13 @@ export class SpriteRendererComponent extends Component {
     
     #color: Color;
     #sprite: Texture;
+    #name: string;
     
     constructor() {
         super();
         this.#color = new Color(1, 1, 1, 1);
         this.#sprite = null;
+        this.name = '';
 
         this.type = ComponentType.SpriteRendererComponent;
     }
@@ -179,10 +181,19 @@ export class SpriteRendererComponent extends Component {
 
     setSprite(sprite: Texture) {
         this.#sprite = sprite;
+        this.#name = sprite.image.src.substring( sprite.image.src.lastIndexOf('/') + 1 );
     }
 
     getSprite() {
         return this.#sprite;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(newName: string) {
+        this.#name = newName;
     }
 
     toString() {

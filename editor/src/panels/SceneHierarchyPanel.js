@@ -126,10 +126,11 @@ export class SceneHierarchyPanel {
                         const sprite = new banana.Texture(`resources/${file}`);
 
                         spriteRenderer.setSprite(sprite);
+                        spriteRenderer.name = file;
                     })
                 }
                 banana.ImGui.SameLine();
-                banana.ImGui.InputText('Sprite', (value = texture ? texture.image.src : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+                banana.ImGui.InputText('Sprite', (value = texture ? spriteRenderer.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
 
                 banana.ImGui.TreePop();
             }
