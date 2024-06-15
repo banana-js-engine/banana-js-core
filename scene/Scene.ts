@@ -67,9 +67,14 @@ export class Scene
 
         sprites.forEach(entity => {
             const transform = this.registry.get<TransformComponent>(entity, ComponentType.TransformComponent);
-            const sprite = this.registry.get<SpriteRendererComponent>(entity, ComponentType.SpriteRendererComponent);
+            const spriteRenderer = this.registry.get<SpriteRendererComponent>(entity, ComponentType.SpriteRendererComponent);
 
-            Renderer2D.drawColorQuad(transform, sprite.getColor());
+            if (spriteRenderer.getSprite()) {
+                Renderer2D.drawTextureQuad(transform, spriteRenderer.getSprite(), spriteRenderer.getColor());
+            }
+            else {
+                Renderer2D.drawColorQuad(transform, spriteRenderer.getColor());
+            }
         });
         
         const circles = this.registry.group(ComponentType.TransformComponent, ComponentType.CircleRendererComponent);
