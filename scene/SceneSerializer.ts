@@ -1,4 +1,4 @@
-import { CameraType, Color, ShapeType, Vec3, Vec4 } from "../banana.js";
+import { CameraType, Color, ShapeType, Texture, Vec3, Vec4 } from "../banana.js";
 import { Writer } from "../core/FileManager.js";
 import { ComponentType } from "../core/Type.js";
 import { Body2DComponent, CameraComponent, CircleRendererComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
@@ -100,9 +100,15 @@ export class SceneSerializer {
                 const spriteRendererComponent = currentEntity.addComponent<SpriteRendererComponent>(ComponentType.SpriteRendererComponent);
 
                 const colorString = lines[i+1].split(':')[1].trim();
+                const sprite = lines[i+2].split('Texture:')[1].trim();
+
                 const color = this.parseVec4(colorString);
 
                 spriteRendererComponent.setColor(new Color(color.x, color.y, color.z, color.w));
+
+                if (sprite != 'None') {
+                    spriteRendererComponent.setSprite(new Texture(sprite));
+                }
             }
             else if (lines[i].startsWith(' CircleRendererComponent:')) {
                 const circleRendererComponent = currentEntity.addComponent<CircleRendererComponent>(ComponentType.CircleRendererComponent);

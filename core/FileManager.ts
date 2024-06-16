@@ -91,4 +91,40 @@ export class Reader {
                 });
         });
     }
+
+    static selectPngFile() {
+        return new Promise((resolve, reject) => {
+            // Use showOpenFilePicker() asynchronously
+            window.showOpenFilePicker({
+                types: [{
+                    description: 'PNG files',
+                    accept: {
+                        'image/png': ['.png']
+                    }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            })
+            .then(fileHandle => {
+                // Get the first file handle
+                const handle = fileHandle[0];
+        
+                // Get the file as a Blob
+                return handle.getFile();
+            })
+            .then(file => {
+                if (file.type === "image/png") {
+                    // Resolve with the file name
+                    resolve(file.name);
+                } else {
+                    reject(new Error("Selected file is not a PNG."));
+                }
+            })
+            .catch(error => {
+                // Reject with any errors
+                reject(error);
+            });
+        });
+    }
+    
 }

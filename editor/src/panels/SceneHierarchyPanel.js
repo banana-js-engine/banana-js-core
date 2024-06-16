@@ -115,9 +115,22 @@ export class SceneHierarchyPanel {
             }
 
             if (opened) {
-                const sprite = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                const spriteRenderer = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                const texture = spriteRenderer.getSprite();
 
-                banana.ImGui.ColorEdit4('Color', sprite.getColor());
+                banana.ImGui.ColorEdit4('Color', spriteRenderer.getColor());
+                
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectPngFile()
+                    .then((file) => {
+                        const sprite = new banana.Texture(`resources/${file}`);
+
+                        spriteRenderer.setSprite(sprite);
+                        spriteRenderer.name = file;
+                    })
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Sprite', (value = texture ? spriteRenderer.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
 
                 banana.ImGui.TreePop();
             }

@@ -386,7 +386,7 @@ export class Renderer2D {
      * @param transform transform of the quad
      * @param texture texture of the quad
      */
-    static drawTextureQuad(transform: TransformComponent, texture: Texture) {
+    static drawTextureQuad(transform: TransformComponent, texture: Texture, color: Color) {
         if (Render2DData.QuadIndexCount >= Render2DData.MaxIndices) {
             Renderer2D.flush();
             Renderer2D.newBatch();
@@ -417,7 +417,7 @@ export class Renderer2D {
             this.quadVertex.position = t.mulVec4(Render2DData.QuadVertexPositions[i]);
             this.quadVertex.texCoord = Render2DData.QuadTextureCoords[i];
             this.quadVertex.texIndex = useTextureSlot;
-            this.quadVertex.color = Color.WHITE;
+            this.quadVertex.color = color;
             Render2DData.QuadVertexBuffer.addVertex(Render2DData.QuadVertexCount, this.quadVertex.flat());
             Render2DData.QuadVertexCount++;
         }
