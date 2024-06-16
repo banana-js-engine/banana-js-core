@@ -85,6 +85,7 @@ export class SceneHierarchyPanel {
             this.drawAddComponent(banana.ComponentType.CircleRendererComponent, 'Circle Renderer');
             this.drawAddComponent(banana.ComponentType.TextRendererComponent, 'Text Renderer');
             this.drawAddComponent(banana.ComponentType.Body2DComponent, 'Body2D');
+            this.drawAddComponent(banana.ComponentType.AudioComponent, 'Audio');
 
             banana.ImGui.EndPopup();
         }
@@ -344,6 +345,31 @@ export class SceneHierarchyPanel {
                 body2d.gravityScale = bodyGravityScale[0];
 
                 banana.ImGui.TreePop();
+            }
+        }
+
+        // Audio Component
+        if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.AudioComponent)) {
+            let opened = banana.ImGui.TreeNodeEx('AudioComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Audio');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.Body2DComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
+                const audioComponent = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.AudioComponent);
+
+                let newValue = audioComponent.playOnStart;
+
+                if (banana.ImGui.Checkbox('Play On Start', (value = newValue) => newValue = value)) { 
+                    audioComponent.playOnStart = newValue;
+                }
             }
         }
     }

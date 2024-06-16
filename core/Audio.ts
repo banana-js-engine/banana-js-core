@@ -2,90 +2,66 @@
  * Audio Class. Uses Web Audio API.
 */
 
-export let audioContext;
-export let currentAudio;
-export let gainNode;
-export let source;
 
+export class AudioManager {
+    
+    static #audioContext: AudioContext = new AudioContext();
+    static #sources: Audio[] = [];
+
+    static async loadAudio(src: string): Promise<AudioBuffer> {
+        return fetch(src) 
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => this.#audioContext.decodeAudioData(arrayBuffer));
+    }
+
+    static createSource(buffer: AudioBuffer) {
+        const audioSource = new Audio(this.#audioContext, buffer);
+        this.#sources.push(audioSource);
+        return audioSource;
+    }
+        
+}
+        
 export class Audio {
-    
-    constructor(){
-        AudioContext = window.AudioContext //|| window.webkitAudioContext;
-        audioContext = new AudioContext();
-        gainNode = audioContext.createGain();
+
+    #audioContext: AudioContext;
+    #buffer: AudioBuffer;
+    #source: AudioBufferSourceNode;
+    #gainNode: GainNode;
+
+    constructor(audioContext: AudioContext, audioBuffer: AudioBuffer) {
+        this.#audioContext = audioContext;
+        this.#buffer = audioBuffer;
+        this.#source = null;
+        this.#gainNode = this.#audioContext.createGain();
+        this.#gainNode.connect(this.#audioContext.destination);
     }
-    
-}
 
-/**
- * Sets the new selected audio
- * @param audioSource The new audio to be played
- */
-export async function setAudio(audioSource) {
-    if (!audioContext) {
-      audioContext = new AudioContext();
-      gainNode = audioContext.createGain();
+    /**
+     * Starts playing the selected audio or resumes it. 
+     */
+    play() {
+        this.#source = this.#audioContext.createBufferSource();
+        this.#source.buffer = this.#buffer;
+        this.#source.connect(this.#gainNode);
+        this.#source.start(0);
     }
-  
-    // This is supposed to create a media element like in html. Example here: <audio src="myCoolTrack.mp3"></audio>, 
-    // const audioElement = document.querySelector("audio");
-    // Thıs part doesn't work and is to be fixed
-    const mediaElement = document.createElement('audio');
-    mediaElement.src = audioSource;
-  
-    // Optionally set other attributes (autoplay, controls, etc.)
-    // ...
-  
-    mediaElement.addEventListener('error', (error) => {
-      console.error('Error creating audio element:', error);
-      // Optionally provide user feedback or fallback behavior
-    });
-  
 
-    try {
-      currentAudio = await audioContext.audioWorklet.addModule('audio-processor.js'); // Optional worklet for processing
-      currentAudio = currentAudio ? await currentAudio.createProcessor('audioProcessor') : audioContext.createMediaElementSource(mediaElement);
-    } catch (error) {
-      console.error('Error loading audio:', error);
-      // Optionally provide user feedback or fallback behavior
+    /**
+     * Stops the audio
+     */
+    stop() {
+        if (this.#source) {
+            this.#source.stop(0);
+            this.#source = null;
+        }
     }
-  
-    if (currentAudio) {
-      currentAudio.connect(gainNode).connect(audioContext.destination);
-      await mediaElement.play(); // Play the audio
+
+    /**
+     * Modifies the volume of the audio playing
+     * @param currentVolume The volume user aims for
+     */
+    modifyVolume(currentVolume: number) {
+        this.#gainNode.gain.value = currentVolume;
     }
-  }
-
-/**
- * Starts playing the selected audio or resumes it. 
- */
-export function Play(){
-    if (audioContext.state === "suspended") {
-        audioContext.resume();
-    } else {
-        audioContext.play();
-    }
-}
-
-/**
- * Pauses the currently playing audio
- */
-export function Pause() {
-    audioContext.pause();
-}
-
-/**
- * Restarts the currently selected audio
- */
-export function Reset() {
-    this.currentAudio.currentTime = 0; 
-    this.Play();
-}
-
-/**
- * Modifies the volume of the audio playing
- * @param currentVolume The volume user aims for
- */
-export function ModifyVolume(currentVolume) {
-    this.gainNode.gain.value = currentVolume;
 }

@@ -6,6 +6,7 @@ import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
 import { ScriptableEntity } from './ScriptableEntity.js'
 import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Texture } from '../render/Texture.js'
+import { Audio, AudioManager } from '../banana.js'
 
 export class Component {
     type: ComponentType;
@@ -453,6 +454,49 @@ export class Body2DComponent extends Component {
     }
 }
 
+export class AudioComponent extends Component {
+
+    readonly isPlaying: boolean;
+
+    #audio: Audio;
+    #playOnStart: boolean;
+    #loop: boolean;
+
+    constructor() {
+        super();
+
+        this.isPlaying = false;
+
+        this.#audio = null;
+        this.#playOnStart = false;
+        this.#loop = false;
+
+        this.type = ComponentType.AudioComponent;
+    }
+    
+    get playOnStart() {
+        return this.#playOnStart;
+    }
+
+    set playOnStart(val: boolean) {
+        this.#playOnStart = val;
+    }
+
+    setAudio(audio: Audio) {
+        this.#audio = audio;
+    }
+
+    play() {
+        this.#audio.play();
+    }
+
+    toString() {
+        return `AudioComponent:
+          Source: resources/testAudio.mp3
+          PlayOnStart: ${this.#playOnStart ? '1' : '0'}\n`;
+    }
+}
+
 export const ComponentCreator = {}
 ComponentCreator[ComponentType.TagComponent] = TagComponent;
 ComponentCreator[ComponentType.TransformComponent] = TransformComponent;
@@ -463,3 +507,4 @@ ComponentCreator[ComponentType.CameraComponent] = CameraComponent;
 ComponentCreator[ComponentType.NativeScriptComponent] = NativeScriptComponent;
 ComponentCreator[ComponentType.MovementComponent] = MovementComponent;
 ComponentCreator[ComponentType.Body2DComponent] = Body2DComponent;
+ComponentCreator[ComponentType.AudioComponent] = AudioComponent;

@@ -1,26 +1,18 @@
 import * as banana from "../../build/banana.js";
-
-import { GamepadTestScript } from "./GamepadTestScript.js";
-
+import { MenuBarPanel } from "./panels/MenuBarPanel.js";
+import { ProjectSettingsPanel } from "./panels/ProjectSettingsPanel.js";
 import { SceneHierarchyPanel } from "./panels/SceneHierarchyPanel.js";
 
 /**
- * Example layer which demonstrates a simple ImGUI Panel and main editor features
+ * Example layer which demonstrates a simple ImGUI Panel
  */
 export class EditorLayer extends banana.Layer {
 
     constructor() {
         super('Editor Layer');
 
-        this.playText = "Play";
-        this.audioVolume = 50;
-        this.counter = 0;
-        this.darkMode = true;
-        this.clearColorIm = new banana.ImGui.Vec4(0.0, 0.0, 0.0, 1.0);
-        this.fps = 75;
+        this.editorCameraController = new banana.EditorCameraController();
         
-        banana.setAudio('/editor/src/testMaterial/testAudio.mp3');
-
         this.scene = new banana.Scene('game scene');
 
         this.gameWindow = null;
@@ -31,52 +23,11 @@ export class EditorLayer extends banana.Layer {
     }
 
     onUpdate(deltaTime) {
-        this.scene.onUpdateRuntime(deltaTime);
-
+        this.scene.onUpdateEditor(deltaTime, this.editorCameraController);
     }
 
     onImGuiRender() {
-        banana.ImGui.Begin('Test Panel');
-        banana.ImGui.Text(`FPS: ${this.fps.toFixed(1)}`);
-        
-        banana.ImGui.ColorEdit4('Clear Color', this.clearColorIm);
-
-        banana.ImGui.Checkbox("Dark Mode", (value = this.darkMode) => this.darkMode = value);
-
-        if (banana.ImGui.Button('Save')) {
-            banana.SceneSerializer.save(this.scene);
-        }
-
-        if (banana.ImGui.Button('Load')) {
-            banana.Reader.readFileAsText()
-                .then(content => {
-                    this.scene = banana.SceneSerializer.deserialize(content);
-                    this.sceneHierarchyPanel.setRefScene(this.scene);
-                });
-        }
-
-        if (banana.ImGui.SliderInt('Volume', (value = this.audioVolume) => this.audioVolume = value, 0, 100)){
-            banana.ModifyVolume(this.audioVolume);
-        }
-            
-            
-        if (banana.ImGui.Button(this.playText)){
-            if (this.playText === "Play") {
-                this.playText = 'Pause';
-                banana.Play();
-            } else {
-                this.playText = 'Play';
-                banana.Pause()
-            }
-        }
-
-        banana.ImGui.SameLine();
-
-        if (banana.ImGui.Button("Restart")){
-            banana.Reset();
-        }
-
-        banana.ImGui.End();
+        this.editorCameraController.update();
 
         this.menuBarPanel.onImGuiRender();
         this.projectSettingsPanel.onImGuiRender();
