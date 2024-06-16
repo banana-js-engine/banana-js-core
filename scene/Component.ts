@@ -5,7 +5,7 @@ import { Movement } from './Movement.js'
 import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
 import { ScriptableEntity } from './ScriptableEntity.js'
 import { Body2D, ShapeType } from '../physics/Body2D.js'
-import { Scene } from './Scene.js'
+import { Texture } from '../render/Texture.js'
 
 export class Component {
     type: ComponentType;
@@ -158,26 +158,48 @@ export class TransformComponent extends Component {
 
 export class SpriteRendererComponent extends Component {
     
-    color: Color;
+    #color: Color;
+    #sprite: Texture;
+    #name: string;
     
     constructor() {
         super();
-        this.color = new Color(1, 1, 1, 1);
+        this.#color = new Color(1, 1, 1, 1);
+        this.#sprite = null;
+        this.name = '';
 
         this.type = ComponentType.SpriteRendererComponent;
     }
 
     setColor(color: Color) {
-        this.color = color;
+        this.#color = color;
     }
 
     getColor(): Color {
-        return this.color;
+        return this.#color;
+    }
+
+    setSprite(sprite: Texture) {
+        this.#sprite = sprite;
+        this.#name = sprite.image.src.substring( sprite.image.src.lastIndexOf('/') + 1 );
+    }
+
+    getSprite() {
+        return this.#sprite;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(newName: string) {
+        this.#name = newName;
     }
 
     toString() {
         return `SpriteRendererComponent:
-          Color: ${this.color}\n`;
+          Color: ${this.#color}
+          Texture: ${this.#sprite ? this.#sprite.image.src : 'None'}\n`;
     }
 }
 
