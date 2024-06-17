@@ -1,7 +1,7 @@
-import { CameraType, Color, ShapeType, Texture, Vec3, Vec4 } from "../banana.js";
+import { AudioManager, CameraType, Color, ShapeType, Texture, Vec3, Vec4 } from "../banana.js";
 import { Writer } from "../core/FileManager.js";
 import { ComponentType } from "../core/Type.js";
-import { Body2DComponent, CameraComponent, CircleRendererComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
+import { AudioComponent, Body2DComponent, CameraComponent, CircleRendererComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
 import { Entity } from "./Entity.js";
 import { Scene } from "./Scene.js";
 
@@ -55,6 +55,11 @@ export class SceneSerializer {
             if (scene.registry.has(entity, ComponentType.Body2DComponent)) {
                 const body2dComponent = scene.registry.get<Body2DComponent>(entity, ComponentType.Body2DComponent);
                 sceneData += ` ${body2dComponent}`;
+            }
+
+            if (scene.registry.has(entity, ComponentType.AudioComponent)) {
+                const audioComponent = scene.registry.get<AudioComponent>(entity, ComponentType.AudioComponent);
+                sceneData += ` ${audioComponent}`;
             }
         }
 
@@ -182,6 +187,22 @@ export class SceneSerializer {
                 body2dComponent.setShape(type);
                 
                 body2dComponent.gravityScale = gravityScale;
+            }
+            else if (lines[i].startsWith(' AudioComponent:')) {
+                const audioComponent = currentEntity.addComponent<AudioComponent>(ComponentType.AudioComponent);
+
+                const audioSource = lines[i+1].split(':')[1].trim();
+                const playOnStart = lines[i+2].split(':')[1].trim() == '1';
+                const loop = lines[i+3].split(':')[1].trim() == '1';
+                const volume = parseFloat(lines[i+4].split(':')[1].trim());
+
+                AudioManager.loadAudio(audioSource)
+                .then(buffer => {
+                    audioComponent.setAudio( AudioManager.createSource(buffer) );
+                    audioComponent.playOnStart = playOnStart;
+                    audioComponent.loop = loop;
+                    audioComponent.volume = volume;
+                })
             }
         }
     

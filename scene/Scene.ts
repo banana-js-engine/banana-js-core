@@ -12,7 +12,8 @@ import { CameraComponent,
          TagComponent, 
          TransformComponent, 
          PhysicsWorld,
-         TextRendererComponent} from '../banana.js'
+         TextRendererComponent,
+         AudioComponent} from '../banana.js'
 import { Mat4, Vec2, Vec3, Vec4 } from '../math/BananaMath.js'
  
 export class Scene 
@@ -146,6 +147,16 @@ export class Scene
                         this.world.collide(deltaTime, bodyComponentA, transformComponentA, bodyComponentB, transformComponentB, this.physicsIterations);
                     };
                 };
+            }
+        }
+
+        // audio
+        let audioComponents = this.registry.get_all<AudioComponent>(ComponentType.AudioComponent);
+
+        for (const audioComponent of audioComponents) {
+            if (audioComponent.playOnStart) {
+                audioComponent.playOnStart = false;
+                audioComponent.play();
             }
         }
 

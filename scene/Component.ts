@@ -6,6 +6,7 @@ import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
 import { ScriptableEntity } from './ScriptableEntity.js'
 import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Texture } from '../render/Texture.js'
+import { Audio, AudioManager } from '../banana.js'
 
 export class Component {
     type: ComponentType;
@@ -453,6 +454,92 @@ export class Body2DComponent extends Component {
     }
 }
 
+export class AudioComponent extends Component {
+
+    readonly isPlaying: boolean;
+
+    #audio: Audio;
+    #playOnStart: boolean;
+    #loop: boolean;
+    #name: string;
+    #src: string;
+    #volume: number;
+
+    constructor() {
+        super();
+
+        this.isPlaying = false;
+
+        this.#audio = null;
+        this.#playOnStart = false;
+        this.#loop = false;
+        this.#volume = 0.5;
+
+        this.type = ComponentType.AudioComponent;
+    }
+    
+    get playOnStart() {
+        return this.#playOnStart;
+    }
+
+    set playOnStart(val: boolean) {
+        this.#playOnStart = val;
+    }
+
+    get loop() {
+        return this.#loop;
+    }
+
+    set loop(val: boolean) {
+        this.#loop = val;
+    }
+
+    get audio() {
+        return this.#audio;
+    }
+
+    setAudio(audio: Audio) {
+        this.#audio = audio;
+        this.#audio.modifyVolume(this.#volume);
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(newName: string) {
+        this.#name = newName;
+    }
+
+    set src(newSrc: string){
+        this.#src = newSrc;
+    }
+
+    get volume() {
+        return this.#volume;
+    }
+
+    set volume(newVolume: number) {
+        this.#volume = newVolume;
+        
+        if (this.#audio) {
+            this.#audio.modifyVolume(this.#volume);
+        } 
+    } 
+
+    play() {
+        this.#audio.play(this.#loop);
+    }
+
+    toString() {
+        return `AudioComponent:
+          Source: ${this.#src}
+          PlayOnStart: ${this.#playOnStart ? '1' : '0'}
+          Loop: ${this.#loop ? '1' : '0'}
+          Volume: ${this.#volume}\n`;
+    }
+}
+
 export const ComponentCreator = {}
 ComponentCreator[ComponentType.TagComponent] = TagComponent;
 ComponentCreator[ComponentType.TransformComponent] = TransformComponent;
@@ -463,3 +550,4 @@ ComponentCreator[ComponentType.CameraComponent] = CameraComponent;
 ComponentCreator[ComponentType.NativeScriptComponent] = NativeScriptComponent;
 ComponentCreator[ComponentType.MovementComponent] = MovementComponent;
 ComponentCreator[ComponentType.Body2DComponent] = Body2DComponent;
+ComponentCreator[ComponentType.AudioComponent] = AudioComponent;

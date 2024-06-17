@@ -1,6 +1,7 @@
 export * from "./core/EntryPoint.js";
 export * from "./core/Layer.js";
 export * from "./core/Log.js";
+export * from "./core/Audio.js";
 export * from "./core/Input.js";
 export * from "./core/KeyCode.js";
 export * from "./core/MouseButtonCode.js";
@@ -10,7 +11,7 @@ export * from "./core/Application.js";
 export * from "./core/Window.js";
 export * from "./core/Profiler.js";
 export * from "./core/Type.js";
-export * from './core/FileManager.js'
+export * from "./core/FileManager.js";
 export * from "./event/Event.js";
 export * from "./event/KeyboardEvent.js";
 export * from "./event/MouseEvent.js";

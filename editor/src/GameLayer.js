@@ -32,7 +32,7 @@ export class GameLayer extends banana.Layer {
             if (message.type == 'init') {
                 this.scene = banana.SceneSerializer.deserialize(message.data);
                 this.secondFlag = true;
-                
+
                 // caching
                 window.localStorage.setItem('sceneData', message.data);
             }
