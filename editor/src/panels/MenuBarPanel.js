@@ -36,6 +36,14 @@ export class MenuBarPanel {
                 banana.ImGui.EndMenu();
             }
 
+            if (banana.ImGui.BeginMenu('Debug')) {
+                if (banana.ImGui.MenuItem('Clear Cache')) {
+                    localStorage.clear();
+                }
+
+                banana.ImGui.EndMenu();
+            }
+
             banana.ImGui.EndMainMenuBar();
         }
     }

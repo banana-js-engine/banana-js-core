@@ -126,5 +126,41 @@ export class Reader {
             });
         });
     }
+
+    static selectAudioFile() {
+        return new Promise((resolve, reject) => {
+            // Use showOpenFilePicker() asynchronously
+            window.showOpenFilePicker({
+                types: [{
+                    description: 'Audio files',
+                    accept: {
+                        'audio/mp3': ['.mp3'],
+                        'audio/wav': ['.wav']
+                    }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            })
+            .then(fileHandle => {
+                // Get the first file handle
+                const handle = fileHandle[0];
+        
+                // Get the file as a Blob
+                return handle.getFile();
+            })
+            .then(file => {
+                if (file.type === "audio/mpeg" || file.type === "audio/wav") {
+                    // Resolve with the file name
+                    resolve(file.name);
+                } else {
+                    reject(new Error("Selected file is not an MP3 or WAV file."));
+                }
+            })
+            .catch(error => {
+                // Reject with any errors
+                reject(error);
+            });
+        });
+    }
     
 }

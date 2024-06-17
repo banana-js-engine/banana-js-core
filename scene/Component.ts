@@ -461,6 +461,9 @@ export class AudioComponent extends Component {
     #audio: Audio;
     #playOnStart: boolean;
     #loop: boolean;
+    #name: string;
+    #src: string;
+    #volume: number;
 
     constructor() {
         super();
@@ -470,6 +473,7 @@ export class AudioComponent extends Component {
         this.#audio = null;
         this.#playOnStart = false;
         this.#loop = false;
+        this.#volume = 0.5;
 
         this.type = ComponentType.AudioComponent;
     }
@@ -490,9 +494,38 @@ export class AudioComponent extends Component {
         this.#loop = val;
     }
 
+    get audio() {
+        return this.#audio;
+    }
+
     setAudio(audio: Audio) {
         this.#audio = audio;
+        this.#audio.modifyVolume(this.#volume);
     }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(newName: string) {
+        this.#name = newName;
+    }
+
+    set src(newSrc: string){
+        this.#src = newSrc;
+    }
+
+    get volume() {
+        return this.#volume;
+    }
+
+    set volume(newVolume: number) {
+        this.#volume = newVolume;
+        
+        if (this.#audio) {
+            this.#audio.modifyVolume(this.#volume);
+        } 
+    } 
 
     play() {
         this.#audio.play(this.#loop);
@@ -500,9 +533,10 @@ export class AudioComponent extends Component {
 
     toString() {
         return `AudioComponent:
-          Source: resources/testAudio.mp3
+          Source: ${this.#src}
           PlayOnStart: ${this.#playOnStart ? '1' : '0'}
-          Loop: ${this.#loop ? '1' : '0'}\n`;
+          Loop: ${this.#loop ? '1' : '0'}
+          Volume: ${this.#volume}\n`;
     }
 }
 

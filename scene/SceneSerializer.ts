@@ -192,14 +192,16 @@ export class SceneSerializer {
                 const audioComponent = currentEntity.addComponent<AudioComponent>(ComponentType.AudioComponent);
 
                 const audioSource = lines[i+1].split(':')[1].trim();
-                const playOnStart = lines[i+2].split(':')[1].trim() == '1'
-                const loop = lines[i+3].split(':')[1].trim() == '1'
+                const playOnStart = lines[i+2].split(':')[1].trim() == '1';
+                const loop = lines[i+3].split(':')[1].trim() == '1';
+                const volume = parseFloat(lines[i+4].split(':')[1].trim());
 
                 AudioManager.loadAudio(audioSource)
                 .then(buffer => {
                     audioComponent.setAudio( AudioManager.createSource(buffer) );
                     audioComponent.playOnStart = playOnStart;
                     audioComponent.loop = loop;
+                    audioComponent.volume = volume;
                 })
             }
         }

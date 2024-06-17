@@ -365,6 +365,23 @@ export class SceneHierarchyPanel {
             if (opened) {
                 const audioComponent = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.AudioComponent);
 
+                const audio = audioComponent.audio;
+
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectAudioFile()
+                    .then((file) => {
+
+                        banana.AudioManager.loadAudio(`resources/${file}`)
+                        .then((buffer) => {
+                            audioComponent.setAudio( banana.AudioManager.createSource(buffer) );
+                            audioComponent.src = `resources/${file}`;
+                            audioComponent.name = file;
+                        });
+                    })
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Source', (value = audio ? audioComponent.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+
                 let newValue = audioComponent.playOnStart;
 
                 if (banana.ImGui.Checkbox('Play On Start', (value = newValue) => newValue = value)) { 
@@ -375,6 +392,12 @@ export class SceneHierarchyPanel {
 
                 if (banana.ImGui.Checkbox('Loop', (value = newValue) => newValue = value)) { 
                     audioComponent.loop = newValue;
+                }
+
+                let newVolume = audioComponent.volume;
+
+                if (banana.ImGui.SliderFloat('Volume', (value = newVolume) => newVolume = value, 0, 1)) {
+                    audioComponent.volume = newVolume;
                 }
             }
         }
