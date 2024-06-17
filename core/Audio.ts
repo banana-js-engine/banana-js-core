@@ -40,9 +40,10 @@ export class Audio {
     /**
      * Starts playing the selected audio or resumes it. 
      */
-    play() {
+    play(loop: boolean) {
         this.#source = this.#audioContext.createBufferSource();
         this.#source.buffer = this.#buffer;
+        this.#source.loop = loop;
         this.#source.connect(this.#gainNode);
         this.#source.start(0);
     }

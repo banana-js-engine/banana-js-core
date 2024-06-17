@@ -482,18 +482,27 @@ export class AudioComponent extends Component {
         this.#playOnStart = val;
     }
 
+    get loop() {
+        return this.#loop;
+    }
+
+    set loop(val: boolean) {
+        this.#loop = val;
+    }
+
     setAudio(audio: Audio) {
         this.#audio = audio;
     }
 
     play() {
-        this.#audio.play();
+        this.#audio.play(this.#loop);
     }
 
     toString() {
         return `AudioComponent:
           Source: resources/testAudio.mp3
-          PlayOnStart: ${this.#playOnStart ? '1' : '0'}\n`;
+          PlayOnStart: ${this.#playOnStart ? '1' : '0'}
+          Loop: ${this.#loop ? '1' : '0'}\n`;
     }
 }
 

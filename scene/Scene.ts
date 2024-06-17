@@ -153,8 +153,6 @@ export class Scene
         // audio
         let audioComponents = this.registry.get_all<AudioComponent>(ComponentType.AudioComponent);
 
-        console.log(audioComponents);
-
         for (const audioComponent of audioComponents) {
             if (audioComponent.playOnStart) {
                 audioComponent.playOnStart = false;

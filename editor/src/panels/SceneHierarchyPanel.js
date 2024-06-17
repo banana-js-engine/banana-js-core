@@ -370,6 +370,12 @@ export class SceneHierarchyPanel {
                 if (banana.ImGui.Checkbox('Play On Start', (value = newValue) => newValue = value)) { 
                     audioComponent.playOnStart = newValue;
                 }
+
+                newValue = audioComponent.loop;
+
+                if (banana.ImGui.Checkbox('Loop', (value = newValue) => newValue = value)) { 
+                    audioComponent.loop = newValue;
+                }
             }
         }
     }

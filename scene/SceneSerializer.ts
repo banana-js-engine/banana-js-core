@@ -193,11 +193,13 @@ export class SceneSerializer {
 
                 const audioSource = lines[i+1].split(':')[1].trim();
                 const playOnStart = lines[i+2].split(':')[1].trim() == '1'
+                const loop = lines[i+3].split(':')[1].trim() == '1'
 
                 AudioManager.loadAudio(audioSource)
                 .then(buffer => {
                     audioComponent.setAudio( AudioManager.createSource(buffer) );
                     audioComponent.playOnStart = playOnStart;
+                    audioComponent.loop = loop;
                 })
             }
         }
