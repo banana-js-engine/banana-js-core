@@ -1,4 +1,4 @@
-import * as banana from "../../../build/banana.js";
+import * as banana from "../../../dist/banana.js";
 
 export class SceneHierarchyPanel {
 
@@ -124,7 +124,7 @@ export class SceneHierarchyPanel {
                 if (banana.ImGui.Button('Choose')) {
                     banana.Reader.selectPngFile()
                     .then((file) => {
-                        const sprite = new banana.Texture(`resources/${file}`);
+                        const sprite = new banana.Texture(`../editor/resources/${file}`);
 
                         spriteRenderer.setSprite(sprite);
                         spriteRenderer.name = file;
@@ -371,10 +371,10 @@ export class SceneHierarchyPanel {
                     banana.Reader.selectAudioFile()
                     .then((file) => {
 
-                        banana.AudioManager.loadAudio(`resources/${file}`)
+                        banana.AudioManager.loadAudio(`../editor/resources/${file}`)
                         .then((buffer) => {
                             audioComponent.setAudio( banana.AudioManager.createSource(buffer) );
-                            audioComponent.src = `resources/${file}`;
+                            audioComponent.src = `../editor/resources/${file}`;
                             audioComponent.name = file;
                         });
                     })
