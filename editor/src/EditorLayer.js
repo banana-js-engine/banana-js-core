@@ -1,4 +1,4 @@
-import * as banana from "../../build/banana.js";
+import * as banana from "../../dist/banana.js";
 import { MenuBarPanel } from "./panels/MenuBarPanel.js";
 import { ProjectSettingsPanel } from "./panels/ProjectSettingsPanel.js";
 import { SceneHierarchyPanel } from "./panels/SceneHierarchyPanel.js";
@@ -62,7 +62,7 @@ export class EditorLayer extends banana.Layer {
 
         const windowFeatures = `location=no,width=${windowWidth},height=${windowHeight},left=${left},top=${top}`;
 
-        this.gameWindow = window.open('/editor/game.html', '', windowFeatures);
+        this.gameWindow = window.open('/game/game.html', '', windowFeatures);
 
         if (this.gameWindow) {
             this.gameWindow.focus();

@@ -1,4 +1,4 @@
-import * as banana from "../../../build/banana.js";
+import * as banana from "../../../dist/banana.js";
 
 export class ProjectSettingsPanel {
     constructor() {
