@@ -163,4 +163,38 @@ export class Reader {
         });
     }
     
+    static selectJavaScriptFile() {
+        return new Promise((resolve, reject) => {
+            // Use showOpenFilePicker() asynchronously
+            window.showOpenFilePicker({
+                types: [{
+                    description: 'JavaScript files',
+                    accept: {
+                        'text/javascript': ['.js']
+                    }
+                }],
+                excludeAcceptAllOption: true,
+                multiple: false
+            })
+            .then(fileHandles => {
+                // Get the first file handle
+                const handle = fileHandles[0];
+                
+                // Get the file as a Blob
+                return handle.getFile();
+            })
+            .then(file => {
+                if (file.type === "text/javascript") {
+                    resolve(file);
+                } else {
+                    reject(new Error("Selected file is not a JavaScript file."));
+                }
+            })
+            .catch(error => {
+                // Reject with any errors
+                reject(error);
+            });
+        });
+    }
+    
 }

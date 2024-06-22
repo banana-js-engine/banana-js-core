@@ -109,15 +109,17 @@ export class Scene
             const nativeScripts = this.registry.get_all_with_entity<NativeScriptComponent>(ComponentType.NativeScriptComponent);
             
             for (const [entity, ns] of Object.entries(nativeScripts)) {
-                if (!ns.Instance) 
-                {
-                    ns.Instance = ns.instanceScriptFn();
-                    ns.Instance.entity = new Entity(entity, this);
-                    ns.Instance.onCreateSealed();
-                    ns.Instance.onCreate();
+                if (ns.instanceScriptFn) {
+                    if (!ns.Instance) {
+                        ns.Instance = ns.instanceScriptFn();
+                        ns.Instance.entity = new Entity(entity, this);
+                        ns.Instance.onCreateSealed();
+                        ns.Instance.onCreate();
+                    }
+
+                    ns.Instance.onUpdate(deltaTime);
                 }
 
-                ns.Instance.onUpdate(deltaTime);
             }
         }
 

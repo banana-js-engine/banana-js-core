@@ -6,9 +6,10 @@ import { ShapeType } from "../physics/Body2D.js";
 import { Vec3, Vec4 } from "../math/BananaMath.js";
 import { Writer } from "../core/FileManager.js";
 import { ComponentType } from "../core/Type.js";
-import { AudioComponent, Body2DComponent, CameraComponent, CircleRendererComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
+import { AudioComponent, Body2DComponent, CameraComponent, CircleRendererComponent, NativeScriptComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
 import { Entity } from "./Entity.js";
 import { Scene } from "./Scene.js";
+import { ScriptableEntity } from "./ScriptableEntity.js";
 
 export class SceneSerializer {
     static save(scene: Scene) {
@@ -55,6 +56,11 @@ export class SceneSerializer {
             if (scene.registry.has(entity, ComponentType.CameraComponent)) {
                 const cameraComponent = scene.registry.get<CameraComponent>(entity, ComponentType.CameraComponent);
                 sceneData += ` ${cameraComponent}`;
+            }
+
+            if (scene.registry.has(entity, ComponentType.NativeScriptComponent)) {
+                const scriptComponent = scene.registry.get<NativeScriptComponent>(entity, ComponentType.NativeScriptComponent);
+                sceneData += ` ${scriptComponent}`;
             }
 
             if (scene.registry.has(entity, ComponentType.Body2DComponent)) {
@@ -169,6 +175,17 @@ export class SceneSerializer {
                 cameraComponent.sceneCamera.clearColor = new Color(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 
                 cameraComponent.sceneCamera.setViewportSize();
+            }
+            else if (lines[i].startsWith(' NativeScriptComponent')) {
+                const scriptComponent = currentEntity.addComponent<NativeScriptComponent>(ComponentType.NativeScriptComponent);
+
+                const src = lines[i+1].split(':')[1].trim();
+
+                scriptComponent.src = src;
+
+                import(src).then(module => {
+                    scriptComponent.bind(Object.values(module)[0] as { new(): ScriptableEntity });
+                });
             }
             else if (lines[i].startsWith(' Body2DComponent:')) {
                 const body2dComponent = currentEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);

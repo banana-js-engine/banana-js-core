@@ -71,7 +71,7 @@ export class EditorLayer extends banana.Layer {
         this.gameWindow.addEventListener('load', () => {
             setTimeout(() => {
                 this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
-            }, 100);
+            }, 500);
         });
     }
 }
