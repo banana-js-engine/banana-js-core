@@ -1,4 +1,4 @@
-import * as banana from "../../../build/banana.js";
+import * as banana from "../../../dist/banana.js";
 
 export class SceneHierarchyPanel {
 
@@ -85,6 +85,7 @@ export class SceneHierarchyPanel {
             this.drawAddComponent(banana.ComponentType.CircleRendererComponent, 'Circle Renderer');
             this.drawAddComponent(banana.ComponentType.TextRendererComponent, 'Text Renderer');
             this.drawAddComponent(banana.ComponentType.Body2DComponent, 'Body2D');
+            this.drawAddComponent(banana.ComponentType.AudioComponent, 'Audio');
 
             banana.ImGui.EndPopup();
         }
@@ -115,9 +116,22 @@ export class SceneHierarchyPanel {
             }
 
             if (opened) {
-                const sprite = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                const spriteRenderer = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                const texture = spriteRenderer.getSprite();
 
-                banana.ImGui.ColorEdit4('Color', sprite.getColor());
+                banana.ImGui.ColorEdit4('Color', spriteRenderer.getColor());
+                
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectPngFile()
+                    .then((file) => {
+                        const sprite = new banana.Texture(`../editor/resources/${file}`);
+
+                        spriteRenderer.setSprite(sprite);
+                        spriteRenderer.name = file;
+                    })
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Sprite', (value = texture ? spriteRenderer.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
 
                 banana.ImGui.TreePop();
             }
@@ -299,7 +313,92 @@ export class SceneHierarchyPanel {
                     banana.ImGui.EndCombo();
                 }
 
+                if (body2d.body2d.shapeType == banana.ShapeType.Box) {
+                    const boxWidth = [ body2d.body2d.width ];
+                    const boxHeight = [ body2d.body2d.height ];
+
+                    banana.ImGui.DragFloat('Width', boxWidth, 0.1);
+                    banana.ImGui.DragFloat('Height', boxHeight, 0.1);
+
+                    body2d.width = boxWidth[0];
+                    body2d.height = boxHeight[0];
+                }
+                else if (body2d.body2d.shapeType == banana.ShapeType.Circle) {
+                    const circleRadius = [ body2d.body2d.radius ];
+
+                    banana.ImGui.DragFloat('Radius', circleRadius, 0.1);
+
+                    body2d.radius = circleRadius[0];
+                }
+
+                const bodyDensity = [ body2d.body2d.density ];
+                const bodyRestitution = [ body2d.body2d.restitution ];
+                const bodyGravityScale = [ body2d.body2d.gravityScale ];
+
+                banana.ImGui.DragFloat('Density', bodyDensity, 0.05);
+                banana.ImGui.Checkbox('Is Static', (value = body2d.body2d.isStatic) => body2d.isStatic = value);
+                banana.ImGui.DragFloat('Bounciness', bodyRestitution, 0.05);
+                banana.ImGui.DragFloat('Gravity Scale', bodyGravityScale, 0.05);
+
+                body2d.density = bodyDensity[0];
+                body2d.restitution = bodyRestitution[0];
+                body2d.gravityScale = bodyGravityScale[0];
+
                 banana.ImGui.TreePop();
+            }
+        }
+
+        // Audio Component
+        if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.AudioComponent)) {
+            let opened = banana.ImGui.TreeNodeEx('AudioComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Audio');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.Body2DComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
+                const audioComponent = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.AudioComponent);
+
+                const audio = audioComponent.audio;
+
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectAudioFile()
+                    .then((file) => {
+
+                        banana.AudioManager.loadAudio(`../editor/resources/${file}`)
+                        .then((buffer) => {
+                            audioComponent.setAudio( banana.AudioManager.createSource(buffer) );
+                            audioComponent.src = `../editor/resources/${file}`;
+                            audioComponent.name = file;
+                        });
+                    })
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Source', (value = audio ? audioComponent.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+
+                let newValue = audioComponent.playOnStart;
+
+                if (banana.ImGui.Checkbox('Play On Start', (value = newValue) => newValue = value)) { 
+                    audioComponent.playOnStart = newValue;
+                }
+
+                newValue = audioComponent.loop;
+
+                if (banana.ImGui.Checkbox('Loop', (value = newValue) => newValue = value)) { 
+                    audioComponent.loop = newValue;
+                }
+
+                let newVolume = audioComponent.volume;
+
+                if (banana.ImGui.SliderFloat('Volume', (value = newVolume) => newVolume = value, 0, 1)) {
+                    audioComponent.volume = newVolume;
+                }
             }
         }
     }

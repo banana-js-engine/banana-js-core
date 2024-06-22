@@ -1,6 +1,6 @@
 {
-    "name": "banana-js",
-    "version": "0.0.2",
+    "name": "banana-js-core",
+    "version": "0.8.9",
     "description": "Game making framework in JavaScript",
     "main": "banana.js",
     "scripts": {
@@ -21,6 +21,7 @@
         "@rollup/plugin-alias": "^3.1.1",
         "@rollup/plugin-commonjs": "^17.1.0",
         "http-server": "^0.12.3",
+        "live-server": "^1.2.2",
         "node-fetch": "^2.6.0",
         "rollup": "^2.41.2",
         "rollup-plugin-node-builtins": "^2.1.2",

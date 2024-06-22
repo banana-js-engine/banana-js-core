@@ -1,4 +1,4 @@
-import * as banana from "../../build/banana.js";
+import * as banana from "../../dist/banana.js";
 import { MenuBarPanel } from "./panels/MenuBarPanel.js";
 import { ProjectSettingsPanel } from "./panels/ProjectSettingsPanel.js";
 import { SceneHierarchyPanel } from "./panels/SceneHierarchyPanel.js";
@@ -14,6 +14,8 @@ export class EditorLayer extends banana.Layer {
         this.editorCameraController = new banana.EditorCameraController();
         
         this.scene = new banana.Scene('game scene');
+
+        this.gameWindow = null;
 
         this.menuBarPanel = new MenuBarPanel(this);
         this.projectSettingsPanel = new ProjectSettingsPanel();
@@ -38,6 +40,14 @@ export class EditorLayer extends banana.Layer {
     }
 
     runGame() {
+        if (this.gameWindow && !this.gameWindow.closed) {
+            this.gameWindow.location.reload();
+            this.gameWindow.focus();
+
+            this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            return;
+        }
+
         const windowWidth = this.projectSettingsPanel.gameWindowWidth;
         const windowHeight = this.projectSettingsPanel.gameWindowHeight;
 
@@ -52,14 +62,16 @@ export class EditorLayer extends banana.Layer {
 
         const windowFeatures = `location=no,width=${windowWidth},height=${windowHeight},left=${left},top=${top}`;
 
-        const gameWindow = window.open('/editor/game.html', '', windowFeatures);
+        this.gameWindow = window.open('/game/game.html', '', windowFeatures);
 
-        if (gameWindow) {
-            gameWindow.focus();
+        if (this.gameWindow) {
+            this.gameWindow.focus();
         }
 
-        setTimeout(() => {
-            gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
-        }, 300);
+        this.gameWindow.addEventListener('load', () => {
+            setTimeout(() => {
+                this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            }, 100);
+        });
     }
 }
