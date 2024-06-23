@@ -20,7 +20,7 @@ export class GameLayer extends banana.Layer {
 
             setTimeout(() => {
                 this.secondFlag = true
-            }, 300);
+            }, 500);
         }
 
         window.addEventListener('message', (event) =>{     

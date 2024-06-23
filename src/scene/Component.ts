@@ -338,11 +338,15 @@ export class NativeScriptComponent extends Component {
     instanceScriptFn: Function;
     destroyScriptFn: Function;
 
+    #src: string;
+
     constructor() {
         super();
         this.Instance = null;
-        this.instanceScriptFn = function() {}
-        this.destroyScriptFn = function(nativeScriptComponent: NativeScriptComponent) {}
+        this.instanceScriptFn = null;
+        this.destroyScriptFn = null;
+
+        this.#src = '';
 
         this.type = ComponentType.NativeScriptComponent;
     }
@@ -350,6 +354,19 @@ export class NativeScriptComponent extends Component {
     bind(scriptableEntityClass: { new(): ScriptableEntity }) {
         this.instanceScriptFn = function() { return new scriptableEntityClass(); }
         this.destroyScriptFn = function(nativeScriptComponent: NativeScriptComponent) { nativeScriptComponent.Instance = null; }
+    }
+
+    get src() {
+        return this.#src;
+    }
+
+    set src(newSrc: string) {
+        this.#src = newSrc;
+    }
+
+    toString() {
+        return `NativeScriptComponent:
+          Source: ${this.#src}\n`;
     }
 }
 

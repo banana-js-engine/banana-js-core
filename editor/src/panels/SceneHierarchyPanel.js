@@ -86,6 +86,7 @@ export class SceneHierarchyPanel {
             this.drawAddComponent(banana.ComponentType.TextRendererComponent, 'Text Renderer');
             this.drawAddComponent(banana.ComponentType.Body2DComponent, 'Body2D');
             this.drawAddComponent(banana.ComponentType.AudioComponent, 'Audio');
+            this.drawAddComponent(banana.ComponentType.NativeScriptComponent, 'Script');
 
             banana.ImGui.EndPopup();
         }
@@ -354,7 +355,7 @@ export class SceneHierarchyPanel {
 
             if (banana.ImGui.BeginPopupContextItem()) {
                 if (banana.ImGui.MenuItem('Delete')) {
-                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.Body2DComponent);
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.AudioComponent);
                 }
     
                 banana.ImGui.EndPopup();
@@ -380,7 +381,7 @@ export class SceneHierarchyPanel {
                     })
                 }
                 banana.ImGui.SameLine();
-                banana.ImGui.InputText('Source', (value = audio ? audioComponent.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+                banana.ImGui.InputText('Source', (value = audioComponent.name ? audioComponent.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
 
                 let newValue = audioComponent.playOnStart;
 
@@ -399,6 +400,42 @@ export class SceneHierarchyPanel {
                 if (banana.ImGui.SliderFloat('Volume', (value = newVolume) => newVolume = value, 0, 1)) {
                     audioComponent.volume = newVolume;
                 }
+
+                banana.ImGui.TreePop();
+            }
+        }
+
+        // Native Script Component
+        if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.NativeScriptComponent)) {
+            let opened = banana.ImGui.TreeNodeEx('NativeScriptComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Script');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.NativeScriptComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
+                const scriptComponent = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.NativeScriptComponent);
+
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectJavaScriptFile()
+                    .then((file) => {
+                        scriptComponent.src = `/editor/resources/${file.name}`;
+
+                        import(scriptComponent.src).then(module => {
+                            scriptComponent.bind(Object.values(module)[0]);
+                        });
+                    });
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Source', (value = scriptComponent.src ? scriptComponent.src : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+            
+                banana.ImGui.TreePop();
             }
         }
     }
