@@ -16,6 +16,12 @@ export class SceneHierarchyPanel {
         banana.ImGui.SetNextWindowSize(this.sceneHierarchyPanelDefaultSize, banana.ImGui.ImGuiCond.FirstUseEver);
         banana.ImGui.SetNextWindowPos(this.sceneHierarchyPanelDefaultPos, banana.ImGui.ImGuiCond.FirstUseEver);
         banana.ImGui.Begin('Scene Hierarchy');
+
+        // text-field for scene name
+        let newSceneName = this.refScene.name;
+        if (banana.ImGui.InputText('Scene Name', (value = newSceneName) => newSceneName = value)) {
+            this.refScene.name = newSceneName;
+        }
         
         // right-click on empty space
         if (banana.ImGui.BeginPopupContextWindow()) {

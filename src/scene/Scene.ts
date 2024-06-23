@@ -22,20 +22,24 @@ export class Scene
     world: PhysicsWorld;
     physicsIterations: number;
 
-    private _name: string;
-    private _view: Mat4;
+    #name: string;
+    #view: Mat4;
 
     constructor(name: string)
     {
         this.registry = new ntt();
         this.world = new PhysicsWorld();
-        this._name = name;
-        this._view = new Mat4();
+        this.#name = name;
+        this.#view = new Mat4();
         this.physicsIterations = 10;
     }
 
-    public get name(): string {
-        return this._name;
+    get name(): string {
+        return this.#name;
+    }
+
+    set name(newName: string) {
+        this.#name = newName;
     }
 
     createEntity(name: string): Entity {
@@ -180,11 +184,11 @@ export class Scene
             return;
         }
 
-        this._view.identity();
-        this._view.setTranslation(mainCameraTransform.getPosition());
-        this._view.applyRotationZ(mainCameraTransform.getRotation().z);
+        this.#view.identity();
+        this.#view.setTranslation(mainCameraTransform.getPosition());
+        this.#view.applyRotationZ(mainCameraTransform.getRotation().z);
 
-        Renderer2D.beginScene(mainCamera, this._view);
+        Renderer2D.beginScene(mainCamera, this.#view);
 
         this.renderScene(deltaTime);
 
