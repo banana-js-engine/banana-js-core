@@ -14,6 +14,32 @@ export class PhysicsWorld {
     public static readonly minIterations = 1;
     public static readonly maxIterations = 64;
 
+    static get withRotation() {
+        const cachedValue = localStorage.getItem('withRotation');
+        if (cachedValue) {
+            return cachedValue == 'true';
+        }
+
+        return true;
+    }
+
+    static set withRotation(newValue: boolean) {
+        localStorage.setItem('withRotation', newValue.toString());
+    }
+
+    static get withFriction() {
+        const cachedValue = localStorage.getItem('withFriction');
+        if (cachedValue) {
+            return cachedValue == 'true';
+        }
+
+        return true;
+    }
+
+    static set withFriction(newValue: boolean) {
+        localStorage.setItem('withFriction', newValue.toString());
+    }
+
     public gravity: Vec2;
 
     private contactList: CollisionInformation[];
@@ -137,7 +163,7 @@ export class PhysicsWorld {
 
     private narrowPhase() {
         for (const collInfo of this.contactList) {
-            this.resolveCollision(collInfo);
+            this.resolveCollision(collInfo, PhysicsWorld.withFriction, PhysicsWorld.withRotation);
 
             // if (collInfo.contactCount > 1) {
             //     PhysicsWorld.contactPoints.push(collInfo.contact1);

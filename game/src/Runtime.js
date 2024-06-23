@@ -6,9 +6,26 @@ import { GameLayer } from "./GameLayer.js";
  */
 class RuntimeApplication extends banana.Application {
     constructor() {
-        super('game', window.outerWidth, window.outerHeight);
+        super('Loading...', window.outerWidth, window.outerHeight);
         
         this.pushLayer(new GameLayer());
+
+        if (localStorage.getItem('title')) {
+            this.setTitle(localStorage.getItem('title'));
+        }
+
+        window.addEventListener('message', (event) => {
+            if (event.origin !== window.location.origin) {
+                return;
+            }
+            
+            const message = event.data;
+            if (message.type == 'title') {
+                this.setTitle(message.data);
+
+                localStorage.setItem('title', message.data);
+            }
+        });
     }
 }
 
