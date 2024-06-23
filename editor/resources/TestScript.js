@@ -18,5 +18,10 @@ export class TestScript extends banana.ScriptableEntity {
         if (banana.Input.isKeyPressed(banana.KeyCode.S)) {
             this.transform.translate(0, deltaTime, 0);
         }
+
+
+        if (banana.Input.isMouseButtonPressed(banana.MouseButton.MOUSE_RIGHT)) {
+            this.transform.setPosition( this.mainCamera.screenToViewportSpace( banana.Input.mousePosition ) );
+        }
     }
 }

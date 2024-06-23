@@ -224,6 +224,8 @@ export class SceneSerializer {
                     audioComponent.playOnStart = playOnStart;
                     audioComponent.loop = loop;
                     audioComponent.volume = volume;
+                    audioComponent.src = audioSource;
+                    audioComponent.name = audioSource.substring(audioSource.lastIndexOf('/') + 1);
                 })
             }
         }

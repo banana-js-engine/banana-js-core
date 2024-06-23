@@ -381,7 +381,7 @@ export class SceneHierarchyPanel {
                     })
                 }
                 banana.ImGui.SameLine();
-                banana.ImGui.InputText('Source', (value = audio ? audioComponent.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+                banana.ImGui.InputText('Source', (value = audioComponent.name ? audioComponent.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
 
                 let newValue = audioComponent.playOnStart;
 
@@ -400,6 +400,8 @@ export class SceneHierarchyPanel {
                 if (banana.ImGui.SliderFloat('Volume', (value = newVolume) => newVolume = value, 0, 1)) {
                     audioComponent.volume = newVolume;
                 }
+
+                banana.ImGui.TreePop();
             }
         }
 
@@ -432,6 +434,8 @@ export class SceneHierarchyPanel {
                 }
                 banana.ImGui.SameLine();
                 banana.ImGui.InputText('Source', (value = scriptComponent.src ? scriptComponent.src : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+            
+                banana.ImGui.TreePop();
             }
         }
     }
