@@ -22,8 +22,23 @@ export class EditorLayer extends banana.Layer {
         this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene, this.editorCameraController);
     }
 
+    get mainCamera() {
+        const cameras = this.scene.registry.get_all(banana.ComponentType.CameraComponent);
+        for (const camera of cameras) {
+            if (camera.isPrimary) {
+                return camera.getCamera();
+            }
+        }
+
+        return null;
+    }
+
     onUpdate(deltaTime) {
         this.scene.onUpdateEditor(deltaTime, this.editorCameraController);
+
+        if (this.mainCamera) {
+            this.editorCameraController.getCamera().clearColor = banana.Color.copy(this.mainCamera.clearColor);
+        }
     }
 
     onImGuiRender() {

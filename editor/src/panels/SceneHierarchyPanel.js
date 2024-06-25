@@ -230,10 +230,6 @@ export class SceneHierarchyPanel {
 
                 banana.ImGui.ColorEdit4('Clear color', camera.clearColor);
 
-                if (camera.isPrimary) {
-                    this.cameraController.getCamera().clearColor = banana.Color.copy(camera.clearColor);
-                }
-
                 if (banana.ImGui.BeginCombo('Proj. Type', currentProjection)) {
                     for (let i = 0; i < 2; i++) {
                         const isSelected = (currentProjection == projectionTypes[i]);

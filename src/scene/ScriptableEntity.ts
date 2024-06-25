@@ -10,7 +10,7 @@ export class ScriptableEntity {
         this.entity = null;
     }
 
-    public get mainCamera() {
+    get mainCamera() {
         const cameras = this.entity.scene.registry.get_all<CameraComponent>(ComponentType.CameraComponent);
         for (const camera of cameras) {
             if (camera.isPrimary) {
