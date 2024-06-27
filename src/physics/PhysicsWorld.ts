@@ -40,6 +40,19 @@ export class PhysicsWorld {
         localStorage.setItem('withFriction', newValue.toString());
     }
 
+    static get staticCollision() {
+        const cachedValue = localStorage.getItem('staticCollision');
+        if (cachedValue) {
+            return cachedValue == 'true';
+        }
+
+        return true;
+    }
+
+    static set staticCollision(newValue: boolean) {
+        localStorage.setItem('staticCollision', newValue.toString());
+    }
+
     public gravity: Vec2;
 
     private contactList: CollisionInformation[];
@@ -132,6 +145,10 @@ export class PhysicsWorld {
         }
 
         if (bodyA.body2d.isStatic && bodyB.body2d.isStatic) {
+            if (!PhysicsWorld.staticCollision) {
+                return;
+            }
+
             if (transformA.lastMovedTimestamp > transformB.lastMovedTimestamp) {
                 bodyA.moveBy(collInfo.normal.mul(-collInfo.depth), transformA);
             }
