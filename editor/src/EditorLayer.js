@@ -1,4 +1,4 @@
-import * as banana from "../../build/banana.js";
+import * as banana from "../../dist/banana.js";
 import { MenuBarPanel } from "./panels/MenuBarPanel.js";
 import { ProjectSettingsPanel } from "./panels/ProjectSettingsPanel.js";
 import { SceneHierarchyPanel } from "./panels/SceneHierarchyPanel.js";
@@ -22,8 +22,23 @@ export class EditorLayer extends banana.Layer {
         this.sceneHierarchyPanel = new SceneHierarchyPanel(this.scene, this.editorCameraController);
     }
 
+    get mainCamera() {
+        const cameras = this.scene.registry.get_all(banana.ComponentType.CameraComponent);
+        for (const camera of cameras) {
+            if (camera.isPrimary) {
+                return camera.getCamera();
+            }
+        }
+
+        return null;
+    }
+
     onUpdate(deltaTime) {
         this.scene.onUpdateEditor(deltaTime, this.editorCameraController);
+
+        if (this.mainCamera) {
+            this.editorCameraController.getCamera().clearColor = banana.Color.copy(this.mainCamera.clearColor);
+        }
     }
 
     onImGuiRender() {
@@ -45,6 +60,7 @@ export class EditorLayer extends banana.Layer {
             this.gameWindow.focus();
 
             this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
+            this.gameWindow.postMessage({ type: 'title', data: this.scene.name }, '*' );
             return;
         }
 
@@ -62,7 +78,7 @@ export class EditorLayer extends banana.Layer {
 
         const windowFeatures = `location=no,width=${windowWidth},height=${windowHeight},left=${left},top=${top}`;
 
-        this.gameWindow = window.open('/editor/game.html', '', windowFeatures);
+        this.gameWindow = window.open('/game/game.html', '', windowFeatures);
 
         if (this.gameWindow) {
             this.gameWindow.focus();
@@ -71,7 +87,8 @@ export class EditorLayer extends banana.Layer {
         this.gameWindow.addEventListener('load', () => {
             setTimeout(() => {
                 this.gameWindow.postMessage({ type: 'init', data: banana.SceneSerializer.serialize(this.scene) }, '*' );
-            }, 100);
+                this.gameWindow.postMessage({ type: 'title', data: this.scene.name }, '*' );
+            }, 500);
         });
     }
 }

@@ -1,4 +1,4 @@
-import * as banana from "../../../build/banana.js";
+import * as banana from "../../../dist/banana.js";
 
 export class MenuBarPanel {
 
@@ -31,6 +31,14 @@ export class MenuBarPanel {
 
                         this.editorLayer.sceneHierarchyPanel.setRefScene(this.editorLayer.scene);
                     });
+                }
+
+                banana.ImGui.EndMenu();
+            }
+
+            if (banana.ImGui.BeginMenu('Debug')) {
+                if (banana.ImGui.MenuItem('Clear Cache')) {
+                    localStorage.clear();
                 }
 
                 banana.ImGui.EndMenu();

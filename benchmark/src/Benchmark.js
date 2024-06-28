@@ -1,5 +1,5 @@
 import * as banana from "../../dist/banana.js";
-import { EditorLayer } from './EditorLayer.js';
+import { BenchmarkLayer } from './BenchmarkLayer.js';
 
 /**
  * The banana application that represents the editor.
@@ -8,7 +8,7 @@ class EditorApplication extends banana.Application {
     constructor() {
         super('banana editor', window.innerWidth, window.innerHeight);
         
-        this.pushLayer(new EditorLayer());
+        this.pushLayer(new BenchmarkLayer());
     }
 }
 

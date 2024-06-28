@@ -1,4 +1,4 @@
-import * as banana from "../../../build/banana.js";
+import * as banana from "../../../dist/banana.js";
 
 export class SceneHierarchyPanel {
 
@@ -16,6 +16,12 @@ export class SceneHierarchyPanel {
         banana.ImGui.SetNextWindowSize(this.sceneHierarchyPanelDefaultSize, banana.ImGui.ImGuiCond.FirstUseEver);
         banana.ImGui.SetNextWindowPos(this.sceneHierarchyPanelDefaultPos, banana.ImGui.ImGuiCond.FirstUseEver);
         banana.ImGui.Begin('Scene Hierarchy');
+
+        // text-field for scene name
+        let newSceneName = this.refScene.name;
+        if (banana.ImGui.InputText('Scene Name', (value = newSceneName) => newSceneName = value)) {
+            this.refScene.name = newSceneName;
+        }
         
         // right-click on empty space
         if (banana.ImGui.BeginPopupContextWindow()) {
@@ -85,6 +91,8 @@ export class SceneHierarchyPanel {
             this.drawAddComponent(banana.ComponentType.CircleRendererComponent, 'Circle Renderer');
             this.drawAddComponent(banana.ComponentType.TextRendererComponent, 'Text Renderer');
             this.drawAddComponent(banana.ComponentType.Body2DComponent, 'Body2D');
+            this.drawAddComponent(banana.ComponentType.AudioComponent, 'Audio');
+            this.drawAddComponent(banana.ComponentType.NativeScriptComponent, 'Script');
 
             banana.ImGui.EndPopup();
         }
@@ -115,9 +123,22 @@ export class SceneHierarchyPanel {
             }
 
             if (opened) {
-                const sprite = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                const spriteRenderer = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.SpriteRendererComponent);
+                const texture = spriteRenderer.getSprite();
 
-                banana.ImGui.ColorEdit4('Color', sprite.getColor());
+                banana.ImGui.ColorEdit4('Color', spriteRenderer.getColor());
+                
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectPngFile()
+                    .then((file) => {
+                        const sprite = new banana.Texture(`../editor/resources/${file}`);
+
+                        spriteRenderer.setSprite(sprite);
+                        spriteRenderer.name = file;
+                    })
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Sprite', (value = texture ? spriteRenderer.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
 
                 banana.ImGui.TreePop();
             }
@@ -208,10 +229,6 @@ export class SceneHierarchyPanel {
                 }
 
                 banana.ImGui.ColorEdit4('Clear color', camera.clearColor);
-
-                if (camera.isPrimary) {
-                    this.cameraController.getCamera().clearColor = banana.Color.copy(camera.clearColor);
-                }
 
                 if (banana.ImGui.BeginCombo('Proj. Type', currentProjection)) {
                     for (let i = 0; i < 2; i++) {
@@ -330,6 +347,96 @@ export class SceneHierarchyPanel {
                 body2d.restitution = bodyRestitution[0];
                 body2d.gravityScale = bodyGravityScale[0];
 
+                banana.ImGui.TreePop();
+            }
+        }
+
+        // Audio Component
+        if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.AudioComponent)) {
+            let opened = banana.ImGui.TreeNodeEx('AudioComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Audio');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.AudioComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
+                const audioComponent = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.AudioComponent);
+
+                const audio = audioComponent.audio;
+
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectAudioFile()
+                    .then((file) => {
+
+                        banana.AudioManager.loadAudio(`../editor/resources/${file}`)
+                        .then((buffer) => {
+                            audioComponent.setAudio( banana.AudioManager.createSource(buffer) );
+                            audioComponent.src = `../editor/resources/${file}`;
+                            audioComponent.name = file;
+                        });
+                    })
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Source', (value = audioComponent.name ? audioComponent.name : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+
+                let newValue = audioComponent.playOnStart;
+
+                if (banana.ImGui.Checkbox('Play On Start', (value = newValue) => newValue = value)) { 
+                    audioComponent.playOnStart = newValue;
+                }
+
+                newValue = audioComponent.loop;
+
+                if (banana.ImGui.Checkbox('Loop', (value = newValue) => newValue = value)) { 
+                    audioComponent.loop = newValue;
+                }
+
+                let newVolume = audioComponent.volume;
+
+                if (banana.ImGui.SliderFloat('Volume', (value = newVolume) => newVolume = value, 0, 1)) {
+                    audioComponent.volume = newVolume;
+                }
+
+                banana.ImGui.TreePop();
+            }
+        }
+
+        // Native Script Component
+        if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.NativeScriptComponent)) {
+            let opened = banana.ImGui.TreeNodeEx('NativeScriptComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Script');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.NativeScriptComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
+                const scriptComponent = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.NativeScriptComponent);
+
+                if (banana.ImGui.Button('Choose')) {
+                    banana.Reader.selectJavaScriptFile()
+                    .then((file) => {
+                        scriptComponent.src = `/editor/resources/${file.name}`;
+
+                        import(scriptComponent.src).then(module => {
+                            scriptComponent.bind(Object.values(module)[0]);
+                        });
+                    });
+                }
+                banana.ImGui.SameLine();
+                banana.ImGui.InputText('Source', (value = scriptComponent.src ? scriptComponent.src : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+            
                 banana.ImGui.TreePop();
             }
         }

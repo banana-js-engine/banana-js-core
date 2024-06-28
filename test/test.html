@@ -3,7 +3,7 @@
         <link rel="icon" type="image/png", sizes="32x32" href="../public/banana_favicon/favicon-32x32.png">
         <link rel="icon" type="image/png", sizes="16x16" href="../public/banana_favicon/favicon-16x16.png">
 
-        <title id="title">banana editor</title>
+        <title id="title">banana test</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- <script type="text/javascript" src="../node_modules/@flyover/system/build/system.js"></script> -->
         <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/flyover/system.ts/build/system.js"></script>
@@ -12,30 +12,30 @@
         </script>
 
         <script type="module" src="../dist/banana.js"></script>
-        <script type="module" src="./src/Editor.js"></script>
+        <script type="module" src="./src/Test.js"></script>
 
         <style>
-            html, body, div, canvas {
-                margin: 0;
-                padding: 0;
-            }
+        html, body, div, canvas {
+            margin: 0;
+            padding: 0;
+        }
 
-            #gl-canvas {
-                user-select: "none";
-                position: absolute;
-                left: 0px;
-                right: 0px;
-                top: 0px;
-                bottom: 0px;
-                width: 100%;
-                height: 100%;
-            }
+        #gl-canvas {
+            user-select: "none";
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            top: 0px;
+            bottom: 0px;
+            width: 100%;
+            height: 100%;
+        }
 
-            body {
-                overflow: hidden;
-            }
+        body {
+            overflow: hidden;
+        }
     </style>
-  </head>
+    </head>
     <body>
         <canvas id="gl-canvas" tabindex="1"></canvas>
     </body>
