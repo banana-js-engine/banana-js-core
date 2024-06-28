@@ -10,45 +10,45 @@ export enum ShapeType {
 }
 
 export class Body2D {
-    private _linearVelocity: Vec2;
-    private _rotationalVelocity: number;
+    #linearVelocity: Vec2;
+    #rotationalVelocity: number;
 
-    private _force: Vec2;
+    #force: Vec2;
 
-    private _gravityScale: number;
+    #gravityScale: number;
 
-    public density: number;
-    public mass: number;
-    public restitution: number;
-    public area: number;
+    density: number;
+    mass: number;
+    restitution: number;
+    area: number;
     
-    public isStatic: boolean;
+    isStatic: boolean;
     
-    public radius: number;
-    public width: number;
-    public height: number;
+    radius: number;
+    width: number;
+    height: number;
 
-    public inertia: number;
+    inertia: number;
     
-    public inverseMass: number;
-    public inverseInertia: number;
+    inverseMass: number;
+    inverseInertia: number;
     
-    public vertices: Vec4[];
+    vertices: Vec4[];
 
-    public shapeType: ShapeType;
+    shapeType: ShapeType;
 
-    public staticFriction: number;
-    public dynamicFriction: number;
+    staticFriction: number;
+    dynamicFriction: number;
 
     constructor(density: number, mass: number, restitution: number, area: number, isStatic: boolean, radius: number,
         width: number, height: number, inertia: number, shapeType: ShapeType
     ) {
-        this._linearVelocity = Vec2.ZERO;
-        this._rotationalVelocity = 0;
+        this.#linearVelocity = Vec2.ZERO;
+        this.#rotationalVelocity = 0;
 
-        this._force = Vec2.ZERO;
+        this.#force = Vec2.ZERO;
 
-        this._gravityScale = 1;
+        this.#gravityScale = 1;
 
         this.density = density;
         this.mass = mass;
@@ -188,14 +188,14 @@ export class Body2D {
 
         const time = deltaTime / iterations;
 
-        this._linearVelocity = this._linearVelocity.add(gravity.mul(this._gravityScale).mul(time));
+        this.#linearVelocity = this.#linearVelocity.add(gravity.mul(this.#gravityScale).mul(time));
 
-        this._linearVelocity = this._linearVelocity.add(this._force.mul(time));
+        this.#linearVelocity = this.#linearVelocity.add(this.#force);
 
-        transform.translate(this._linearVelocity.x * time, this._linearVelocity.y * time, 0);
-        transform.rotate(0, 0, Utils.toDegrees(this._rotationalVelocity) * time);
+        transform.translate(this.#linearVelocity.x * time, this.#linearVelocity.y * time, 0);
+        transform.rotate(0, 0, Utils.toDegrees(this.#rotationalVelocity) * time);
     
-        this._force = Vec2.ZERO;
+        this.#force = Vec2.ZERO;
     }
 
     public moveBy(v: Vec2, transform: TransformComponent) {
@@ -203,31 +203,31 @@ export class Body2D {
     }
 
     public addForce(amount: Vec2) {
-        this._force = amount;
+        this.#force = amount;
     }
 
     public get linearVelocity() {
-        return this._linearVelocity;
+        return this.#linearVelocity;
     }
 
     public set linearVelocity(v: Vec2) {
-        this._linearVelocity.x = v.x;
-        this._linearVelocity.y = v.y;
+        this.#linearVelocity.x = v.x;
+        this.#linearVelocity.y = v.y;
     }
 
     public get rotationalVelocity() {
-        return this._rotationalVelocity;
+        return this.#rotationalVelocity;
     }
 
     public set rotationalVelocity(ang: number) {
-        this._rotationalVelocity = ang;
+        this.#rotationalVelocity = ang;
     }
 
     public get gravityScale() {
-        return this._gravityScale;
+        return this.#gravityScale;
     }
 
     public set gravityScale(newValue: number) {
-        this._gravityScale = newValue;
+        this.#gravityScale = newValue;
     }
 }
