@@ -40,6 +40,19 @@ export class PhysicsWorld {
         localStorage.setItem('withFriction', newValue.toString());
     }
 
+    static get staticCollision() {
+        const cachedValue = localStorage.getItem('staticCollision');
+        if (cachedValue) {
+            return cachedValue == 'true';
+        }
+
+        return true;
+    }
+
+    static set staticCollision(newValue: boolean) {
+        localStorage.setItem('staticCollision', newValue.toString());
+    }
+
     public gravity: Vec2;
 
     private contactList: CollisionInformation[];
@@ -61,10 +74,6 @@ export class PhysicsWorld {
 
     public collide(deltaTime: number, bodyA: Body2DComponent, transformA: TransformComponent, bodyB: Body2DComponent, transformB: TransformComponent, iterations: number) {
                 
-        if (bodyA.body2d.isStatic && bodyB.body2d.isStatic) {
-            return;
-        }
-
         const AABB_a = bodyA.body2d.getAABB(transformA);
         const AABB_b = bodyB.body2d.getAABB(transformB);
         
@@ -131,28 +140,45 @@ export class PhysicsWorld {
             );
         }
 
-        if (collInfo.isColliding) {
+        if (!collInfo.isColliding) {
+            return;
+        }
 
-            if (bodyA.body2d.isStatic) {
-                bodyB.moveBy(collInfo.normal.mul(collInfo.depth), transformB);
+        if (bodyA.body2d.isStatic && bodyB.body2d.isStatic) {
+            if (!PhysicsWorld.staticCollision) {
+                return;
             }
-            else if (bodyB.body2d.isStatic) {
+
+            if (transformA.lastMovedTimestamp > transformB.lastMovedTimestamp) {
                 bodyA.moveBy(collInfo.normal.mul(-collInfo.depth), transformA);
+            }
+            else if (transformA.lastMovedTimestamp < transformB.lastMovedTimestamp) {
+                bodyB.moveBy(collInfo.normal.mul(collInfo.depth), transformB);
             }
             else {
                 bodyA.moveBy(collInfo.normal.mul(collInfo.depth).div(-2), transformA);
                 bodyB.moveBy(collInfo.normal.mul(collInfo.depth).div(2), transformB);
             }
-            
-            collInfo.bodyA = bodyA.body2d;
-            collInfo.bodyB = bodyB.body2d;
-            collInfo.bodyAPos = transformA.getPosition();
-            collInfo.bodyBPos = transformB.getPosition();
-
-            
-
-            this.contactList.push(collInfo);
+            return;
         }
+
+        if (bodyA.body2d.isStatic) {
+            bodyB.moveBy(collInfo.normal.mul(collInfo.depth), transformB);
+        }
+        else if (bodyB.body2d.isStatic) {
+            bodyA.moveBy(collInfo.normal.mul(-collInfo.depth), transformA);
+        }
+        else {
+            bodyA.moveBy(collInfo.normal.mul(collInfo.depth).div(-2), transformA);
+            bodyB.moveBy(collInfo.normal.mul(collInfo.depth).div(2), transformB);
+        }
+        
+        collInfo.bodyA = bodyA.body2d;
+        collInfo.bodyB = bodyB.body2d;
+        collInfo.bodyAPos = transformA.getPosition();
+        collInfo.bodyBPos = transformB.getPosition();
+
+        this.contactList.push(collInfo);
 
         this.narrowPhase();
     }

@@ -49,6 +49,8 @@ export class TransformComponent extends Component {
     rotation: Vec3;
     scale: Vec3;
 
+    lastMovedTimestamp: number;
+
     constructor() {
         super();
         this.transform = new Mat4();
@@ -59,6 +61,8 @@ export class TransformComponent extends Component {
         this.position = new Vec3(0, 0, 0);
         this.rotation = new Vec3(0, 0, 0);
         this.scale = new Vec3(1, 1, 1);
+
+        this.lastMovedTimestamp = 0;
 
         this.type = ComponentType.TransformComponent;
     }
@@ -98,6 +102,8 @@ export class TransformComponent extends Component {
         this.position.x += x;
         this.position.y += y;
         this.position.z += z;
+
+        this.lastMovedTimestamp = Date.now();
     }
 
     getRotation(): Vec3 {

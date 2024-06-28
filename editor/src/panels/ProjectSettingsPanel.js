@@ -67,6 +67,8 @@ export class ProjectSettingsPanel {
         if (opened) {
             banana.ImGui.Checkbox('Rotation', (value = banana.PhysicsWorld.withRotation) => banana.PhysicsWorld.withRotation = value);
             banana.ImGui.Checkbox('Friction', (value = banana.PhysicsWorld.withFriction) => banana.PhysicsWorld.withFriction = value);
+            banana.ImGui.Checkbox('Static Collision', 
+                (value = banana.PhysicsWorld.staticCollision) => banana.PhysicsWorld.staticCollision = value);
 
             banana.ImGui.TreePop();
         }
