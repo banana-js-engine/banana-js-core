@@ -2,10 +2,13 @@ import { ntt } from './ntt.js'
 import { ComponentType } from '../core/Type.js'
 import { Renderer2D } from '../render/Renderer2D.js'
 import { Entity } from './Entity.js'
-import { Mat4 } from '../math/BananaMath.js'
+import { Mat4, Vec2 } from '../math/BananaMath.js'
 import { PhysicsWorld } from '../physics/PhysicsWorld.js'
 import { SceneCamera } from '../render/Camera.js'
 import { Log } from '../core/Log.js'
+import { EditorCameraController } from '../core/CameraController.js'
+import { Event } from '../event/Event.js'
+import { Color } from '../render/Color.js'
 import { CameraComponent, 
          CircleRendererComponent, 
          NativeScriptComponent, 
@@ -15,22 +18,25 @@ import { CameraComponent,
          TransformComponent, 
          TextRendererComponent,
          AudioComponent} from '../scene/Component.js'
- 
-export class Scene 
-{
+import { ShapeType } from '../physics/Body2D.js'
+
+
+
+export class Scene {
     registry: ntt;
     world: PhysicsWorld;
     physicsIterations: number;
 
     #name: string;
     #view: Mat4;
+    #tempTransform: TransformComponent;
 
-    constructor(name: string)
-    {
+    constructor(name: string) {
         this.registry = new ntt();
         this.world = new PhysicsWorld();
         this.#name = name;
         this.#view = new Mat4();
+        this.#tempTransform = new TransformComponent();
         this.physicsIterations = 10;
     }
 
@@ -107,7 +113,61 @@ export class Scene
         // }
     }
 
-    onUpdateRuntime(deltaTime) {
+    renderEditor(deltaTime: number, windowAspectRatio: number) {
+
+        // Render camera boundaries
+        let mainCamera: SceneCamera = null;
+        let mainCameraTransform: TransformComponent = null;
+
+        const cameraEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.CameraComponent);
+        cameraEntities.forEach(cameraEntity => {
+            const transform = this.registry.get<TransformComponent>(cameraEntity, ComponentType.TransformComponent);
+            const camera = this.registry.get<CameraComponent>(cameraEntity, ComponentType.CameraComponent);
+
+            if (camera.isPrimary) {
+                mainCameraTransform = transform;
+                mainCamera = camera.getCamera();
+            }
+        });
+
+        if (mainCamera) {
+            const cameraSize = new Vec2(mainCamera.size * windowAspectRatio, mainCamera.size);
+
+            Renderer2D.drawRectangle(mainCameraTransform.getPosition(), cameraSize, Color.BLUE);
+        }
+
+        // Render body2d boundaries
+        const bodyEntities = this.registry.group(ComponentType.TransformComponent, ComponentType.Body2DComponent);
+        bodyEntities.forEach(bodyEntity => {
+            const transform = this.registry.get<TransformComponent>(bodyEntity, ComponentType.TransformComponent);
+            const body2d = this.registry.get<Body2DComponent>(bodyEntity, ComponentType.Body2DComponent);
+
+            if (body2d.body2d.shapeType == ShapeType.Box) {
+
+                // render rectangular boundary
+                const scale = transform.getScale();
+                const bodySize = new Vec2(body2d.body2d.width * scale.x, body2d.body2d.height * scale.y);
+
+                Renderer2D.drawRectangle(transform.getPosition(), bodySize, Color.GREEN);
+            }
+            else if (body2d.body2d.shapeType == ShapeType.Circle) {
+                
+                // render circular boundary
+                const originalScale = transform.getScale();
+                const radiusScale = body2d.body2d.radius * 2;
+                
+
+                // #tempTransform is needed because we need to account for body2d's radius property in the scale.
+                this.#tempTransform.setPosition( transform.getPosition() );
+                this.#tempTransform.setRotation( transform.getRotation() );
+                this.#tempTransform.setScale( originalScale.x * radiusScale, originalScale.y * radiusScale, originalScale.z );
+
+                Renderer2D.drawCircle(this.#tempTransform, Color.GREEN, 0.02, 0);
+            }
+        })
+    }
+
+    onUpdateRuntime(deltaTime: number) {
         {
             // scriptable entities
             const nativeScripts = this.registry.get_all_with_entity<NativeScriptComponent>(ComponentType.NativeScriptComponent);
@@ -195,16 +255,18 @@ export class Scene
         Renderer2D.endScene();
     }
 
-    onUpdateEditor(deltaTime, editorCameraController) 
+    onUpdateEditor(deltaTime: number, editorCameraController: EditorCameraController, windowAspectRatio: number) 
     {
         Renderer2D.beginScene(editorCameraController.getCamera());
 
         this.renderScene(deltaTime);
 
+        this.renderEditor(deltaTime, windowAspectRatio);
+
         Renderer2D.endScene();
     }
 
-    onEvent(event) 
+    onEvent(event: Event) 
     {
         const cameraComponents = this.registry.get_all<CameraComponent>(ComponentType.CameraComponent);
 

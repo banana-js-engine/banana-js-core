@@ -517,7 +517,7 @@ export class Renderer2D {
     }
 
     /**
-     * Adds vetex data for rendering a colored circle
+     * Adds vertex data for rendering a colored circle
      * @param transform transform of the circle
      * @param color color of the circle
      * @param thickness refers to how thick the circle is, 
