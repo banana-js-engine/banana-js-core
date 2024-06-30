@@ -34,7 +34,8 @@ export class EditorLayer extends banana.Layer {
     }
 
     onUpdate(deltaTime) {
-        this.scene.onUpdateEditor(deltaTime, this.editorCameraController);
+        this.scene.onUpdateEditor(deltaTime, this.editorCameraController, 
+            this.projectSettingsPanel.gameWindowWidth / this.projectSettingsPanel.gameWindowHeight);
 
         if (this.mainCamera) {
             this.editorCameraController.getCamera().clearColor = banana.Color.copy(this.mainCamera.clearColor);
