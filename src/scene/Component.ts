@@ -6,7 +6,7 @@ import { ScriptableEntity } from '../script/ScriptableEntity.js'
 import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Texture } from '../render/Texture.js'
 import { Audio } from '../core/Audio.js'
-import { SupportedType } from '../script/ScriptManager.js'
+import { ScriptManager, SupportedType } from '../script/ScriptManager.js'
 
 export class Component {
     type: ComponentType;
@@ -389,7 +389,7 @@ export class NativeScriptComponent extends Component {
         let propertiesString = '';
 
         for (const [name, value] of Object.entries(this.properties)) {
-            if (typeof value == 'number' || typeof value == 'string' || typeof value == 'boolean') {
+            if (ScriptManager.isSupportedType(value)) {
                 propertiesString += `          ${name}: ${value}\n`; 
             }
         }
