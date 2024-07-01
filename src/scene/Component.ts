@@ -5,7 +5,8 @@ import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
 import { ScriptableEntity } from '../script/ScriptableEntity.js'
 import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Texture } from '../render/Texture.js'
-import { Audio, AudioManager } from '../core/Audio.js'
+import { Audio } from '../core/Audio.js'
+import { SupportedType } from '../script/ScriptManager.js'
 
 export class Component {
     type: ComponentType;
@@ -343,7 +344,7 @@ export class NativeScriptComponent extends Component {
     Instance: ScriptableEntity;
     instanceScriptFn: Function;
     destroyScriptFn: Function;
-    properties: { [key: string]: number | string | boolean };
+    properties: { [key: string]: SupportedType };
     createdInEditor: boolean;
 
     #src: string;
@@ -372,7 +373,7 @@ export class NativeScriptComponent extends Component {
         }
     }
 
-    addProperty(name: string, value: number | string | boolean) {
+    addProperty(name: string, value: SupportedType) {
         this.properties[name] = value;
     }
 
