@@ -72,4 +72,4 @@ export * from './scene/Entity.js'
 
 // script
 export * from './script/ScriptableEntity.js'
-export * from './script/Serializable.js'
+export * from './script/ScriptManager.js'

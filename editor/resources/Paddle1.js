@@ -1,12 +1,9 @@
 import * as banana from '../../dist/banana.js';
 
 export class Paddle1 extends banana.ScriptableEntity {
-    
-    x = 6;
-    y = 'asd'
-    z = false;
-    w;
 
+    moveSpeed = 5;
+    
     // Use this function for initialization.
     onCreate() {
         
@@ -15,11 +12,11 @@ export class Paddle1 extends banana.ScriptableEntity {
     // This function is called once per frame.
     onUpdate(deltaTime) {
         if (banana.Input.isKeyPressed(banana.KeyCode.W)) {
-            this.transform.translate(0, -deltaTime * 4, 0);
+            this.transform.translate(0, -deltaTime * this.moveSpeed, 0);
         }
 
         if (banana.Input.isKeyPressed(banana.KeyCode.S)) {
-            this.transform.translate(0, deltaTime * 4, 0);
+            this.transform.translate(0, deltaTime * this.moveSpeed, 0);
         }
     }
 }

@@ -344,6 +344,7 @@ export class NativeScriptComponent extends Component {
     instanceScriptFn: Function;
     destroyScriptFn: Function;
     properties: { [key: string]: number | string | boolean };
+    createdInEditor: boolean;
 
     #src: string;
 
@@ -353,6 +354,7 @@ export class NativeScriptComponent extends Component {
         this.instanceScriptFn = null;
         this.destroyScriptFn = null;
         this.properties = {};
+        this.createdInEditor = false;
 
         this.#src = '';
 
@@ -362,6 +364,12 @@ export class NativeScriptComponent extends Component {
     bind(scriptableEntityClass: { new(): ScriptableEntity }) {
         this.instanceScriptFn = function() { return new scriptableEntityClass(); }
         this.destroyScriptFn = function(nativeScriptComponent: NativeScriptComponent) { nativeScriptComponent.Instance = null; }
+    }
+
+    deserialize() {
+        for (const [name, value] of Object.entries(this.properties)) {
+            this.Instance[name] = value;
+        }
     }
 
     addProperty(name: string, value: number | string | boolean) {
@@ -376,9 +384,21 @@ export class NativeScriptComponent extends Component {
         this.#src = newSrc;
     }
 
+    toStringProperties(): string {
+        let propertiesString = '';
+
+        for (const [name, value] of Object.entries(this.properties)) {
+            if (typeof value == 'number' || typeof value == 'string' || typeof value == 'boolean') {
+                propertiesString += `          ${name}: ${value}\n`; 
+            }
+        }
+        return propertiesString;
+    }
+
     toString() {
         return `NativeScriptComponent:
-          Source: ${this.#src}\n`;
+          Source: ${this.#src}
+${this.toStringProperties()}`;
     }
 }
 

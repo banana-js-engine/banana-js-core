@@ -1,8 +1,13 @@
 import * as banana from '../../dist/banana.js';
 
 export class TestScript extends banana.ScriptableEntity {
+
+    textToDisplay = '';
+
     onCreate() {
         banana.Log.Info('I AM ALIVE');
+        this.textRenderer = this.getComponent(banana.ComponentType.TextRendererComponent);
+        this.textRenderer.setText(this.textToDisplay);
     }
 
     onUpdate(deltaTime) {

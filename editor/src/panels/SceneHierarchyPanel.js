@@ -430,8 +430,8 @@ export class SceneHierarchyPanel {
                         scriptComponent.src = `/editor/resources/${file.name}`;
 
                         import(scriptComponent.src).then(module => {
-                            scriptComponent.Instance = null;
-                            scriptComponent.properties = {};
+                            // reset the mock creation in case the source is changed
+                            banana.ScriptManager.resetMockCreation(scriptComponent);
                             scriptComponent.bind(Object.values(module)[0]);
                         });
                     });
@@ -439,33 +439,15 @@ export class SceneHierarchyPanel {
                 banana.ImGui.SameLine();
                 banana.ImGui.InputText('Source', (value = scriptComponent.src ? scriptComponent.src : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
 
-                if (scriptComponent.instanceScriptFn && !scriptComponent.Instance) {
-                    scriptComponent.Instance = scriptComponent.instanceScriptFn();
-                    scriptComponent.Instance.entity = new banana.Entity(this.selectedEntity, this.refScene);
-                    scriptComponent.Instance.onCreateSealed();
-                    scriptComponent.Instance.onCreate();
+                // if the script is not already mock-created, fetch its properties
+                if (scriptComponent.instanceScriptFn && !banana.ScriptManager.isMockCreated(scriptComponent)) {
+                    banana.ScriptManager.mockCreateInEditor(scriptComponent, this.selectedEntity, this.refScene);
 
-                    const properties = Object.entries(scriptComponent.Instance);
-                    for (let i = 1; i < properties.length; i++) {
-                        scriptComponent.addProperty(properties[i][0], properties[i][1]);
-                    }
+                    banana.ScriptManager.addPrimitiveProperties(scriptComponent);
                 }
 
-                // Script properties
-                for (let [name, value] of Object.entries(scriptComponent.properties)) {
-                    if (typeof value == 'number') {
-                        banana.ImGui.InputInt(name, (v = value) => scriptComponent.properties[name] = v);
-                    }
-                    else if (typeof value == 'string') {
-                        banana.ImGui.InputText(name, (v = value) => scriptComponent.properties[name] = v);
-                    }
-                    else if (typeof value == 'boolean') {
-                        banana.ImGui.Checkbox(name, (v = value) => scriptComponent.properties[name] = v)
-                    }
-                    else if (typeof value == 'undefined') {
-                        banana.ImGui.Text(`${name} is undefined, must be initialized`);
-                    }
-                }
+                // serialize properties into respective ImGui fields
+                banana.ScriptManager.serializeProperties(scriptComponent);
             
                 banana.ImGui.TreePop();
             }
