@@ -2,6 +2,11 @@ import * as banana from '../../dist/banana.js';
 
 export class Paddle1 extends banana.ScriptableEntity {
     
+    x = 6;
+    y = 'asd'
+    z = false;
+    w;
+
     // Use this function for initialization.
     onCreate() {
         

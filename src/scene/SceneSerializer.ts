@@ -9,7 +9,7 @@ import { ComponentType } from "../core/Type.js";
 import { AudioComponent, Body2DComponent, CameraComponent, CircleRendererComponent, NativeScriptComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
 import { Entity } from "./Entity.js";
 import { Scene } from "./Scene.js";
-import { ScriptableEntity } from "./ScriptableEntity.js";
+import { ScriptableEntity } from "../script/ScriptableEntity.js";
 
 export class SceneSerializer {
     static save(scene: Scene) {

@@ -29,7 +29,7 @@ export * from "./scene/Scene.js";
 export * from "./scene/SceneSerializer.js";
 export * from "./scene/Component.js";
 export * from "./scene/Entity.js";
-export * from "./scene/ScriptableEntity.js";
+export * from "./script/ScriptableEntity.js";
 export * from "./math/BananaMath.js";
 export * from "./physics/PhysicsWorld.js";
 export * from "./physics/Body2D.js";

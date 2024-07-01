@@ -2,7 +2,7 @@ import { Color } from '../render/Color.js'
 import { ComponentType } from '../core/Type.js'
 import { SceneCamera } from '../render/Camera.js'
 import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
-import { ScriptableEntity } from './ScriptableEntity.js'
+import { ScriptableEntity } from '../script/ScriptableEntity.js'
 import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Texture } from '../render/Texture.js'
 import { Audio, AudioManager } from '../core/Audio.js'
@@ -343,6 +343,7 @@ export class NativeScriptComponent extends Component {
     Instance: ScriptableEntity;
     instanceScriptFn: Function;
     destroyScriptFn: Function;
+    properties: { [key: string]: number | string | boolean };
 
     #src: string;
 
@@ -351,6 +352,7 @@ export class NativeScriptComponent extends Component {
         this.Instance = null;
         this.instanceScriptFn = null;
         this.destroyScriptFn = null;
+        this.properties = {};
 
         this.#src = '';
 
@@ -360,6 +362,10 @@ export class NativeScriptComponent extends Component {
     bind(scriptableEntityClass: { new(): ScriptableEntity }) {
         this.instanceScriptFn = function() { return new scriptableEntityClass(); }
         this.destroyScriptFn = function(nativeScriptComponent: NativeScriptComponent) { nativeScriptComponent.Instance = null; }
+    }
+
+    addProperty(name: string, value: number | string | boolean) {
+        this.properties[name] = value;
     }
 
     get src() {
