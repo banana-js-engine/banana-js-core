@@ -1,4 +1,4 @@
-import { Body2DComponent, CameraComponent, ComponentType, Entity, ShapeType, TagComponent, TransformComponent, Vec2 } from "../banana.js"
+import { CameraComponent, ComponentType, Entity, TagComponent, TransformComponent, Vec2 } from "../banana.js"
 
 export class ScriptableEntity {
 
@@ -21,28 +21,21 @@ export class ScriptableEntity {
         return null;
     }
 
-    getComponent<T>(componentType): T {
+    getComponent<T>(componentType: ComponentType): T {
         return this.entity.getComponent(componentType);
     }
 
-    instantiate(position: Vec2, flag: boolean = false) {
-        const clonedEntity = this.entity.scene.createEntity('test');
-        const clonedEntityTransform = clonedEntity.getComponent<TransformComponent>(ComponentType.TransformComponent);
-        clonedEntityTransform.setPosition(position.x, position.y, 0);
-        
-        const body = clonedEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);
+    instantiate(position: Vec2) {
 
-        if (flag) {
-            body.setShape(ShapeType.Circle);
-            clonedEntity.addComponent(ComponentType.CircleRendererComponent);
-        }
-        else {
-            clonedEntity.addComponent(ComponentType.SpriteRendererComponent);
-        }        
+        const tagComponent = this.entity.getComponent<TagComponent>(ComponentType.TagComponent);
+
+        const clonedEntity = this.entity.scene.createEntity(`${tagComponent.getName()} (Clone)`);
+        const clonedEntityTransform = clonedEntity.getComponent<TransformComponent>(ComponentType.TransformComponent);
+        clonedEntityTransform.setPosition(position.x, position.y, 0);     
     }
 
     onCreate() {}
-    onUpdate(deltaTime) {}
+    onUpdate(deltaTime: number) {}
     onDestroy() {}
 
     // DONT INHERIT THESE METHODS

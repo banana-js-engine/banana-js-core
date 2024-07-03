@@ -9,7 +9,8 @@ import { ComponentType } from "../core/Type.js";
 import { AudioComponent, Body2DComponent, CameraComponent, CircleRendererComponent, NativeScriptComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
 import { Entity } from "./Entity.js";
 import { Scene } from "./Scene.js";
-import { ScriptableEntity } from "./ScriptableEntity.js";
+import { ScriptableEntity } from "../script/ScriptableEntity.js";
+import { ScriptManager, SupportedType } from "../script/ScriptManager.js";
 
 export class SceneSerializer {
     static save(scene: Scene) {
@@ -32,45 +33,45 @@ export class SceneSerializer {
 
             // tag component
             const tagComponent = scene.registry.get<TagComponent>(entity, ComponentType.TagComponent);
-            sceneData += ` ${tagComponent}`;
+            sceneData += `${tagComponent}`;
 
             // transform component
             const transformComponent = scene.registry.get<TransformComponent>(entity, ComponentType.TransformComponent);
-            sceneData += ` ${transformComponent}`;
+            sceneData += `${transformComponent}`;
 
             if (scene.registry.has(entity, ComponentType.SpriteRendererComponent)) {
                 const spriteRendererComponent = scene.registry.get<SpriteRendererComponent>(entity, ComponentType.SpriteRendererComponent);
-                sceneData += ` ${spriteRendererComponent}`;
+                sceneData += `${spriteRendererComponent}`;
             }
 
             if (scene.registry.has(entity, ComponentType.CircleRendererComponent)) {
                 const circleRendererComponent = scene.registry.get<CircleRendererComponent>(entity, ComponentType.CircleRendererComponent);
-                sceneData += ` ${circleRendererComponent}`;
+                sceneData += `${circleRendererComponent}`;
             }
 
             if (scene.registry.has(entity, ComponentType.TextRendererComponent)) {
                 const textRendererComponent = scene.registry.get<TextRendererComponent>(entity, ComponentType.TextRendererComponent);
-                sceneData += ` ${textRendererComponent}`;
+                sceneData += `${textRendererComponent}`;
             }
 
             if (scene.registry.has(entity, ComponentType.CameraComponent)) {
                 const cameraComponent = scene.registry.get<CameraComponent>(entity, ComponentType.CameraComponent);
-                sceneData += ` ${cameraComponent}`;
+                sceneData += `${cameraComponent}`;
             }
 
             if (scene.registry.has(entity, ComponentType.NativeScriptComponent)) {
                 const scriptComponent = scene.registry.get<NativeScriptComponent>(entity, ComponentType.NativeScriptComponent);
-                sceneData += ` ${scriptComponent}`;
+                sceneData += `${scriptComponent}`;
             }
 
             if (scene.registry.has(entity, ComponentType.Body2DComponent)) {
                 const body2dComponent = scene.registry.get<Body2DComponent>(entity, ComponentType.Body2DComponent);
-                sceneData += ` ${body2dComponent}`;
+                sceneData += `${body2dComponent}`;
             }
 
             if (scene.registry.has(entity, ComponentType.AudioComponent)) {
                 const audioComponent = scene.registry.get<AudioComponent>(entity, ComponentType.AudioComponent);
-                sceneData += ` ${audioComponent}`;
+                sceneData += `${audioComponent}`;
             }
         }
 
@@ -93,12 +94,12 @@ export class SceneSerializer {
                 const entityId = lines[i].split(':')[1].trim();
                 currentEntity = new Entity(scene.registry.create_with_id(entityId), scene);
             } 
-            else if (lines[i].startsWith(' TagComponent:')) {
+            else if (lines[i].startsWith('TagComponent:')) {
                 const tagComponent = currentEntity.addComponent<TagComponent>(ComponentType.TagComponent);
                 const tag = lines[i+1].split(':')[1].trim();
                 tagComponent.setName(tag);
             } 
-            else if (lines[i].startsWith(' TransformComponent:')) {
+            else if (lines[i].startsWith('TransformComponent:')) {
                 const transformComponent = currentEntity.addComponent<TransformComponent>(ComponentType.TransformComponent);
                 const positionString = lines[i+1].split(':')[1].trim();
                 const rotationString = lines[i+2].split(':')[1].trim();
@@ -112,7 +113,7 @@ export class SceneSerializer {
                 transformComponent.setRotation(rotation.x, rotation.y, rotation.z);
                 transformComponent.setScale(scale.x, scale.y, scale.y);
             }
-            else if (lines[i].startsWith(' SpriteRendererComponent:')) {
+            else if (lines[i].startsWith('SpriteRendererComponent:')) {
                 const spriteRendererComponent = currentEntity.addComponent<SpriteRendererComponent>(ComponentType.SpriteRendererComponent);
 
                 const colorString = lines[i+1].split(':')[1].trim();
@@ -126,7 +127,7 @@ export class SceneSerializer {
                     spriteRendererComponent.setSprite(new Texture(sprite));
                 }
             }
-            else if (lines[i].startsWith(' CircleRendererComponent:')) {
+            else if (lines[i].startsWith('CircleRendererComponent:')) {
                 const circleRendererComponent = currentEntity.addComponent<CircleRendererComponent>(ComponentType.CircleRendererComponent);
 
                 const colorString = lines[i+1].split(':')[1].trim();
@@ -141,14 +142,14 @@ export class SceneSerializer {
                 circleRendererComponent.thickness = thickness;
                 circleRendererComponent.fade = fade;
             }
-            else if (lines[i].startsWith(' TextRendererComponent:')) {
+            else if (lines[i].startsWith('TextRendererComponent:')) {
                 const textRendererComponent = currentEntity.addComponent<TextRendererComponent>(ComponentType.TextRendererComponent);
 
                 const text = lines[i+1].split(':')[1].trim();
 
                 textRendererComponent.setText(text);
             }
-            else if (lines[i].startsWith(' CameraComponent:')) {
+            else if (lines[i].startsWith('CameraComponent:')) {
                 const cameraComponent = currentEntity.addComponent<CameraComponent>(ComponentType.CameraComponent);
 
                 const type = parseInt(lines[i+2].split(':')[1].trim()) as CameraType;
@@ -176,7 +177,7 @@ export class SceneSerializer {
 
                 cameraComponent.sceneCamera.setViewportSize();
             }
-            else if (lines[i].startsWith(' NativeScriptComponent')) {
+            else if (lines[i].startsWith('NativeScriptComponent')) {
                 const scriptComponent = currentEntity.addComponent<NativeScriptComponent>(ComponentType.NativeScriptComponent);
 
                 const src = lines[i+1].split(':')[1].trim();
@@ -184,10 +185,34 @@ export class SceneSerializer {
                 scriptComponent.src = src;
 
                 import(src).then(module => {
+
                     scriptComponent.bind(Object.values(module)[0] as { new(): ScriptableEntity });
+                    ScriptManager.mockCreateInEditor(scriptComponent, currentEntity.entityHandle, scene);
+
+                    const properties = Object.entries(scriptComponent.Instance);
+                    for (let j = 1; j < properties.length; j++) {
+                        let value: SupportedType = properties[j][1];
+
+                        // skip unsupported types
+                        if (!ScriptManager.isSupportedType(value)) {
+                            continue;
+                        }
+
+                        // Source is (i+1)th line, 
+                        // since j starts from 1, we start counting lines from i+j+1 
+                        const serializedValue = lines[i+j+1].split(':')[1].trim();
+                        const propertyName = properties[j][0];
+                    
+                        ScriptManager.deserializeProperties(scriptComponent, value, serializedValue, propertyName);
+                    }
+
+                    // this line is needed: see Scene.ts, line 177
+                    // never falls in that if statement when the game starts.
+                    // also cannot call resetMockCreation here, because we need to preserve properties.
+                    scriptComponent.Instance = null;
                 });
             }
-            else if (lines[i].startsWith(' Body2DComponent:')) {
+            else if (lines[i].startsWith('Body2DComponent:')) {
                 const body2dComponent = currentEntity.addComponent<Body2DComponent>(ComponentType.Body2DComponent);
 
                 const type = parseInt(lines[i+1].split(':')[1].trim()) as ShapeType;
@@ -210,7 +235,7 @@ export class SceneSerializer {
                 
                 body2dComponent.gravityScale = gravityScale;
             }
-            else if (lines[i].startsWith(' AudioComponent:')) {
+            else if (lines[i].startsWith('AudioComponent:')) {
                 const audioComponent = currentEntity.addComponent<AudioComponent>(ComponentType.AudioComponent);
 
                 const audioSource = lines[i+1].split(':')[1].trim();

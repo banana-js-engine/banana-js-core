@@ -46,6 +46,13 @@ export * from './event/KeyboardEvent.js'
 export * from './event/MouseEvent.js'
 export * from './event/ApplicationEvent.js'
 
+// math
+export * from './math/BananaMath.js'
+
+// physics
+export * from './physics/PhysicsWorld.js'
+export * from './physics/Body2D.js'
+
 // render
 export * from './render/Renderer2D.js'
 export * from './render/RenderCommand.js'
@@ -62,11 +69,7 @@ export * from './scene/Scene.js'
 export * from './scene/SceneSerializer.js'
 export * from './scene/Component.js'
 export * from './scene/Entity.js'
-export * from './scene/ScriptableEntity.js'
 
-// math
-export * from './math/BananaMath.js'
-
-// physics
-export * from './physics/PhysicsWorld.js'
-export * from './physics/Body2D.js'
+// script
+export * from './script/ScriptableEntity.js'
+export * from './script/ScriptManager.js'

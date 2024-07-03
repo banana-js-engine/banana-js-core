@@ -430,12 +430,24 @@ export class SceneHierarchyPanel {
                         scriptComponent.src = `/editor/resources/${file.name}`;
 
                         import(scriptComponent.src).then(module => {
+                            // reset the mock creation in case the source is changed
+                            banana.ScriptManager.resetMockCreation(scriptComponent);
                             scriptComponent.bind(Object.values(module)[0]);
                         });
                     });
                 }
                 banana.ImGui.SameLine();
                 banana.ImGui.InputText('Source', (value = scriptComponent.src ? scriptComponent.src : 'None') => value, 128, banana.ImGui.ImGuiInputTextFlags.ReadOnly);
+
+                // if the script is not already mock-created, fetch its properties
+                if (scriptComponent.instanceScriptFn && !banana.ScriptManager.isMockCreated(scriptComponent)) {
+                    banana.ScriptManager.mockCreateInEditor(scriptComponent, this.selectedEntity, this.refScene);
+
+                    banana.ScriptManager.addPrimitiveProperties(scriptComponent);
+                }
+
+                // serialize properties into respective ImGui fields
+                banana.ScriptManager.serializeProperties(scriptComponent);
             
                 banana.ImGui.TreePop();
             }

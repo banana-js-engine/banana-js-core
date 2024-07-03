@@ -2,10 +2,11 @@ import { Color } from '../render/Color.js'
 import { ComponentType } from '../core/Type.js'
 import { SceneCamera } from '../render/Camera.js'
 import { Mat4, Vec2, Vec3 } from '../math/BananaMath.js'
-import { ScriptableEntity } from './ScriptableEntity.js'
+import { ScriptableEntity } from '../script/ScriptableEntity.js'
 import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Texture } from '../render/Texture.js'
-import { Audio, AudioManager } from '../core/Audio.js'
+import { Audio } from '../core/Audio.js'
+import { ScriptManager, SupportedType } from '../script/ScriptManager.js'
 
 export class Component {
     type: ComponentType;
@@ -343,6 +344,8 @@ export class NativeScriptComponent extends Component {
     Instance: ScriptableEntity;
     instanceScriptFn: Function;
     destroyScriptFn: Function;
+    properties: { [key: string]: SupportedType };
+    createdInEditor: boolean;
 
     #src: string;
 
@@ -351,6 +354,8 @@ export class NativeScriptComponent extends Component {
         this.Instance = null;
         this.instanceScriptFn = null;
         this.destroyScriptFn = null;
+        this.properties = {};
+        this.createdInEditor = false;
 
         this.#src = '';
 
@@ -362,6 +367,16 @@ export class NativeScriptComponent extends Component {
         this.destroyScriptFn = function(nativeScriptComponent: NativeScriptComponent) { nativeScriptComponent.Instance = null; }
     }
 
+    deserialize() {
+        for (const [name, value] of Object.entries(this.properties)) {
+            this.Instance[name] = value;
+        }
+    }
+
+    addProperty(name: string, value: SupportedType) {
+        this.properties[name] = value;
+    }
+
     get src() {
         return this.#src;
     }
@@ -370,9 +385,21 @@ export class NativeScriptComponent extends Component {
         this.#src = newSrc;
     }
 
+    toStringProperties(): string {
+        let propertiesString = '';
+
+        for (const [name, value] of Object.entries(this.properties)) {
+            if (ScriptManager.isSupportedType(value)) {
+                propertiesString += `          ${name}: ${value}\n`; 
+            }
+        }
+        return propertiesString;
+    }
+
     toString() {
         return `NativeScriptComponent:
-          Source: ${this.#src}\n`;
+          Source: ${this.#src}
+${this.toStringProperties()}`;
     }
 }
 

@@ -177,6 +177,7 @@ export class Scene {
                     if (!ns.Instance) {
                         ns.Instance = ns.instanceScriptFn();
                         ns.Instance.entity = new Entity(entity, this);
+                        ns.deserialize();
                         ns.Instance.onCreateSealed();
                         ns.Instance.onCreate();
                     }
