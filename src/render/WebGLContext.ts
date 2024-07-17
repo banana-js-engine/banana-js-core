@@ -2,7 +2,7 @@ import { Log } from "../core/Log.js"
 import { Color } from "./Color.js";
 import { RenderCommand } from "./RenderCommand.js";
 
-export let gl;
+export let gl: WebGL2RenderingContext;
 
 export class WebGLContext {
 

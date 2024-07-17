@@ -1,8 +1,7 @@
 import { Log } from "../core/Log.js"
 import { gl } from "./WebGLContext.js"
 
-export class FramebufferSpecification
-{
+export class FramebufferSpecification {
     width: number;
     height: number;
     samples: number;
@@ -15,22 +14,19 @@ export class FramebufferSpecification
     }
 }
 
-export class Framebuffer 
-{
+export class Framebuffer{
     spec: FramebufferSpecification;
 
-    framebufferId: number;
-    colorAttachment: number;
+    framebufferId: WebGLFramebuffer;
+    colorAttachment: WebGLTexture;
 
-    constructor(spec) 
-    {
+    constructor(spec) {
         this.spec = spec;
 
         this.invalidate();
     }
 
-    invalidate() 
-    {
+    invalidate() {
         this.framebufferId = gl.createFramebuffer();
 
         this.bind();
@@ -43,26 +39,22 @@ export class Framebuffer
         
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorAttachment, 0);
 
-        if (!gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) 
-        {
+        if (!(gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE)) {
             Log.Core_Error('Framebuffer is incomplete!');
         }
         
         this.unbind();
     }
 
-    bind() 
-    {
+    bind() {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferId);
     }
 
-    unbind() 
-    {
+    unbind() {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
-    getColorAttachmentId() 
-    {
+    getColorAttachmentId() {
         return this.colorAttachment;
     }
 }

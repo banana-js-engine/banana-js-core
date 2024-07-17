@@ -16,7 +16,7 @@ class VertexAttribute {
 
 export class VertexBuffer {
     
-    bufferId: number;
+    bufferId: WebGLBuffer;
     data: Float32Array;
     usage: number;
 
@@ -77,7 +77,7 @@ export class VertexBuffer {
 }
 
 export class IndexBuffer {
-    bufferId: number;
+    bufferId: WebGLBuffer;
     data: Uint16Array;
 
     constructor(data: Uint16Array) {

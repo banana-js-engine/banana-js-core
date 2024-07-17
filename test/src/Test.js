@@ -6,7 +6,7 @@ import { TestLayer } from "./TestLayer.js";
  */
 class TestApplication extends banana.Application {
     constructor() {
-        super('banana test', 600, 800);
+        super('banana test', 1920, 1080);
         
         this.pushLayer(new TestLayer());
     }

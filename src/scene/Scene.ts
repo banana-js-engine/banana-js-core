@@ -17,7 +17,8 @@ import { CameraComponent,
          TagComponent, 
          TransformComponent, 
          TextRendererComponent,
-         AudioComponent} from '../scene/Component.js'
+         AudioComponent,
+         WindowComponent} from '../scene/Component.js'
 import { ShapeType } from '../physics/Body2D.js'
 
 
@@ -25,19 +26,21 @@ import { ShapeType } from '../physics/Body2D.js'
 export class Scene {
     registry: ntt;
     world: PhysicsWorld;
-    physicsIterations: number;
-
+    
     #name: string;
     #view: Mat4;
     #tempTransform: TransformComponent;
+    #physicsIterations: number;
+    #windowsOpened: boolean;
 
     constructor(name: string) {
         this.registry = new ntt();
         this.world = new PhysicsWorld();
         this.#name = name;
         this.#view = new Mat4();
+        this.#physicsIterations = 10;
         this.#tempTransform = new TransformComponent();
-        this.physicsIterations = 10;
+        this.#windowsOpened = false;
     }
 
     get name(): string {
@@ -168,6 +171,20 @@ export class Scene {
     }
 
     onUpdateRuntime(deltaTime: number) {
+        
+        const windowComponents = this.registry.get_all<WindowComponent>(ComponentType.WindowComponent);
+        {
+            // multi-window logic
+            
+            if (!this.#windowsOpened) { 
+                for (const windowComponent of windowComponents) {
+                    windowComponent.open();
+                }
+            }
+    
+            this.#windowsOpened = true;
+        }
+
         {
             // scriptable entities
             const nativeScripts = this.registry.get_all_with_entity<NativeScriptComponent>(ComponentType.NativeScriptComponent);
@@ -195,12 +212,12 @@ export class Scene {
             //PhysicsWorld.contactPoints = [];
 
             // TODO: SHOULD BE IMPROVED
-            for (let it = 0; it < this.physicsIterations; it++) {
+            for (let it = 0; it < this.#physicsIterations; it++) {
                 for (let i = 0; i < groupedEntities.length; i++) {
                     const transformComponentA = this.registry.get<TransformComponent>(groupedEntities[i], ComponentType.TransformComponent);
                     const bodyComponentA = this.registry.get<Body2DComponent>(groupedEntities[i], ComponentType.Body2DComponent);
     
-                    this.world.update(deltaTime, bodyComponentA, transformComponentA, this.physicsIterations);
+                    this.world.update(deltaTime, bodyComponentA, transformComponentA, this.#physicsIterations);
                 };
                 
                 for (let i = 0; i < groupedEntities.length; i++) {
@@ -211,7 +228,7 @@ export class Scene {
                         const transformComponentB = this.registry.get<TransformComponent>(groupedEntities[j], ComponentType.TransformComponent);
                         const bodyComponentB = this.registry.get<Body2DComponent>(groupedEntities[j], ComponentType.Body2DComponent);
     
-                        this.world.collide(deltaTime, bodyComponentA, transformComponentA, bodyComponentB, transformComponentB, this.physicsIterations);
+                        this.world.collide(deltaTime, bodyComponentA, transformComponentA, bodyComponentB, transformComponentB, this.#physicsIterations);
                     };
                 };
             }
@@ -245,6 +262,10 @@ export class Scene {
             return;
         }
 
+        for (const windowComponent of windowComponents) {
+            windowComponent.clear(mainCamera.clearColor);
+        }
+
         this.#view.identity();
         this.#view.setTranslation(mainCameraTransform.getPosition());
         this.#view.applyRotationZ(mainCameraTransform.getRotation().z);
@@ -271,8 +292,14 @@ export class Scene {
     {
         const cameraComponents = this.registry.get_all<CameraComponent>(ComponentType.CameraComponent);
 
-        cameraComponents.forEach(cc => {
-            cc.getCamera().onEvent(event);
+        cameraComponents.forEach(cameraComponent => {
+            cameraComponent.getCamera().onEvent(event);
+        });
+
+        const windowComponents = this.registry.get_all<WindowComponent>(ComponentType.WindowComponent);
+
+        windowComponents.forEach(windowComponent => {
+            windowComponent.onEvent(event);
         });
     }
 }

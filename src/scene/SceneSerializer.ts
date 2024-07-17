@@ -6,7 +6,7 @@ import { ShapeType } from "../physics/Body2D.js";
 import { Vec3, Vec4 } from "../math/BananaMath.js";
 import { Writer } from "../core/FileManager.js";
 import { ComponentType } from "../core/Type.js";
-import { AudioComponent, Body2DComponent, CameraComponent, CircleRendererComponent, NativeScriptComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent } from "./Component.js";
+import { AudioComponent, Body2DComponent, CameraComponent, CircleRendererComponent, NativeScriptComponent, SpriteRendererComponent, TagComponent, TextRendererComponent, TransformComponent, WindowComponent } from "./Component.js";
 import { Entity } from "./Entity.js";
 import { Scene } from "./Scene.js";
 import { ScriptableEntity } from "../script/ScriptableEntity.js";
@@ -72,6 +72,11 @@ export class SceneSerializer {
             if (scene.registry.has(entity, ComponentType.AudioComponent)) {
                 const audioComponent = scene.registry.get<AudioComponent>(entity, ComponentType.AudioComponent);
                 sceneData += `${audioComponent}`;
+            }
+
+            if (scene.registry.has(entity, ComponentType.WindowComponent)) {
+                const windowComponent = scene.registry.get<WindowComponent>(entity, ComponentType.WindowComponent);
+                sceneData += `${windowComponent}`;
             }
         }
 
@@ -237,12 +242,12 @@ export class SceneSerializer {
             }
             else if (lines[i].startsWith('AudioComponent:')) {
                 const audioComponent = currentEntity.addComponent<AudioComponent>(ComponentType.AudioComponent);
-
+                
                 const audioSource = lines[i+1].split(':')[1].trim();
                 const playOnStart = lines[i+2].split(':')[1].trim() == '1';
                 const loop = lines[i+3].split(':')[1].trim() == '1';
                 const volume = parseFloat(lines[i+4].split(':')[1].trim());
-
+                
                 AudioManager.loadAudio(audioSource)
                 .then(buffer => {
                     audioComponent.setAudio( AudioManager.createSource(buffer) );
@@ -252,6 +257,17 @@ export class SceneSerializer {
                     audioComponent.src = audioSource;
                     audioComponent.name = audioSource.substring(audioSource.lastIndexOf('/') + 1);
                 })
+            }
+            else if (lines[i].startsWith('WindowComponent:')) {
+                const windowComponent = currentEntity.addComponent<WindowComponent>(ComponentType.WindowComponent);
+
+                const title = lines[i+1].split(':')[1].trim();
+                const width = parseFloat(lines[i+2].split(':')[1].trim());
+                const height = parseFloat(lines[i+3].split(':')[1].trim());
+
+                windowComponent.title = title;
+                windowComponent.width = width;
+                windowComponent.height = height;
             }
         }
     

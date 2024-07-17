@@ -79,7 +79,7 @@ export class EditorLayer extends banana.Layer {
 
         const windowFeatures = `location=no,width=${windowWidth},height=${windowHeight},left=${left},top=${top}`;
 
-        this.gameWindow = window.open('/game/game.html', '', windowFeatures);
+        this.gameWindow = window.open('/game/', '', windowFeatures);
 
         if (this.gameWindow) {
             this.gameWindow.focus();
