@@ -7,8 +7,6 @@ export class TestLayer extends banana.Layer {
 
     constructor() {
         super('Test Layer');
-
-        banana.Renderer2D.init();
         
         this.scene = new banana.Scene('test scene');
 
@@ -25,12 +23,9 @@ export class TestLayer extends banana.Layer {
         this.text = this.scene.createEntity('text');
         this.text.addComponent(banana.ComponentType.TextRendererComponent).setText('deniz!');
         this.text.getComponent(banana.ComponentType.TransformComponent).translate(0, 1.5, 0);
-        
-        banana.RenderCommand.setClearColor(banana.Color.BLACK);
     }
 
     onUpdate(deltaTime) {
-        banana.RenderCommand.clear();
         this.scene.onUpdateRuntime(deltaTime);
     }
 

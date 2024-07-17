@@ -7,6 +7,8 @@ import { Body2D, ShapeType } from '../physics/Body2D.js'
 import { Texture } from '../render/Texture.js'
 import { Audio } from '../core/Audio.js'
 import { ScriptManager, SupportedType } from '../script/ScriptManager.js'
+import { Event, EventDispatcher, EventType } from '../event/Event.js'
+import { Window } from '../core/Window.js'
 
 export class Component {
     type: ComponentType;
@@ -581,6 +583,61 @@ export class AudioComponent extends Component {
     }
 }
 
+export class WindowComponent extends Component {
+
+    #window: Window;
+    #title: string;
+    width: number;
+    height: number
+
+    constructor() {
+        super();
+        this.type = ComponentType.WindowComponent;
+
+        this.#title = 'New window';
+        this.width = 400;
+        this.height = 400;
+    }
+
+    get window() {
+        return this.#window;
+    }
+
+    get title() {
+        return this.#title;
+    }
+
+    set title(newTitle: string) {
+        this.#title = newTitle;
+    }
+
+    open() {
+        this.#window = new Window(this.#title, this.width, this.height, false);
+    }
+
+    clear(color: Color) {
+        this.#window.clear(color);
+    }
+
+    onEvent(event: Event) {
+        const eventDispatcher = new EventDispatcher(event);
+
+        // close the non-main windows when the main window is closed
+        eventDispatcher.dispatch(() => {
+            if (this.#window) {
+                this.#window.close();
+            }
+        }, EventType.WindowClosedEvent);
+    }
+
+    toString() {
+        return `WindowComponent:
+          Title: ${this.#title}
+          Width: ${this.width}
+          Height: ${this.height}\n`;
+    }
+}
+
 export const ComponentCreator = {}
 ComponentCreator[ComponentType.TagComponent] = TagComponent;
 ComponentCreator[ComponentType.TransformComponent] = TransformComponent;
@@ -591,3 +648,4 @@ ComponentCreator[ComponentType.CameraComponent] = CameraComponent;
 ComponentCreator[ComponentType.NativeScriptComponent] = NativeScriptComponent;
 ComponentCreator[ComponentType.Body2DComponent] = Body2DComponent;
 ComponentCreator[ComponentType.AudioComponent] = AudioComponent;
+ComponentCreator[ComponentType.WindowComponent] = WindowComponent;

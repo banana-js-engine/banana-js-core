@@ -1,4 +1,4 @@
-import { canvas } from '../core/Window.js'
+import { Window } from '../core/Window.js';
 import { EventType, EventDispatcher } from '../event/Event.js'
 import { Utils, Vec3, Mat4 } from '../math/BananaMath.js';
 import { Color } from './Color.js';
@@ -26,7 +26,7 @@ export class Camera {
         this.projectionMatrix = new Mat4();  
     
         this.cameraType = CameraType.Orthographic;      
-        this.aspectRatio = parseFloat(canvas.width) / parseFloat(canvas.height);
+        this.aspectRatio = Window.mainWidth / Window.mainHeight;
         this.clearColor = new Color(0.345, 0.588, 0.809, 1);
     }
 
@@ -41,7 +41,7 @@ export class Camera {
         this.setViewportSize();
     }
 
-    setOrthographic(size, near, far) {
+    setOrthographic(size: number, near: number, far: number) {
         this.cameraType = CameraType.Orthographic;
 
         this.size = size;
@@ -51,7 +51,7 @@ export class Camera {
         this.setViewportSize();
     }
 
-    setPerspective(fovy, near, far) {
+    setPerspective(fovy: number, near: number, far: number) {
         this.cameraType = CameraType.Perspective;
 
         this.fovy = fovy;
@@ -85,8 +85,8 @@ export class Camera {
 
     screenToViewportSpace(vector: Vec3) {
         return new Vec3(
-            (vector.x - canvas.width / 2) / (canvas.height / this.size),
-            (vector.y - canvas.height / 2) / (canvas.height / this.size),
+            (vector.x - Window.mainWidth / 2) / (Window.mainHeight / this.size),
+            (vector.y - Window.mainHeight / 2) / (Window.mainHeight / this.size),
             vector.z
         );
     }
@@ -108,7 +108,7 @@ export class SceneCamera extends Camera {
     }
 
     onWindowResized(event) {
-        this.aspectRatio = parseFloat(canvas.width) / parseFloat(canvas.height)
+        this.aspectRatio = Window.mainWidth / Window.mainHeight;
         this.setViewportSize();
 
         return true;

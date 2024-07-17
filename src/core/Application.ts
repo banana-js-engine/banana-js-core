@@ -1,5 +1,5 @@
 import { Log } from "./Log.js"
-import { Window, canvas } from "./Window.js"
+import { Window } from "./Window.js"
 import { Event, EventDispatcher, EventType } from "../event/Event.js"
 import { LayerStack } from "./LayerStack.js"
 import { RenderCommand } from "../render/RenderCommand.js"
@@ -99,8 +99,8 @@ export class Application
     }
 
     public onWindowResized(event) {
-        canvas.width = event.getWidth();
-        canvas.height = event.getHeight();
+        Window.mainWidth = event.getWidth();
+        Window.mainHeight = event.getHeight();
         RenderCommand.setViewport(event.getWidth(), event.getHeight());
 
         return false;

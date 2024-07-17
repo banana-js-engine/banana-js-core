@@ -3,7 +3,7 @@ import { gl } from "./WebGLContext.js"
 
 export class Texture {
 
-    textureId: number;
+    textureId: WebGLTexture;
     loaded: boolean;
     width: number;
     height: number;

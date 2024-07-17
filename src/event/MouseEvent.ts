@@ -1,3 +1,4 @@
+import { MouseButton } from "../core/MouseButtonCode";
 import { Event, EventCategory, EventType } from "./Event.js";
 
 class MouseEvent extends Event {
@@ -63,9 +64,9 @@ export class MouseScrolledEvent extends Event {
 
 class MouseButtonEvent extends MouseEvent {
     
-    button: MouseButtonEvent;
+    button: MouseButton;
     
-    constructor(mousePositionX: number, mousePositionY: number, button: MouseButtonEvent) {
+    constructor(mousePositionX: number, mousePositionY: number, button: MouseButton) {
         super(mousePositionX, mousePositionY);
         this.button = button;
     }

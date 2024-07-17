@@ -8,4 +8,5 @@ export enum ComponentType {
     NativeScriptComponent,
     Body2DComponent,
     AudioComponent,
+    WindowComponent,
 }

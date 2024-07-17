@@ -93,6 +93,7 @@ export class SceneHierarchyPanel {
             this.drawAddComponent(banana.ComponentType.Body2DComponent, 'Body2D');
             this.drawAddComponent(banana.ComponentType.AudioComponent, 'Audio');
             this.drawAddComponent(banana.ComponentType.NativeScriptComponent, 'Script');
+            this.drawAddComponent(banana.ComponentType.WindowComponent, 'Window');
 
             banana.ImGui.EndPopup();
         }
@@ -449,6 +450,37 @@ export class SceneHierarchyPanel {
                 // serialize properties into respective ImGui fields
                 banana.ScriptManager.serializeProperties(scriptComponent);
             
+                banana.ImGui.TreePop();
+            }
+        }
+
+        // Native Script Component
+        if (this.refScene.registry.has(this.selectedEntity, banana.ComponentType.WindowComponent)) {
+            let opened = banana.ImGui.TreeNodeEx('WindowComponent', banana.ImGui.ImGuiTreeNodeFlags.DefaultOpen, 'Window');
+
+            if (banana.ImGui.BeginPopupContextItem()) {
+                if (banana.ImGui.MenuItem('Delete')) {
+                    this.refScene.registry.remove(this.selectedEntity, banana.ComponentType.WindowComponent);
+                }
+    
+                banana.ImGui.EndPopup();
+
+                opened = false;
+            }
+
+            if (opened) {
+                const windowComponent = this.refScene.registry.get(this.selectedEntity, banana.ComponentType.WindowComponent);
+            
+                const windowWidth = [ windowComponent.width ];
+                const windowHeight = [ windowComponent.height ];
+
+                banana.ImGui.InputText('Title', (value = windowComponent.title) => windowComponent.title = value);
+                banana.ImGui.InputInt('Width', windowWidth);
+                banana.ImGui.InputInt('Height', windowHeight);
+
+                windowComponent.width = windowWidth[0];
+                windowComponent.height = windowHeight[0];
+
                 banana.ImGui.TreePop();
             }
         }
